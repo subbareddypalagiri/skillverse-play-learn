@@ -14,7 +14,228 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      courses: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          duration: string
+          id: string
+          instructor: string
+          level: string
+          platform: string | null
+          price: string | null
+          rating: number
+          students: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          duration: string
+          id?: string
+          instructor: string
+          level: string
+          platform?: string | null
+          price?: string | null
+          rating?: number
+          students?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration?: string
+          id?: string
+          instructor?: string
+          level?: string
+          platform?: string | null
+          price?: string | null
+          rating?: number
+          students?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          attendees: number
+          created_at: string
+          date: string
+          description: string
+          duration: string
+          id: string
+          location: string
+          organizer: string | null
+          registration_link: string | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          attendees?: number
+          created_at?: string
+          date: string
+          description: string
+          duration: string
+          id?: string
+          location: string
+          organizer?: string | null
+          registration_link?: string | null
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          attendees?: number
+          created_at?: string
+          date?: string
+          description?: string
+          duration?: string
+          id?: string
+          location?: string
+          organizer?: string | null
+          registration_link?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hobbies: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          meeting_schedule: string | null
+          members: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          meeting_schedule?: string | null
+          members?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          meeting_schedule?: string | null
+          members?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      internship_opportunities: {
+        Row: {
+          application_link: string | null
+          company: string
+          created_at: string
+          description: string | null
+          duration: string
+          id: string
+          location: string
+          posted_date: string
+          skills: string[]
+          stipend: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          application_link?: string | null
+          company: string
+          created_at?: string
+          description?: string | null
+          duration: string
+          id?: string
+          location: string
+          posted_date?: string
+          skills?: string[]
+          stipend: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          application_link?: string | null
+          company?: string
+          created_at?: string
+          description?: string | null
+          duration?: string
+          id?: string
+          location?: string
+          posted_date?: string
+          skills?: string[]
+          stipend?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      job_opportunities: {
+        Row: {
+          application_link: string | null
+          company: string
+          created_at: string
+          description: string | null
+          duration: string | null
+          id: string
+          location: string
+          posted_date: string
+          salary: string | null
+          sector: string
+          skills: string[]
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          application_link?: string | null
+          company: string
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          location: string
+          posted_date?: string
+          salary?: string | null
+          sector: string
+          skills?: string[]
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          application_link?: string | null
+          company?: string
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          location?: string
+          posted_date?: string
+          salary?: string | null
+          sector?: string
+          skills?: string[]
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
