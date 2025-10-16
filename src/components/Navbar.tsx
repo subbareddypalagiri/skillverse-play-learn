@@ -1,16 +1,18 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Palette, Award, User } from "lucide-react";
+import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Palette, Award, User, LogIn, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Home", path: "/", icon: Home },
-  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Courses", path: "/courses", icon: BookOpen },
   { name: "Events", path: "/events", icon: Calendar },
   { name: "Career Hub", path: "/career", icon: Briefcase },
   { name: "Hobbies", path: "/hobbies", icon: Palette },
   { name: "Achievements", path: "/achievements", icon: Award },
   { name: "Profile", path: "/profile", icon: User },
+  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "Login", path: "/login", icon: LogIn },
+  { name: "Signup", path: "/signup", icon: UserPlus },
 ];
 
 const Navbar = () => {
@@ -23,10 +25,10 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
-              <span className="text-2xl font-bold text-primary-foreground">S</span>
+              <span className="text-2xl font-bold text-primary-foreground">R</span>
             </div>
             <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              SkillVerse
+              Raise
             </span>
           </Link>
 
@@ -48,7 +50,11 @@ const Navbar = () => {
                   )}
                 >
                   <Icon className="w-4 h-4" />
-                  <span className="text-sm font-medium">{item.name}</span>
+                  {item.name === "Profile" ? (
+                    <span className="sr-only">Profile</span>
+                  ) : (
+                    <span className="text-sm font-medium">{item.name}</span>
+                  )}
                 </Link>
               );
             })}

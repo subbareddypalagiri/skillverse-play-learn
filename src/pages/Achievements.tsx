@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Award, Star, Target, Zap, Medal } from "lucide-react";
@@ -8,7 +9,7 @@ const Achievements = () => {
     {
       icon: Trophy,
       title: "First Course Completed",
-      description: "Complete your first course on SkillVerse",
+      description: "Complete your first course on Raise",
       progress: 100,
       unlocked: true
     },
@@ -22,7 +23,7 @@ const Achievements = () => {
     {
       icon: Award,
       title: "Event Enthusiast",
-      description: "Attend 3 SkillVerse events",
+      description: "Attend 3 Raise events",
       progress: 66,
       unlocked: false
     },
@@ -43,7 +44,7 @@ const Achievements = () => {
     {
       icon: Medal,
       title: "Hackathon Winner",
-      description: "Win a SkillVerse hackathon",
+      description: "Win a Raise hackathon",
       progress: 0,
       unlocked: false
     }
@@ -132,6 +133,7 @@ const Achievements = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
