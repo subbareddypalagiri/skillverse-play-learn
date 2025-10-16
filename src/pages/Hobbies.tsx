@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Palette, Music, Camera, BookOpen, Dumbbell, Code } from "lucide-react";
@@ -81,6 +82,7 @@ const Hobbies = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

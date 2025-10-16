@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -46,7 +47,7 @@ const Profile = () => {
                 <div className="space-y-2 text-muted-foreground mb-4">
                   <div className="flex items-center justify-center md:justify-start">
                     <Mail className="w-4 h-4 mr-2" />
-                    john.student@skillverse.com
+                    john.student@raise.com
                   </div>
                   <div className="flex items-center justify-center md:justify-start">
                     <MapPin className="w-4 h-4 mr-2" />
@@ -112,6 +113,7 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
