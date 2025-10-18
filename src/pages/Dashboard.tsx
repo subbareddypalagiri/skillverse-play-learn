@@ -3,20 +3,18 @@ import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Calendar, Trophy, TrendingUp, Clock, Target } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { BookOpen, Calendar, Trophy, TrendingUp, Clock, Target, Play, CheckCircle, Users, Star } from "lucide-react";
+import { useCourseContext } from "../contexts/CourseContext";
 
 const Dashboard = () => {
+  const { enrolledCourses, updateProgress } = useCourseContext();
+  
   const stats = [
-    { label: "Courses in Progress", value: "3", icon: BookOpen, color: "text-primary" },
+    { label: "Courses in Progress", value: enrolledCourses.length.toString(), icon: BookOpen, color: "text-primary" },
     { label: "Upcoming Events", value: "5", icon: Calendar, color: "text-accent" },
     { label: "Achievements", value: "12", icon: Trophy, color: "text-success" },
     { label: "Study Streak", value: "7 days", icon: TrendingUp, color: "text-secondary" },
-  ];
-
-  const courses = [
-    { name: "Web Development Masterclass", progress: 65, nextLesson: "React Hooks Deep Dive" },
-    { name: "Data Structures & Algorithms", progress: 42, nextLesson: "Binary Trees" },
-    { name: "UI/UX Design Fundamentals", progress: 78, nextLesson: "Color Theory" },
   ];
 
   const upcomingEvents = [
@@ -69,21 +67,58 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  {courses.map((course, index) => (
-                    <div key={index} className="p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="font-semibold mb-1">{course.name}</h3>
-                          <div className="flex items-center text-sm text-muted-foreground">
-                            <Clock className="w-4 h-4 mr-1" />
-                            Next: {course.nextLesson}
+                  {enrolledCourses.length > 0 ? (
+                    enrolledCourses.map((course, index) => (
+                      <div key={index} className="p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-semibold">{course.title}</h3>
+                              <Badge variant="outline" className="text-xs">{course.category}</Badge>
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground mb-2">
+                              <Users className="w-3 h-3 mr-1" />
+                              by {course.instructor}
+                            </div>
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <Clock className="w-4 h-4 mr-1" />
+                              Next: {course.nextLesson}
+                            </div>
+                            <div className="flex items-center text-xs text-muted-foreground mt-1">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              {course.completedLessons}/{course.totalLessons} lessons completed
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-sm font-semibold text-primary">{course.progress}%</span>
+                            <div className="text-xs text-muted-foreground">
+                              {course.level}
+                            </div>
                           </div>
                         </div>
-                        <span className="text-sm font-semibold text-primary">{course.progress}%</span>
+                        <Progress value={course.progress} className="h-2 mb-2" />
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" className="flex-1">
+                            <Play className="w-3 h-3 mr-1" />
+                            Continue
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => updateProgress(course.title, course.progress + 10, course.completedLessons + 1)}
+                          >
+                            +1 Lesson
+                          </Button>
+                        </div>
                       </div>
-                      <Progress value={course.progress} className="h-2" />
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>No courses enrolled yet</p>
+                      <p className="text-sm">Start by enrolling in a course from the Courses page</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </Card>
             </div>
