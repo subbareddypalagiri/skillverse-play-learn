@@ -28,11 +28,16 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
-                <span className="text-2xl font-bold text-primary-foreground">R</span>
+            <Link to="/" className="flex items-center space-x-3 group">
+              <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-lg">
+                <img 
+                  src="/Risee.jpeg" 
+                  alt="Raise Logo" 
+                  className="w-full h-full object-cover animate-shine"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
               </div>
-              <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">Raise</span>
+              <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">Raise</span>
             </Link>
             <p className="text-sm text-muted-foreground mt-4">
               Learn, grow, and have fun with a community that lifts you up.

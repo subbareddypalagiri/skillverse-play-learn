@@ -4,8 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { BookOpen, Clock, Users, Star, CheckCircle, Play } from "lucide-react";
+import { BookOpen, Clock, Users, Star, CheckCircle, Play, Wrench } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CourseDashboard from "../components/CourseDashboard";
 import { useCourseContext } from "../contexts/CourseContext";
 
@@ -14,6 +15,7 @@ const Courses = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const { enrolledCourses, addCourse } = useCourseContext();
+  const navigate = useNavigate();
 
   const courses = [
     {
@@ -103,13 +105,22 @@ const Courses = () => {
                   Choose from our curated selection of engaging courses
                 </p>
               </div>
-              <Button 
-                onClick={() => setShowDashboard(true)}
-                className="bg-gradient-primary text-primary-foreground hover:opacity-90"
-              >
-                <BookOpen className="w-4 h-4 mr-2" />
-                Course Dashboard
-              </Button>
+              <div className="flex gap-3">
+                <Button 
+                  onClick={() => navigate('/ai-tools')}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:opacity-90 transition-all duration-300 hover:scale-105"
+                >
+                  <Wrench className="w-4 h-4 mr-2" />
+                  AI Tools
+                </Button>
+                <Button 
+                  onClick={() => setShowDashboard(true)}
+                  className="bg-gradient-primary text-primary-foreground hover:opacity-90"
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Course Dashboard
+                </Button>
+              </div>
             </div>
           </div>
 

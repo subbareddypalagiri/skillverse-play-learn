@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Palette, Award, User, LogIn, UserPlus } from "lucide-react";
+import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Palette, Award, User, LogIn, UserPlus, Waves } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -7,7 +7,7 @@ const navigation = [
   { name: "Courses", path: "/courses", icon: BookOpen },
   { name: "Events", path: "/events", icon: Calendar },
   { name: "Career Hub", path: "/career", icon: Briefcase },
-  { name: "Hobbies", path: "/hobbies", icon: Palette },
+  { name: "Sync", path: "/sync", icon: Waves },
   { name: "Achievements", path: "/achievements", icon: Award },
   { name: "Profile", path: "/profile", icon: User },
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -23,11 +23,16 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
-              <span className="text-2xl font-bold text-primary-foreground">R</span>
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-lg">
+              <img 
+                src="/Risee.jpeg" 
+                alt="Raise Logo" 
+                className="w-full h-full object-cover animate-shine"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
             </div>
-            <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
               Raise
             </span>
           </Link>
