@@ -9,12 +9,13 @@ import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
 import Events from "./pages/Events";
 import CareerHub from "./pages/CareerHub";
-import Hobbies from "./pages/Hobbies";
 import Achievements from "./pages/Achievements";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import Sync from "./pages/Sync";
+import AITools from "./pages/AITools";
 
 const queryClient = new QueryClient();
 
@@ -31,9 +32,11 @@ const App = () => (
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/courses" element={<Courses />} />
+            <Route path="/ai-tools" element={<AITools />} />
             <Route path="/events" element={<Events />} />
             <Route path="/career" element={<CareerHub />} />
-            <Route path="/hobbies" element={<Hobbies />} />
+            <Route path="/sync" element={<Sync />} />
+            {/* Hobbies route removed; rendered within Events */}
             <Route path="/achievements" element={<Achievements />} />
             <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
