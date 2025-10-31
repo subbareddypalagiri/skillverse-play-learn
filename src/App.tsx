@@ -16,6 +16,8 @@ import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 import Sync from "./pages/Sync";
 import AITools from "./pages/AITools";
+import AIAssistant from "./pages/AIAssistant";
+import FloatingChatbot from "./components/FloatingChatbot";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/ai-tools" element={<AITools />} />
+            <Route path="/ai-assistant" element={<AIAssistant />} />
             <Route path="/events" element={<Events />} />
             <Route path="/career" element={<CareerHub />} />
             <Route path="/sync" element={<Sync />} />
@@ -42,6 +45,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <FloatingChatbot />
         </BrowserRouter>
       </CourseProvider>
     </TooltipProvider>

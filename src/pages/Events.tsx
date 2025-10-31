@@ -3,15 +3,19 @@ import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Palette, Music, Camera, BookOpen as BookIcon, Dumbbell, Code } from "lucide-react";
+import { Palette, Music, Camera, BookOpen as BookIcon, Dumbbell, Code, Filter } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Calendar, MapPin, Users, Clock, CheckCircle, Globe, Monitor, Wifi } from "lucide-react";
 import { useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Events = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showEventDetails, setShowEventDetails] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedLocation, setSelectedLocation] = useState("all");
   const hobbies = [
     { icon: Palette, title: "Art & Painting", members: 234, description: "Express yourself through colors and creativity" },
     { icon: Music, title: "Music Club", members: 456, description: "Learn instruments and perform with fellow musicians" },
@@ -22,17 +26,75 @@ const Events = () => {
   ];
 
   const events = [
+    // Cultural Events
+    {
+      title: "Annual Cultural Fest - Rangmanch",
+      date: "Dec 18-20, 2024",
+      time: "10:00 AM - 8:00 PM",
+      location: "In Campus",
+      venue: "Main Auditorium, Campus Center",
+      attendees: 450,
+      maxAttendees: 500,
+      duration: "3 days",
+      type: "Competition",
+      mode: "offline",
+      category: "cultural",
+      description: "Three-day cultural extravaganza featuring dance, music, drama, and art competitions. Showcase your talent and win exciting prizes!",
+      requirements: "Registration form, Performance props (if any)",
+      prizes: "1st Place: $2000, 2nd Place: $1000, 3rd Place: $500 per category",
+      organizer: "Cultural Committee",
+      contact: "cultural@university.edu"
+    },
+    {
+      title: "Classical Dance Workshop",
+      date: "Jan 8, 2025",
+      time: "3:00 PM - 6:00 PM",
+      location: "In Campus",
+      venue: "Dance Studio, Sports Complex",
+      attendees: 35,
+      maxAttendees: 40,
+      duration: "3 hours",
+      type: "Workshop",
+      mode: "offline",
+      category: "cultural",
+      description: "Learn classical Indian dance forms from renowned artists. Perfect for beginners and intermediate dancers.",
+      requirements: "Comfortable dance attire, Water bottle",
+      prizes: "Participation certificate, Performance opportunity",
+      organizer: "Dance Society",
+      contact: "dance@university.edu"
+    },
+    {
+      title: "Heritage Walk & Museum Tour",
+      date: "Jan 15, 2025",
+      time: "9:00 AM - 5:00 PM",
+      location: "Out of Campus",
+      venue: "City Heritage Museum & Old Town",
+      attendees: 40,
+      maxAttendees: 50,
+      duration: "8 hours",
+      type: "Learning",
+      mode: "offline",
+      category: "cultural",
+      description: "Explore the rich cultural heritage of our city with guided tours of historical monuments and museums.",
+      requirements: "Comfortable walking shoes, Camera, Lunch money",
+      prizes: "Cultural appreciation certificate, Photo contest prizes",
+      organizer: "Heritage Club",
+      contact: "heritage@university.edu"
+    },
+
+    // Technical Events
     {
       title: "Winter Coding Hackathon",
       date: "Dec 15-16, 2024",
       time: "9:00 AM - 9:00 PM",
-      location: "Tech Hub, Campus",
+      location: "In Campus",
       venue: "Main Conference Hall, Building A",
       attendees: 150,
       maxAttendees: 200,
       duration: "48 hours",
       type: "Competition",
       mode: "offline",
+      category: "technical",
       description: "Join us for an intense 48-hour coding challenge where teams will build innovative solutions to real-world problems. Food and refreshments will be provided.",
       requirements: "Laptop, Programming knowledge, Team of 2-4 members",
       prizes: "1st Place: $5000, 2nd Place: $3000, 3rd Place: $1000",
@@ -40,35 +102,19 @@ const Events = () => {
       contact: "tech@university.edu"
     },
     {
-      title: "Mountain Adventure Trek",
-      date: "Dec 20-22, 2024",
-      time: "6:00 AM - 6:00 PM",
-      location: "Blue Mountains",
-      venue: "Blue Mountains National Park",
-      attendees: 45,
-      maxAttendees: 50,
-      duration: "3 days",
-      type: "Adventure",
-      mode: "offline",
-      description: "Experience nature while bonding with fellow students. This 3-day trek includes camping, hiking, and team-building activities.",
-      requirements: "Hiking boots, Warm clothing, Sleeping bag",
-      prizes: "Certificate of completion, Group photo, Adventure badge",
-      organizer: "Adventure Club",
-      contact: "adventure@university.edu"
-    },
-    {
       title: "AI & ML Tech Talk",
       date: "Dec 22, 2024",
       time: "2:00 PM - 4:00 PM",
-      location: "Virtual Event",
-      venue: "Zoom Meeting Room",
-      attendees: 300,
-      maxAttendees: 500,
+      location: "In Campus",
+      venue: "Seminar Hall 301, IT Building",
+      attendees: 180,
+      maxAttendees: 200,
       duration: "2 hours",
       type: "Learning",
-      mode: "online",
+      mode: "offline",
+      category: "technical",
       description: "Learn about latest trends in AI from industry experts. Interactive Q&A session included.",
-      requirements: "Stable internet connection, Zoom app",
+      requirements: "Notebook for notes",
       prizes: "Certificate of participation, Networking opportunities",
       organizer: "AI Research Center",
       contact: "ai@university.edu"
@@ -77,13 +123,14 @@ const Events = () => {
       title: "Web Dev Workshop",
       date: "Jan 5, 2025",
       time: "10:00 AM - 2:00 PM",
-      location: "Lab 204, Main Building",
+      location: "In Campus",
       venue: "Computer Lab 204, Main Building, Floor 2",
       attendees: 80,
       maxAttendees: 100,
       duration: "4 hours",
       type: "Workshop",
       mode: "offline",
+      category: "technical",
       description: "Hands-on workshop on modern web development covering React, Node.js, and database integration.",
       requirements: "Laptop, Basic programming knowledge",
       prizes: "Workshop completion certificate, Project portfolio",
@@ -91,16 +138,111 @@ const Events = () => {
       contact: "webdev@university.edu"
     },
     {
+      title: "Robotics Competition",
+      date: "Jan 20, 2025",
+      time: "9:00 AM - 5:00 PM",
+      location: "In Campus",
+      venue: "Engineering Lab, Block C",
+      attendees: 60,
+      maxAttendees: 80,
+      duration: "8 hours",
+      type: "Competition",
+      mode: "offline",
+      category: "technical",
+      description: "Build and program robots to complete challenging tasks. Team-based competition with exciting prizes.",
+      requirements: "Robot kit, Programming tools, Team of 3-5",
+      prizes: "1st: $3000, 2nd: $2000, 3rd: $1000",
+      organizer: "Robotics Club",
+      contact: "robotics@university.edu"
+    },
+
+    // Non-Technical Events
+    {
+      title: "Photography Exhibition & Contest",
+      date: "Dec 28, 2024",
+      time: "11:00 AM - 6:00 PM",
+      location: "In Campus",
+      venue: "Art Gallery, Student Center",
+      attendees: 90,
+      maxAttendees: 120,
+      duration: "7 hours",
+      type: "Competition",
+      mode: "offline",
+      category: "non-technical",
+      description: "Showcase your photography skills! Submit your best shots and compete with fellow photographers.",
+      requirements: "Camera, Printed photos (5 max), Digital submissions",
+      prizes: "1st: Professional camera, 2nd: Photography course, 3rd: Gift vouchers",
+      organizer: "Photography Club",
+      contact: "photo@university.edu"
+    },
+    {
+      title: "Creative Writing Workshop",
+      date: "Jan 10, 2025",
+      time: "2:00 PM - 5:00 PM",
+      location: "In Campus",
+      venue: "Library Reading Room",
+      attendees: 45,
+      maxAttendees: 50,
+      duration: "3 hours",
+      type: "Workshop",
+      mode: "offline",
+      category: "non-technical",
+      description: "Learn the art of storytelling from published authors. Interactive sessions on fiction, poetry, and creative non-fiction.",
+      requirements: "Notebook, Pen, Sample writing (optional)",
+      prizes: "Certificate, Publication opportunity in college magazine",
+      organizer: "Literary Society",
+      contact: "literary@university.edu"
+    },
+    {
+      title: "Debate Championship",
+      date: "Jan 25, 2025",
+      time: "10:00 AM - 4:00 PM",
+      location: "In Campus",
+      venue: "Debate Hall, Academic Block",
+      attendees: 70,
+      maxAttendees: 100,
+      duration: "6 hours",
+      type: "Competition",
+      mode: "offline",
+      category: "non-technical",
+      description: "Inter-college debate competition on contemporary issues. Sharpen your oratory and critical thinking skills.",
+      requirements: "Research on topics, Team of 2-3",
+      prizes: "1st: $1500, 2nd: $1000, 3rd: $500, Best Speaker award",
+      organizer: "Debate Society",
+      contact: "debate@university.edu"
+    },
+
+    // Fun Tours
+    {
+      title: "Mountain Adventure Trek",
+      date: "Dec 20-22, 2024",
+      time: "6:00 AM - 6:00 PM",
+      location: "Out of Campus",
+      venue: "Blue Mountains National Park",
+      attendees: 45,
+      maxAttendees: 50,
+      duration: "3 days",
+      type: "Adventure",
+      mode: "offline",
+      category: "fun-tours",
+      description: "Experience nature while bonding with fellow students. This 3-day trek includes camping, hiking, and team-building activities.",
+      requirements: "Hiking boots, Warm clothing, Sleeping bag",
+      prizes: "Certificate of completion, Group photo, Adventure badge",
+      organizer: "Adventure Club",
+      contact: "adventure@university.edu"
+    },
+    {
       title: "Beach Cleanup & Picnic",
       date: "Jan 12, 2025",
       time: "8:00 AM - 6:00 PM",
-      location: "Sunset Beach",
+      location: "Out of Campus",
       venue: "Sunset Beach Park, Pavilion Area",
       attendees: 60,
       maxAttendees: 80,
       duration: "1 day",
       type: "Social",
       mode: "offline",
+      category: "fun-tours",
       description: "Make a difference while having fun at the beach. Environmental cleanup followed by picnic and games.",
       requirements: "Comfortable clothes, Sunscreen, Water bottle",
       prizes: "Environmental volunteer certificate, Group lunch",
@@ -108,21 +250,316 @@ const Events = () => {
       contact: "environment@university.edu"
     },
     {
-      title: "Startup Pitch Competition",
-      date: "Jan 18, 2025",
-      time: "9:00 AM - 3:00 PM",
-      location: "Innovation Center",
-      venue: "Innovation Center Auditorium, Ground Floor",
-      attendees: 100,
+      title: "Amusement Park Day Trip",
+      date: "Jan 28, 2025",
+      time: "8:00 AM - 8:00 PM",
+      location: "Out of Campus",
+      venue: "WonderWorld Amusement Park",
+      attendees: 120,
       maxAttendees: 150,
-      duration: "6 hours",
+      duration: "12 hours",
+      type: "Social",
+      mode: "offline",
+      category: "fun-tours",
+      description: "A day of unlimited fun with rides, games, and entertainment. Perfect stress-buster before exams!",
+      requirements: "Comfortable clothes, Extra money for food/games",
+      prizes: "Group photos, Fun memories",
+      organizer: "Student Activities Committee",
+      contact: "activities@university.edu"
+    },
+
+    // Industrial Tours
+    {
+      title: "Tech Company Visit - Google Office",
+      date: "Jan 16, 2025",
+      time: "9:00 AM - 4:00 PM",
+      location: "Out of Campus",
+      venue: "Google India Office, Tech Park",
+      attendees: 40,
+      maxAttendees: 50,
+      duration: "7 hours",
+      type: "Learning",
+      mode: "offline",
+      category: "industrial-tours",
+      description: "Visit Google's office, interact with engineers, learn about their work culture and technologies. Networking opportunity with industry professionals.",
+      requirements: "College ID, Formal attire, Resume (optional)",
+      prizes: "Certificate of visit, Networking opportunities, Goodies",
+      organizer: "Industry Relations Cell",
+      contact: "industry@university.edu"
+    },
+    {
+      title: "Manufacturing Plant Tour - AutoTech",
+      date: "Feb 2, 2025",
+      time: "8:00 AM - 5:00 PM",
+      location: "Out of Campus",
+      venue: "AutoTech Manufacturing Facility, Industrial Area",
+      attendees: 55,
+      maxAttendees: 60,
+      duration: "9 hours",
+      type: "Learning",
+      mode: "offline",
+      category: "industrial-tours",
+      description: "Explore automobile manufacturing processes, robotics, and quality control systems. Ideal for engineering students.",
+      requirements: "Safety shoes, College ID, Notebook",
+      prizes: "Industrial visit certificate, Internship opportunities",
+      organizer: "Mechanical Engineering Dept",
+      contact: "mech@university.edu"
+    },
+    {
+      title: "Startup Incubator Visit",
+      date: "Feb 8, 2025",
+      time: "10:00 AM - 3:00 PM",
+      location: "Out of Campus",
+      venue: "Innovation Hub, Startup District",
+      attendees: 35,
+      maxAttendees: 40,
+      duration: "5 hours",
+      type: "Learning",
+      mode: "offline",
+      category: "industrial-tours",
+      description: "Meet startup founders, learn about entrepreneurship, and understand the startup ecosystem. Pitch your ideas!",
+      requirements: "Business casual attire, Notebook, Business idea (optional)",
+      prizes: "Mentorship opportunities, Networking, Certificate",
+      organizer: "Entrepreneurship Cell",
+      contact: "ecell@university.edu"
+    },
+
+    // Hackathons
+    {
+      title: "24-Hour Code Sprint",
+      date: "Feb 14-15, 2025",
+      time: "12:00 PM - 12:00 PM",
+      location: "In Campus",
+      venue: "Innovation Lab, IT Building",
+      attendees: 100,
+      maxAttendees: 120,
+      duration: "24 hours",
       type: "Competition",
       mode: "offline",
-      description: "Pitch your startup idea and win funding. Connect with investors and mentors from the industry.",
-      requirements: "Business plan, Pitch deck, Team presentation",
-      prizes: "1st Place: $10,000 funding, 2nd Place: $5,000, 3rd Place: $2,000",
-      organizer: "Entrepreneurship Center",
-      contact: "startup@university.edu"
+      category: "hackathons",
+      description: "Non-stop 24-hour coding marathon! Build innovative apps, solve real-world problems, and win amazing prizes.",
+      requirements: "Laptop, Charger, Team of 2-4, Programming skills",
+      prizes: "1st: $4000, 2nd: $2500, 3rd: $1500, Swag for all",
+      organizer: "Coding Club",
+      contact: "coding@university.edu"
+    },
+    {
+      title: "AI/ML Hackathon",
+      date: "Feb 22-23, 2025",
+      time: "10:00 AM - 10:00 AM",
+      location: "In Campus",
+      venue: "Data Science Lab, Block D",
+      attendees: 80,
+      maxAttendees: 100,
+      duration: "24 hours",
+      type: "Competition",
+      mode: "offline",
+      category: "hackathons",
+      description: "Focus on AI and Machine Learning projects. Build intelligent systems, work with datasets, and create ML models.",
+      requirements: "Laptop with ML libraries, Team of 2-4, Dataset knowledge",
+      prizes: "1st: $5000 + Cloud credits, 2nd: $3000, 3rd: $1500",
+      organizer: "AI/ML Club",
+      contact: "aiml@university.edu"
+    },
+    {
+      title: "Social Impact Hackathon",
+      date: "Mar 1-2, 2025",
+      time: "9:00 AM - 9:00 AM",
+      location: "In Campus",
+      venue: "Community Center, Campus",
+      attendees: 90,
+      maxAttendees: 120,
+      duration: "24 hours",
+      type: "Competition",
+      mode: "offline",
+      category: "hackathons",
+      description: "Create technology solutions for social good. Address problems in education, healthcare, environment, and community development.",
+      requirements: "Laptop, Team of 3-5, Passion for social change",
+      prizes: "1st: $6000 + Incubation support, 2nd: $3500, 3rd: $2000",
+      organizer: "Social Innovation Lab",
+      contact: "social@university.edu"
+    },
+
+    // Additional Out of Campus Events
+    {
+      title: "TEDx Youth Conference",
+      date: "Dec 10, 2024",
+      time: "9:00 AM - 6:00 PM",
+      location: "Out of Campus",
+      venue: "Grand Convention Center, Downtown",
+      attendees: 280,
+      maxAttendees: 300,
+      duration: "9 hours",
+      type: "Learning",
+      mode: "offline",
+      category: "non-technical",
+      description: "Attend inspiring talks from young innovators, entrepreneurs, and change-makers. Network with like-minded individuals and get inspired by ideas worth spreading.",
+      requirements: "Conference ticket, Notebook, Business cards (optional)",
+      prizes: "Certificate of attendance, Networking opportunities, Speaker meet & greet",
+      organizer: "TEDx Youth Committee",
+      contact: "tedx@university.edu"
+    },
+    {
+      title: "National Science Exhibition",
+      date: "Jan 18-19, 2025",
+      time: "10:00 AM - 7:00 PM",
+      location: "Out of Campus",
+      venue: "National Science Museum & Exhibition Center",
+      attendees: 150,
+      maxAttendees: 200,
+      duration: "2 days",
+      type: "Learning",
+      mode: "offline",
+      category: "technical",
+      description: "Explore cutting-edge scientific innovations, interactive exhibits, and demonstrations. Showcase your own projects and compete for national recognition.",
+      requirements: "Project model (if participating), College ID, Comfortable shoes",
+      prizes: "Best Project: $8000, Runner-up: $5000, Innovation Award: $3000",
+      organizer: "Science & Technology Dept",
+      contact: "science@university.edu"
+    },
+    {
+      title: "Music Festival - Euphoria Live",
+      date: "Feb 14, 2025",
+      time: "5:00 PM - 11:00 PM",
+      location: "Out of Campus",
+      venue: "City Stadium, Main Arena",
+      attendees: 450,
+      maxAttendees: 500,
+      duration: "6 hours",
+      type: "Social",
+      mode: "offline",
+      category: "cultural",
+      description: "Live performances by popular bands and artists. Enjoy an evening of music, dance, and entertainment with fellow students.",
+      requirements: "Event ticket, Valid ID, No outside food/drinks",
+      prizes: "Concert experience, Exclusive merchandise, Meet & greet passes (lucky draw)",
+      organizer: "Music Society",
+      contact: "music@university.edu"
+    },
+    {
+      title: "Historical Fort Trek & Camping",
+      date: "Feb 20-21, 2025",
+      time: "6:00 AM - 6:00 PM",
+      location: "Out of Campus",
+      venue: "Rajgad Fort, Western Ghats",
+      attendees: 55,
+      maxAttendees: 60,
+      duration: "2 days",
+      type: "Adventure",
+      mode: "offline",
+      category: "fun-tours",
+      description: "Trek to the historic Rajgad Fort, camp under the stars, and learn about Maratha history. Includes guided tour, bonfire, and adventure activities.",
+      requirements: "Trekking shoes, Backpack, Sleeping bag, Water bottle, Torch",
+      prizes: "Trekking certificate, Group photos, Adventure badge",
+      organizer: "Trekking & Adventure Club",
+      contact: "trek@university.edu"
+    },
+    {
+      title: "Pharmaceutical Industry Visit - Cipla",
+      date: "Mar 5, 2025",
+      time: "8:30 AM - 4:30 PM",
+      location: "Out of Campus",
+      venue: "Cipla Pharmaceutical Plant, Industrial Estate",
+      attendees: 45,
+      maxAttendees: 50,
+      duration: "8 hours",
+      type: "Learning",
+      mode: "offline",
+      category: "industrial-tours",
+      description: "Tour one of India's leading pharmaceutical manufacturing facilities. Learn about drug development, quality control, and pharmaceutical industry practices.",
+      requirements: "Lab coat, Safety shoes, College ID, Medical clearance certificate",
+      prizes: "Industrial visit certificate, Internship opportunities, Company goodies",
+      organizer: "Pharmacy Department",
+      contact: "pharmacy@university.edu"
+    },
+    {
+      title: "Wildlife Safari & Conservation Workshop",
+      date: "Mar 15-17, 2025",
+      time: "5:00 AM - 7:00 PM",
+      location: "Out of Campus",
+      venue: "Tadoba National Park & Wildlife Sanctuary",
+      attendees: 35,
+      maxAttendees: 40,
+      duration: "3 days",
+      type: "Learning",
+      mode: "offline",
+      category: "fun-tours",
+      description: "Experience wildlife in their natural habitat with guided safaris. Attend workshops on wildlife conservation, photography, and ecosystem management.",
+      requirements: "Binoculars, Camera, Khaki/green clothing, Sunscreen, Hat",
+      prizes: "Wildlife photography contest prizes, Conservation certificate, Safari experience",
+      organizer: "Environmental Science Club",
+      contact: "wildlife@university.edu"
+    },
+    {
+      title: "International Food Festival",
+      date: "Mar 22, 2025",
+      time: "11:00 AM - 9:00 PM",
+      location: "Out of Campus",
+      venue: "City Food Park & Cultural Plaza",
+      attendees: 200,
+      maxAttendees: 250,
+      duration: "10 hours",
+      type: "Social",
+      mode: "offline",
+      category: "cultural",
+      description: "Explore cuisines from around the world, participate in cooking competitions, and enjoy cultural performances. A celebration of global diversity through food.",
+      requirements: "Event pass, Appetite for adventure, Camera",
+      prizes: "Cooking competition prizes, Food vouchers, Cultural exchange certificates",
+      organizer: "International Students Association",
+      contact: "international@university.edu"
+    },
+    {
+      title: "Aerospace & Defense Expo Visit",
+      date: "Apr 2, 2025",
+      time: "9:00 AM - 5:00 PM",
+      location: "Out of Campus",
+      venue: "Aero India Exhibition Grounds, Bangalore",
+      attendees: 65,
+      maxAttendees: 80,
+      duration: "8 hours",
+      type: "Learning",
+      mode: "offline",
+      category: "industrial-tours",
+      description: "Visit Asia's premier aerospace exhibition featuring aircraft displays, defense technology, and space exploration innovations. Meet industry experts and explore career opportunities.",
+      requirements: "Government ID, Formal attire, Resume, Comfortable walking shoes",
+      prizes: "Expo certificate, Industry networking, Internship opportunities",
+      organizer: "Aerospace Engineering Society",
+      contact: "aerospace@university.edu"
+    },
+    {
+      title: "River Rafting Adventure",
+      date: "Apr 10-11, 2025",
+      time: "6:00 AM - 6:00 PM",
+      location: "Out of Campus",
+      venue: "Kundalika River, Kolad",
+      attendees: 40,
+      maxAttendees: 48,
+      duration: "2 days",
+      type: "Adventure",
+      mode: "offline",
+      category: "fun-tours",
+      description: "Experience the thrill of white water rafting in the scenic Kundalika River. Includes safety training, professional guides, camping, and team activities.",
+      requirements: "Swimwear, Extra clothes, Waterproof bag, Adventure spirit",
+      prizes: "Rafting certificate, GoPro footage, Adventure completion badge",
+      organizer: "Water Sports Club",
+      contact: "watersports@university.edu"
+    },
+    {
+      title: "Blockchain & Crypto Summit",
+      date: "Apr 18, 2025",
+      time: "10:00 AM - 6:00 PM",
+      location: "Out of Campus",
+      venue: "Tech Innovation Hub, Cyber City",
+      attendees: 120,
+      maxAttendees: 150,
+      duration: "8 hours",
+      type: "Learning",
+      mode: "offline",
+      category: "technical",
+      description: "Learn about blockchain technology, cryptocurrency, Web3, and decentralized applications from industry leaders. Includes hands-on workshops and networking sessions.",
+      requirements: "Laptop, Basic understanding of blockchain (optional), Notebook",
+      prizes: "Summit certificate, Crypto wallet credits, Internship opportunities",
+      organizer: "Blockchain Research Group",
+      contact: "blockchain@university.edu"
     }
   ];
 
@@ -148,12 +585,19 @@ const Events = () => {
   const handleRegister = (event: any) => {
     setSelectedEvent(event);
     setRegisteredEvents(prev => [...prev, event]);
-    setShowSuccessDialog(true);
+    setShowEventDetails(true); // Navigate to event details page
   };
 
   const isRegistered = (event: any) => {
     return registeredEvents.some(registered => registered.title === event.title);
   };
+
+  // Filter events based on selected category and location
+  const filteredEvents = events.filter(event => {
+    const categoryMatch = selectedCategory === "all" || event.category === selectedCategory;
+    const locationMatch = selectedLocation === "all" || event.location === selectedLocation;
+    return categoryMatch && locationMatch;
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -168,8 +612,72 @@ const Events = () => {
             </p>
           </div>
 
+          {/* Filter Section */}
+          <div className="mb-8 space-y-4">
+            {/* Category Filter */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Filter className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Event Category</h3>
+              </div>
+              <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
+                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 gap-2 h-auto bg-muted/50 p-2">
+                  <TabsTrigger value="all" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                    All Events
+                  </TabsTrigger>
+                  <TabsTrigger value="cultural" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                    Cultural
+                  </TabsTrigger>
+                  <TabsTrigger value="technical" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                    Technical
+                  </TabsTrigger>
+                  <TabsTrigger value="non-technical" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                    Non-Technical
+                  </TabsTrigger>
+                  <TabsTrigger value="fun-tours" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                    Fun Tours
+                  </TabsTrigger>
+                  <TabsTrigger value="industrial-tours" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                    Industrial Tours
+                  </TabsTrigger>
+                  <TabsTrigger value="hackathons" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                    Hackathons
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+
+            {/* Location Filter */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-semibold">Location</h3>
+              </div>
+              <Tabs value={selectedLocation} onValueChange={setSelectedLocation} className="w-full">
+                <TabsList className="grid w-full grid-cols-3 lg:w-1/2 gap-2 h-auto bg-muted/50 p-2">
+                  <TabsTrigger value="all" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                    All Locations
+                  </TabsTrigger>
+                  <TabsTrigger value="In Campus" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                    In Campus
+                  </TabsTrigger>
+                  <TabsTrigger value="Out of Campus" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
+                    Out of Campus
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+          </div>
+
+          {/* Events Count */}
+          <div className="mb-4">
+            <p className="text-sm text-muted-foreground">
+              Showing <span className="font-semibold text-foreground">{filteredEvents.length}</span> event{filteredEvents.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((event, index) => (
+            {filteredEvents.map((event, index) => (
               <Card key={index} className="overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300 hover:-translate-y-1 border-0 bg-gradient-to-br from-card to-card/50">
                 {/* Event Mode Indicator */}
                 <div className={`h-2 w-full ${event.mode === 'online' ? 'bg-gradient-to-r from-blue-400 to-blue-600' : 'bg-gradient-to-r from-green-400 to-green-600'}`} />

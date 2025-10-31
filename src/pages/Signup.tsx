@@ -15,7 +15,7 @@ const Signup = () => {
         <div className="container mx-auto max-w-md">
           <Card className="p-8 shadow-card">
             <h1 className="text-3xl font-bold mb-2 text-center">Create your account</h1>
-            <p className="text-muted-foreground text-center mb-8">Join Raise and start your journey</p>
+            <p className="text-muted-foreground text-center mb-8">Join Risee and start your journey</p>
 
             <form className="space-y-5">
               <div className="space-y-2">

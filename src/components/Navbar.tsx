@@ -27,13 +27,13 @@ const Navbar = () => {
             <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-lg">
               <img 
                 src="/Risee.jpeg" 
-                alt="Raise Logo" 
+                alt="Risee Logo" 
                 className="w-full h-full object-cover animate-shine"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
             </div>
             <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
-              Raise
+              Risee
             </span>
           </Link>
 

@@ -9,7 +9,7 @@ const Achievements = () => {
     {
       icon: Trophy,
       title: "First Course Completed",
-      description: "Complete your first course on Raise",
+      description: "Complete your first course on Risee",
       progress: 100,
       unlocked: true
     },
@@ -23,7 +23,7 @@ const Achievements = () => {
     {
       icon: Award,
       title: "Event Enthusiast",
-      description: "Attend 3 Raise events",
+      description: "Attend 3 Risee events",
       progress: 66,
       unlocked: false
     },
@@ -44,7 +44,7 @@ const Achievements = () => {
     {
       icon: Medal,
       title: "Hackathon Winner",
-      description: "Win a Raise hackathon",
+      description: "Win a Risee hackathon",
       progress: 0,
       unlocked: false
     }

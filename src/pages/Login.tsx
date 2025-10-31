@@ -15,7 +15,7 @@ const Login = () => {
         <div className="container mx-auto max-w-md">
           <Card className="p-8 shadow-card">
             <h1 className="text-3xl font-bold mb-2 text-center">Welcome back</h1>
-            <p className="text-muted-foreground text-center mb-8">Sign in to your Raise account</p>
+            <p className="text-muted-foreground text-center mb-8">Sign in to your Risee account</p>
 
             <form className="space-y-5">
               <div className="space-y-2">

@@ -32,12 +32,12 @@ const Footer = () => {
               <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-lg">
                 <img 
                   src="/Risee.jpeg" 
-                  alt="Raise Logo" 
+                  alt="Risee Logo" 
                   className="w-full h-full object-cover animate-shine"
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
               </div>
-              <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">Raise</span>
+              <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">Risee</span>
             </Link>
             <p className="text-sm text-muted-foreground mt-4">
               Learn, grow, and have fun with a community that lifts you up.
@@ -101,7 +101,7 @@ const Footer = () => {
 
         <div className="mt-10 pt-6 border-t border-border text-xs text-muted-foreground flex flex-col md:flex-row gap-2 md:items-center md:justify-between">
           <p>
-            © {new Date().getFullYear()} Raise. All rights reserved.
+            © {new Date().getFullYear()} Risee. All rights reserved.
           </p>
           <p>
             Built with ❤️ for learners.
