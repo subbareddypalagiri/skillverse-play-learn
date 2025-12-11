@@ -340,6 +340,8 @@ curl http://localhost:5000/api/courses
 
 ## 🔧 Environment Variables
 
+
+
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `PORT` | Server port | 5000 |

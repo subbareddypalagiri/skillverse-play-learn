@@ -4,18 +4,25 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { BookOpen, Clock, Users, Star, CheckCircle, Play, Wrench, Award, GraduationCap, FileText, Trophy, Video, Download, ExternalLink } from "lucide-react";
+import { BookOpen, Clock, Users, Star, CheckCircle, Play, Wrench, Award, GraduationCap, FileText, Trophy, Video, Download, ExternalLink, Monitor } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CourseDashboard from "../components/CourseDashboard";
+import VideoPlayerWithTracking from "../components/VideoPlayerWithTracking";
+import CourseCertificate from "../components/CourseCertificate";
 import { useCourseContext } from "../contexts/CourseContext";
+import { useVideoProgress } from "../contexts/VideoProgressContext";
 
 const Courses = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [showResourcesDialog, setShowResourcesDialog] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<any>(null);
+  const [showCertificate, setShowCertificate] = useState(false);
   const { enrolledCourses, addCourse } = useCourseContext();
+  const { isCourseCompleted, getCompletedVideos, isVideoCompleted } = useVideoProgress();
   const navigate = useNavigate();
 
   const courses = [
@@ -31,11 +38,11 @@ const Courses = () => {
       description: "Complete MERN Stack - HTML, CSS, JavaScript, React, Node.js, MongoDB",
       resources: {
         videos: [
-          { title: "Full Stack Web Dev - 10 Hours", url: "https://www.youtube.com/watch?v=nu_pCVPKzTk", platform: "freeCodeCamp" },
-          { title: "React Full Course 2024", url: "https://www.youtube.com/watch?v=CgkZ7MvWUAA", platform: "freeCodeCamp" },
-          { title: "Node.js & Express Full Course", url: "https://www.youtube.com/watch?v=Oe421EPjeBE", platform: "freeCodeCamp" },
-          { title: "MongoDB Complete Tutorial", url: "https://www.youtube.com/watch?v=c2M-rlkkT5o", platform: "Traversy Media" },
-          { title: "JavaScript Full Course", url: "https://www.youtube.com/watch?v=PkZNo7MFNFg", platform: "freeCodeCamp" }
+          { title: "Full Stack Web Dev - 10 Hours", url: "https://www.youtube.com/watch?v=nu_pCVPKzTk", platform: "YouTube", videoId: "nu_pCVPKzTk" },
+          { title: "React Full Course 2024", url: "https://www.youtube.com/watch?v=CgkZ7MvWUAA", platform: "YouTube", videoId: "CgkZ7MvWUAA" },
+          { title: "Node.js & Express Full Course", url: "https://www.youtube.com/watch?v=Oe421EPjeBE", platform: "YouTube", videoId: "Oe421EPjeBE" },
+          { title: "MongoDB Complete Tutorial", url: "https://www.youtube.com/watch?v=c2M-rlkkT5o", platform: "YouTube", videoId: "c2M-rlkkT5o" },
+          { title: "JavaScript Full Course", url: "https://www.youtube.com/watch?v=PkZNo7MFNFg", platform: "YouTube", videoId: "PkZNo7MFNFg" }
         ],
         pdfs: [
           { title: "Eloquent JavaScript (Free Book)", url: "https://eloquentjavascript.net/" },
@@ -65,9 +72,9 @@ const Courses = () => {
       description: "Master AWS, Azure, and GCP fundamentals",
       resources: {
         videos: [
-          { title: "AWS Full Course", url: "https://www.youtube.com/watch?v=ulprqHHWlng", platform: "freeCodeCamp" },
-          { title: "Azure Fundamentals", url: "https://www.youtube.com/watch?v=NKEFWyqJ5XA", platform: "Microsoft" },
-          { title: "GCP Complete Course", url: "https://www.youtube.com/watch?v=jpno8FSqpc8", platform: "Edureka" }
+          { title: "AWS Full Course", url: "https://www.youtube.com/watch?v=ulprqHHWlng", platform: "YouTube", videoId: "ulprqHHWlng" },
+          { title: "Azure Fundamentals", url: "https://www.youtube.com/watch?v=NKEFWyqJ5XA", platform: "YouTube", videoId: "NKEFWyqJ5XA" },
+          { title: "GCP Complete Course", url: "https://www.youtube.com/watch?v=jpno8FSqpc8", platform: "YouTube", videoId: "jpno8FSqpc8" }
         ],
         pdfs: [
           { title: "AWS Cloud Practitioner Guide", url: "https://d1.awsstatic.com/training-and-certification/docs-cloud-practitioner/AWS-Certified-Cloud-Practitioner_Exam-Guide.pdf" },
@@ -91,9 +98,9 @@ const Courses = () => {
       description: "CI/CD, Docker, Kubernetes, Jenkins",
       resources: {
         videos: [
-          { title: "Docker Full Course", url: "https://www.youtube.com/watch?v=3c-iBn73dDE", platform: "TechWorld with Nana" },
-          { title: "Kubernetes Tutorial", url: "https://www.youtube.com/watch?v=X48VuDVv0do", platform: "TechWorld with Nana" },
-          { title: "Jenkins Complete Course", url: "https://www.youtube.com/watch?v=FX322RVNGj4", platform: "Simplilearn" }
+          { title: "Docker Full Course", url: "https://www.youtube.com/watch?v=3c-iBn73dDE", platform: "YouTube", videoId: "3c-iBn73dDE" },
+          { title: "Kubernetes Tutorial", url: "https://www.youtube.com/watch?v=X48VuDVv0do", platform: "YouTube", videoId: "X48VuDVv0do" },
+          { title: "Jenkins Complete Course", url: "https://www.youtube.com/watch?v=FX322RVNGj4", platform: "YouTube", videoId: "FX322RVNGj4" }
         ],
         pdfs: [
           { title: "Docker Handbook", url: "https://www.freecodecamp.org/news/the-docker-handbook/" },
@@ -119,9 +126,9 @@ const Courses = () => {
       description: "Complete AI from basics to advanced",
       resources: {
         videos: [
-          { title: "AI Full Course - Stanford", url: "https://www.youtube.com/watch?v=J8Eh7RqggsU", platform: "Stanford" },
-          { title: "Machine Learning by Andrew Ng", url: "https://www.coursera.org/learn/machine-learning", platform: "Coursera (Free Audit)" },
-          { title: "AI for Everyone", url: "https://www.youtube.com/watch?v=mJeNghZXtMo", platform: "freeCodeCamp" }
+          { title: "AI Full Course - Stanford", url: "https://www.youtube.com/watch?v=J8Eh7RqggsU", platform: "YouTube", videoId: "J8Eh7RqggsU" },
+          { title: "Machine Learning by Andrew Ng", url: "https://www.coursera.org/learn/machine-learning", platform: "Coursera" },
+          { title: "AI for Everyone", url: "https://www.youtube.com/watch?v=mJeNghZXtMo", platform: "YouTube", videoId: "mJeNghZXtMo" }
         ],
         pdfs: [
           { title: "AI: A Modern Approach", url: "http://aima.cs.berkeley.edu/" },
@@ -142,7 +149,28 @@ const Courses = () => {
       rating: 4.9,
       level: "Advanced",
       category: "AI & ML",
-      description: "TensorFlow, PyTorch, CNNs, RNNs, GANs"
+      description: "TensorFlow, PyTorch, CNNs, RNNs, GANs",
+      resources: {
+        videos: [
+          { title: "Deep Learning Specialization - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc23_cs69/preview", platform: "NPTEL", videoId: "noc23_cs69" },
+          { title: "Deep Learning Full Course", url: "https://www.youtube.com/watch?v=VyWAvY2CF9c", platform: "YouTube", videoId: "VyWAvY2CF9c" },
+          { title: "Neural Networks Explained", url: "https://www.youtube.com/watch?v=aircAruvnKk", platform: "YouTube", videoId: "aircAruvnKk" },
+          { title: "PyTorch Complete Course", url: "https://www.youtube.com/watch?v=c36lUUr864M", platform: "YouTube", videoId: "c36lUUr864M" },
+          { title: "TensorFlow 2.0 Full Tutorial", url: "https://www.youtube.com/watch?v=tPYj3fFJGjk", platform: "YouTube", videoId: "tPYj3fFJGjk" }
+        ],
+        pdfs: [
+          { title: "Deep Learning Book (Ian Goodfellow)", url: "https://www.deeplearningbook.org/" },
+          { title: "Neural Networks and Deep Learning", url: "http://neuralnetworksanddeeplearning.com/" },
+          { title: "Dive into Deep Learning", url: "https://d2l.ai/" },
+          { title: "PyTorch Documentation", url: "https://pytorch.org/docs/stable/index.html" }
+        ],
+        links: [
+          { title: "NPTEL Deep Learning Course", url: "https://nptel.ac.in/courses/106105152" },
+          { title: "Stanford CS230", url: "https://cs230.stanford.edu/" },
+          { title: "Fast.ai Practical Deep Learning", url: "https://course.fast.ai/" },
+          { title: "Papers with Code", url: "https://paperswithcode.com/" }
+        ]
+      }
     },
     {
       title: "Big Data Analytics & Processing",
@@ -152,7 +180,28 @@ const Courses = () => {
       rating: 4.7,
       level: "Intermediate",
       category: "Data Science",
-      description: "Hadoop, Spark, Data Warehousing"
+      description: "Hadoop, Spark, Data Warehousing",
+      resources: {
+        videos: [
+          { title: "Big Data Computing - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc24_cs106/preview", platform: "NPTEL", videoId: "24_cs106" },
+          { title: "Hadoop Full Course", url: "https://www.youtube.com/watch?v=1vbXmCrkT3Y", platform: "YouTube", videoId: "1vbXmCrkT3Y" },
+          { title: "Apache Spark Tutorial", url: "https://www.youtube.com/watch?v=zC9cnh8rJd0", platform: "YouTube", videoId: "zC9cnh8rJd0" },
+          { title: "Big Data Analytics with Python", url: "https://www.youtube.com/watch?v=r-uOLxNrNk8", platform: "YouTube", videoId: "r-uOLxNrNk8" },
+          { title: "Data Warehousing Tutorial", url: "https://www.youtube.com/watch?v=J326LIUrZM8", platform: "YouTube", videoId: "J326LIUrZM8" }
+        ],
+        pdfs: [
+          { title: "Hadoop: The Definitive Guide", url: "https://github.com/onlinebook24/book/blob/master/Hadoop_%20The%20Definitive%20Guide.pdf" },
+          { title: "Learning Spark", url: "https://pages.databricks.com/rs/094-YMS-629/images/LearningSpark2.0.pdf" },
+          { title: "Big Data Analytics Guide", url: "https://www.oreilly.com/library/view/big-data-analytics/" },
+          { title: "Apache Spark Documentation", url: "https://spark.apache.org/docs/latest/" }
+        ],
+        links: [
+          { title: "NPTEL Big Data Course", url: "https://nptel.ac.in/courses/106106184" },
+          { title: "Apache Hadoop Docs", url: "https://hadoop.apache.org/docs/" },
+          { title: "Databricks Academy", url: "https://www.databricks.com/learn" },
+          { title: "Kaggle Learn", url: "https://www.kaggle.com/learn" }
+        ]
+      }
     },
     
     // Emerging Technologies
@@ -164,7 +213,28 @@ const Courses = () => {
       rating: 4.8,
       level: "Intermediate",
       category: "Blockchain",
-      description: "Smart Contracts, DApps, Web3"
+      description: "Smart Contracts, DApps, Web3",
+      resources: {
+        videos: [
+          { title: "Blockchain Architecture Design - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc24_cs75/preview", platform: "NPTEL", videoId: "24_cs75" },
+          { title: "Blockchain Full Course", url: "https://www.youtube.com/watch?v=QCvL-DWcojc", platform: "YouTube", videoId: "QCvL-DWcojc" },
+          { title: "Solidity Full Course", url: "https://www.youtube.com/watch?v=gyMwXuJrbJQ", platform: "YouTube", videoId: "gyMwXuJrbJQ" },
+          { title: "Web3.js Complete Tutorial", url: "https://www.youtube.com/watch?v=t3wM5903ty0", platform: "YouTube", videoId: "t3wM5903ty0" },
+          { title: "Smart Contracts Development", url: "https://www.youtube.com/watch?v=M576WGiDBdQ", platform: "YouTube", videoId: "M576WGiDBdQ" }
+        ],
+        pdfs: [
+          { title: "Mastering Blockchain (Free)", url: "https://github.com/PacktPublishing/Mastering-Blockchain-Third-Edition" },
+          { title: "Blockchain Basics", url: "https://arxiv.org/pdf/1612.06244.pdf" },
+          { title: "Ethereum Whitepaper", url: "https://ethereum.org/en/whitepaper/" },
+          { title: "Solidity Documentation", url: "https://docs.soliditylang.org/" }
+        ],
+        links: [
+          { title: "NPTEL Blockchain Course", url: "https://nptel.ac.in/courses/106105194" },
+          { title: "Ethereum.org Learn", url: "https://ethereum.org/en/developers/" },
+          { title: "Web3 University", url: "https://www.web3.university/" },
+          { title: "CryptoZombies Tutorial", url: "https://cryptozombies.io/" }
+        ]
+      }
     },
     {
       title: "Internet of Things (IoT) Complete",
@@ -174,7 +244,28 @@ const Courses = () => {
       rating: 4.7,
       level: "Beginner",
       category: "IoT",
-      description: "Arduino, Raspberry Pi, IoT Protocols"
+      description: "Arduino, Raspberry Pi, IoT Protocols",
+      resources: {
+        videos: [
+          { title: "Introduction to IoT - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc23_cs97/preview", platform: "NPTEL", videoId: "23_cs97" },
+          { title: "IoT Full Course", url: "https://www.youtube.com/watch?v=LlhmzVL5bm8", platform: "YouTube", videoId: "LlhmzVL5bm8" },
+          { title: "Arduino Tutorial for Beginners", url: "https://www.youtube.com/watch?v=zJ-LqeX_fLU", platform: "YouTube", videoId: "zJ-LqeX_fLU" },
+          { title: "Raspberry Pi Complete Course", url: "https://www.youtube.com/watch?v=QRCUoTTqC_0", platform: "YouTube", videoId: "QRCUoTTqC_0" },
+          { title: "IoT Protocols Explained", url: "https://www.youtube.com/watch?v=F3ux8R-jE9Y", platform: "YouTube", videoId: "F3ux8R-jE9Y" }
+        ],
+        pdfs: [
+          { title: "IoT Fundamentals Guide", url: "https://www.cisco.com/c/dam/en_us/solutions/industries/docs/education/IoT_Fundamentals_IoT_FoE_Course_Overview.pdf" },
+          { title: "Arduino Cookbook", url: "https://www.pdfdrive.com/arduino-cookbook-e158863714.html" },
+          { title: "Raspberry Pi User Guide", url: "https://www.raspberrypi.com/documentation/" },
+          { title: "IoT Architecture Guide", url: "https://www.oreilly.com/library/view/designing-the-internet/" }
+        ],
+        links: [
+          { title: "NPTEL IoT Course", url: "https://nptel.ac.in/courses/106105166" },
+          { title: "Arduino Official", url: "https://www.arduino.cc/en/Tutorial/HomePage" },
+          { title: "Raspberry Pi Projects", url: "https://projects.raspberrypi.org/" },
+          { title: "IoT for All", url: "https://www.iotforall.com/" }
+        ]
+      }
     },
     {
       title: "AR/VR Development Fundamentals",
@@ -184,7 +275,28 @@ const Courses = () => {
       rating: 4.8,
       level: "Intermediate",
       category: "AR/VR",
-      description: "Unity, Unreal Engine, Meta Quest"
+      description: "Unity, Unreal Engine, Meta Quest",
+      resources: {
+        videos: [
+          { title: "Virtual Reality - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc23_cs98/preview", platform: "NPTEL", videoId: "23_cs98" },
+          { title: "Unity VR Development", url: "https://www.youtube.com/watch?v=gGYtahQjmWQ", platform: "YouTube", videoId: "gGYtahQjmWQ" },
+          { title: "Unreal Engine VR Tutorial", url: "https://www.youtube.com/watch?v=wKU0sKZ8h_M", platform: "YouTube", videoId: "wKU0sKZ8h_M" },
+          { title: "AR Development with Unity", url: "https://www.youtube.com/watch?v=FWyTf3USDCQ", platform: "YouTube", videoId: "FWyTf3USDCQ" },
+          { title: "Meta Quest Development", url: "https://www.youtube.com/watch?v=XFljMJ2BdAI", platform: "YouTube", videoId: "XFljMJ2BdAI" }
+        ],
+        pdfs: [
+          { title: "Unity VR Documentation", url: "https://docs.unity3d.com/Manual/VROverview.html" },
+          { title: "AR/VR Development Guide", url: "https://developer.oculus.com/documentation/" },
+          { title: "Unreal Engine VR Guide", url: "https://docs.unrealengine.com/en-US/SharingAndReleasing/XRDevelopment/VR/" },
+          { title: "ARCore Documentation", url: "https://developers.google.com/ar" }
+        ],
+        links: [
+          { title: "NPTEL VR Course", url: "https://nptel.ac.in/courses/106104191" },
+          { title: "Unity Learn VR", url: "https://learn.unity.com/course/create-with-vr" },
+          { title: "Meta for Developers", url: "https://developer.oculus.com/" },
+          { title: "ARKit Apple", url: "https://developer.apple.com/augmented-reality/" }
+        ]
+      }
     },
     
     // Programming
@@ -199,9 +311,9 @@ const Courses = () => {
       description: "From basics to advanced Python",
       resources: {
         videos: [
-          { title: "Python Full Course - 12 Hours", url: "https://www.youtube.com/watch?v=8DvywoWv6fI", platform: "freeCodeCamp" },
-          { title: "Python for Beginners", url: "https://www.youtube.com/watch?v=rfscVS0vtbw", platform: "Programming with Mosh" },
-          { title: "CS50 Python", url: "https://www.youtube.com/watch?v=nLRL_NcnK-4", platform: "Harvard" }
+          { title: "Python Full Course - 12 Hours", url: "https://www.youtube.com/watch?v=8DvywoWv6fI", platform: "YouTube", videoId: "8DvywoWv6fI" },
+          { title: "Python for Beginners", url: "https://www.youtube.com/watch?v=rfscVS0vtbw", platform: "YouTube", videoId: "rfscVS0vtbw" },
+          { title: "CS50 Python", url: "https://www.youtube.com/watch?v=nLRL_NcnK-4", platform: "YouTube", videoId: "nLRL_NcnK-4" }
         ],
         pdfs: [
           { title: "Python Official Tutorial", url: "https://docs.python.org/3/tutorial/" },
@@ -223,7 +335,28 @@ const Courses = () => {
       rating: 4.8,
       level: "Advanced",
       category: "Programming",
-      description: "NumPy, Pandas, Matplotlib, Scikit-learn"
+      description: "NumPy, Pandas, Matplotlib, Scikit-learn",
+      resources: {
+        videos: [
+          { title: "Python for Data Science - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc24_cs94/preview", platform: "NPTEL", videoId: "24_cs94" },
+          { title: "Data Science with Python", url: "https://www.youtube.com/watch?v=ua-CiDNNj30", platform: "YouTube", videoId: "ua-CiDNNj30" },
+          { title: "NumPy Full Tutorial", url: "https://www.youtube.com/watch?v=QUT1VHiLmmI", platform: "YouTube", videoId: "QUT1VHiLmmI" },
+          { title: "Pandas Complete Course", url: "https://www.youtube.com/watch?v=vmEHCJofslg", platform: "YouTube", videoId: "vmEHCJofslg" },
+          { title: "Machine Learning with Scikit-Learn", url: "https://www.youtube.com/watch?v=pqNCD_5r0IU", platform: "YouTube", videoId: "pqNCD_5r0IU" }
+        ],
+        pdfs: [
+          { title: "Python Data Science Handbook", url: "https://jakevdp.github.io/PythonDataScienceHandbook/" },
+          { title: "NumPy User Guide", url: "https://numpy.org/doc/stable/user/index.html" },
+          { title: "Pandas Documentation", url: "https://pandas.pydata.org/docs/" },
+          { title: "Scikit-Learn User Guide", url: "https://scikit-learn.org/stable/user_guide.html" }
+        ],
+        links: [
+          { title: "NPTEL Data Science Course", url: "https://nptel.ac.in/courses/106106145" },
+          { title: "Kaggle Learn", url: "https://www.kaggle.com/learn" },
+          { title: "DataCamp Free Courses", url: "https://www.datacamp.com/courses" },
+          { title: "Real Python Data Science", url: "https://realpython.com/tutorials/data-science/" }
+        ]
+      }
     },
     
     // Cybersecurity
@@ -238,9 +371,9 @@ const Courses = () => {
       description: "Network Security, Cryptography, Security+",
       resources: {
         videos: [
-          { title: "Cybersecurity Full Course", url: "https://www.youtube.com/watch?v=U_P23SqJaDc", platform: "freeCodeCamp" },
-          { title: "Network Security", url: "https://www.youtube.com/watch?v=qiQR5rTSshw", platform: "Professor Messer" },
-          { title: "Ethical Hacking Course", url: "https://www.youtube.com/watch?v=3Kq1MIfTWCE", platform: "freeCodeCamp" }
+          { title: "Cybersecurity Full Course", url: "https://www.youtube.com/watch?v=U_P23SqJaDc", platform: "YouTube", videoId: "U_P23SqJaDc" },
+          { title: "Network Security", url: "https://www.youtube.com/watch?v=qiQR5rTSshw", platform: "YouTube", videoId: "qiQR5rTSshw" },
+          { title: "Ethical Hacking Course", url: "https://www.youtube.com/watch?v=3Kq1MIfTWCE", platform: "YouTube", videoId: "3Kq1MIfTWCE" }
         ],
         pdfs: [
           { title: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" },
@@ -261,7 +394,28 @@ const Courses = () => {
       rating: 4.9,
       level: "Advanced",
       category: "Cybersecurity",
-      description: "CEH, OSCP, Bug Bounty Hunting"
+      description: "CEH, OSCP, Bug Bounty Hunting",
+      resources: {
+        videos: [
+          { title: "Ethical Hacking - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc23_cs72/preview", platform: "NPTEL", videoId: "23_cs72" },
+          { title: "Ethical Hacking Full Course", url: "https://www.youtube.com/watch?v=3Kq1MIfTWCE", platform: "YouTube", videoId: "3Kq1MIfTWCE" },
+          { title: "Penetration Testing Bootcamp", url: "https://www.youtube.com/watch?v=WnN6dbos5u8", platform: "YouTube", videoId: "WnN6dbos5u8" },
+          { title: "Bug Bounty Hunting", url: "https://www.youtube.com/watch?v=Rp69edBmFFo", platform: "YouTube", videoId: "Rp69edBmFFo" },
+          { title: "Kali Linux Tutorial", url: "https://www.youtube.com/watch?v=lZAoFs75_cs", platform: "YouTube", videoId: "lZAoFs75_cs" }
+        ],
+        pdfs: [
+          { title: "The Web Application Hacker's Handbook", url: "https://edu.anarcho-copy.org/Against%20Security%20-%20Self%20Security/Dafydd%20Stuttard,%20Marcus%20Pinto%20-%20The%20web%20application%20hackers%20handbook.pdf" },
+          { title: "Penetration Testing Guide", url: "https://www.offensive-security.com/pwk-oscp/" },
+          { title: "OWASP Testing Guide", url: "https://owasp.org/www-project-web-security-testing-guide/" },
+          { title: "Metasploit Unleashed", url: "https://www.offensive-security.com/metasploit-unleashed/" }
+        ],
+        links: [
+          { title: "NPTEL Ethical Hacking", url: "https://nptel.ac.in/courses/106105031" },
+          { title: "HackTheBox", url: "https://www.hackthebox.com/" },
+          { title: "TryHackMe", url: "https://tryhackme.com/" },
+          { title: "PortSwigger Academy", url: "https://portswigger.net/web-security" }
+        ]
+      }
     },
     {
       title: "Blockchain Security & Auditing",
@@ -271,7 +425,28 @@ const Courses = () => {
       rating: 4.7,
       level: "Advanced",
       category: "Blockchain",
-      description: "Smart Contract Security, DeFi Audits"
+      description: "Smart Contract Security, DeFi Audits",
+      resources: {
+        videos: [
+          { title: "Blockchain and Security - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc24_cs76/preview", platform: "NPTEL", videoId: "24_cs76" },
+          { title: "Smart Contract Security", url: "https://www.youtube.com/watch?v=pUWmJ86X_do", platform: "YouTube", videoId: "pUWmJ86X_do" },
+          { title: "Solidity Security Best Practices", url: "https://www.youtube.com/watch?v=WLD_LcVgJR8", platform: "YouTube", videoId: "WLD_LcVgJR8" },
+          { title: "DeFi Security Tutorial", url: "https://www.youtube.com/watch?v=Df2zzfoTfMc", platform: "YouTube", videoId: "Df2zzfoTfMc" },
+          { title: "Smart Contract Auditing", url: "https://www.youtube.com/watch?v=TmZ8gH-toX0", platform: "YouTube", videoId: "TmZ8gH-toX0" }
+        ],
+        pdfs: [
+          { title: "Smart Contract Security Best Practices", url: "https://consensys.github.io/smart-contract-best-practices/" },
+          { title: "Ethereum Security Guide", url: "https://ethereum.org/en/developers/docs/security/" },
+          { title: "DeFi Security Handbook", url: "https://github.com/OffcierCia/DeFi-Developer-Road-Map" },
+          { title: "SWC Registry", url: "https://swcregistry.io/" }
+        ],
+        links: [
+          { title: "NPTEL Blockchain Security", url: "https://nptel.ac.in/courses/106106129" },
+          { title: "OpenZeppelin Contracts", url: "https://docs.openzeppelin.com/contracts/" },
+          { title: "Consensys Diligence", url: "https://consensys.net/diligence/" },
+          { title: "Immunefi Bug Bounties", url: "https://immunefi.com/" }
+        ]
+      }
     },
     
     // Future Technologies
@@ -283,7 +458,28 @@ const Courses = () => {
       rating: 4.8,
       level: "Advanced",
       category: "Quantum Tech",
-      description: "Qubits, Quantum Algorithms, IBM Qiskit"
+      description: "Qubits, Quantum Algorithms, IBM Qiskit",
+      resources: {
+        videos: [
+          { title: "Quantum Computing - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc24_ph35/preview", platform: "NPTEL", videoId: "24_ph35" },
+          { title: "Quantum Computing Full Course", url: "https://www.youtube.com/watch?v=QuR969uMICM", platform: "YouTube", videoId: "QuR969uMICM" },
+          { title: "Introduction to Quantum Computing", url: "https://www.youtube.com/watch?v=tsbCSkvHhMo", platform: "YouTube", videoId: "tsbCSkvHhMo" },
+          { title: "IBM Qiskit Tutorial", url: "https://www.youtube.com/watch?v=a1NZC5rqQD8", platform: "YouTube", videoId: "a1NZC5rqQD8" },
+          { title: "Quantum Algorithms Explained", url: "https://www.youtube.com/watch?v=F_Riqjdh2oM", platform: "YouTube", videoId: "F_Riqjdh2oM" }
+        ],
+        pdfs: [
+          { title: "Quantum Computing for Everyone", url: "https://quantum.country/qcvc" },
+          { title: "IBM Quantum Learning", url: "https://learning.quantum.ibm.com/" },
+          { title: "Qiskit Textbook", url: "https://qiskit.org/textbook/preface.html" },
+          { title: "Quantum Algorithm Zoo", url: "https://quantumalgorithmzoo.org/" }
+        ],
+        links: [
+          { title: "NPTEL Quantum Computing", url: "https://nptel.ac.in/courses/115106065" },
+          { title: "IBM Quantum Experience", url: "https://quantum-computing.ibm.com/" },
+          { title: "Microsoft Quantum", url: "https://azure.microsoft.com/en-us/products/quantum/" },
+          { title: "Quantum Open Source Foundation", url: "https://qosf.org/" }
+        ]
+      }
     },
     {
       title: "Advanced Cyber Defense & Forensics",
@@ -293,7 +489,28 @@ const Courses = () => {
       rating: 4.9,
       level: "Advanced",
       category: "Cybersecurity",
-      description: "Incident Response, Malware Analysis, DFIR"
+      description: "Incident Response, Malware Analysis, DFIR",
+      resources: {
+        videos: [
+          { title: "Cyber Security and Privacy - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc23_cs73/preview", platform: "NPTEL", videoId: "23_cs73" },
+          { title: "Digital Forensics Full Course", url: "https://www.youtube.com/watch?v=0HX94eWcGGQ", platform: "YouTube", videoId: "0HX94eWcGGQ" },
+          { title: "Malware Analysis Tutorial", url: "https://www.youtube.com/watch?v=qJZ-abfQ-GI", platform: "YouTube", videoId: "qJZ-abfQ-GI" },
+          { title: "Incident Response Training", url: "https://www.youtube.com/watch?v=9Uo7V6flUxs", platform: "YouTube", videoId: "9Uo7V6flUxs" },
+          { title: "Network Forensics", url: "https://www.youtube.com/watch?v=er7_O2BbT8w", platform: "YouTube", videoId: "er7_O2BbT8w" }
+        ],
+        pdfs: [
+          { title: "The Art of Memory Forensics", url: "https://volatility-labs.blogspot.com/" },
+          { title: "Incident Response Guide", url: "https://www.sans.org/white-papers/" },
+          { title: "NIST Cybersecurity Framework", url: "https://www.nist.gov/cyberframework" },
+          { title: "Malware Analysis Handbook", url: "https://nostarch.com/malware" }
+        ],
+        links: [
+          { title: "NPTEL Cyber Security", url: "https://nptel.ac.in/courses/106105031" },
+          { title: "SANS DFIR Resources", url: "https://www.sans.org/digital-forensics-incident-response/" },
+          { title: "Digital Forensics Tools", url: "https://www.sleuthkit.org/" },
+          { title: "Volatility Framework", url: "https://www.volatilityfoundation.org/" }
+        ]
+      }
     },
     
     // Generative AI
@@ -305,7 +522,28 @@ const Courses = () => {
       rating: 4.9,
       level: "Intermediate",
       category: "AI & ML",
-      description: "GPT, DALL-E, Stable Diffusion, Prompt Engineering"
+      description: "GPT, DALL-E, Stable Diffusion, Prompt Engineering",
+      resources: {
+        videos: [
+          { title: "Generative AI - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc24_cs110/preview", platform: "NPTEL", videoId: "24_cs110" },
+          { title: "LLM Full Course", url: "https://www.youtube.com/watch?v=zjkBMFhNj_g", platform: "YouTube", videoId: "zjkBMFhNj_g" },
+          { title: "ChatGPT & GPT-4 Tutorial", url: "https://www.youtube.com/watch?v=vw-KWfKwvTQ", platform: "YouTube", videoId: "vw-KWfKwvTQ" },
+          { title: "Stable Diffusion Complete Guide", url: "https://www.youtube.com/watch?v=DHaL56P6f5M", platform: "YouTube", videoId: "DHaL56P6f5M" },
+          { title: "Prompt Engineering Course", url: "https://www.youtube.com/watch?v=_ZvnD73m40o", platform: "YouTube", videoId: "_ZvnD73m40o" }
+        ],
+        pdfs: [
+          { title: "LLM Introduction Guide", url: "https://www.promptingguide.ai/" },
+          { title: "Attention Is All You Need Paper", url: "https://arxiv.org/abs/1706.03762" },
+          { title: "GPT-3 Paper", url: "https://arxiv.org/abs/2005.14165" },
+          { title: "Prompt Engineering Guide", url: "https://github.com/dair-ai/Prompt-Engineering-Guide" }
+        ],
+        links: [
+          { title: "NPTEL Generative AI", url: "https://nptel.ac.in/courses/106106184" },
+          { title: "Hugging Face Learn", url: "https://huggingface.co/learn" },
+          { title: "OpenAI Cookbook", url: "https://github.com/openai/openai-cookbook" },
+          { title: "LangChain Documentation", url: "https://python.langchain.com/docs/" }
+        ]
+      }
     },
     {
       title: "AI Agents & Automation",
@@ -315,7 +553,28 @@ const Courses = () => {
       rating: 4.8,
       level: "Advanced",
       category: "AI & ML",
-      description: "LangChain, AutoGPT, AI Workflows"
+      description: "LangChain, AutoGPT, AI Workflows",
+      resources: {
+        videos: [
+          { title: "AI and Automation - NPTEL", url: "https://onlinecourses.nptel.ac.in/noc23_cs111/preview", platform: "NPTEL", videoId: "23_cs111" },
+          { title: "LangChain Full Tutorial", url: "https://www.youtube.com/watch?v=LbT1yp6quS8", platform: "YouTube", videoId: "LbT1yp6quS8" },
+          { title: "AutoGPT Complete Guide", url: "https://www.youtube.com/watch?v=jn8EDKcY74A", platform: "YouTube", videoId: "jn8EDKcY74A" },
+          { title: "Building AI Agents", url: "https://www.youtube.com/watch?v=F8NKVhkZZWI", platform: "YouTube", videoId: "F8NKVhkZZWI" },
+          { title: "AI Automation with n8n", url: "https://www.youtube.com/watch?v=CeFQFYdomUo", platform: "YouTube", videoId: "CeFQFYdomUo" }
+        ],
+        pdfs: [
+          { title: "LangChain Documentation", url: "https://python.langchain.com/docs/" },
+          { title: "AI Agents Survey Paper", url: "https://arxiv.org/abs/2309.07864" },
+          { title: "AutoGPT Guide", url: "https://github.com/Significant-Gravitas/AutoGPT" },
+          { title: "CrewAI Documentation", url: "https://docs.crewai.com/" }
+        ],
+        links: [
+          { title: "NPTEL AI Course", url: "https://nptel.ac.in/courses/106105152" },
+          { title: "LangChain Hub", url: "https://python.langchain.com/" },
+          { title: "AutoGPT GitHub", url: "https://github.com/Significant-Gravitas/AutoGPT" },
+          { title: "LangGraph Documentation", url: "https://langchain-ai.github.io/langgraph/" }
+        ]
+      }
     }
   ];
 
@@ -409,6 +668,11 @@ const Courses = () => {
   const handleViewDashboard = () => {
     setShowDashboard(true);
     setShowSuccessDialog(false);
+  };
+
+  const handleWatchVideo = (video: any) => {
+    setSelectedVideo(video);
+    setShowVideoPlayer(true);
   };
 
   if (showDashboard) {
@@ -697,28 +961,54 @@ const Courses = () => {
                   <div className="flex items-center gap-2 mb-3">
                     <Video className="w-5 h-5 text-red-500" />
                     <h3 className="font-bold text-lg">Video Lectures</h3>
+                    <Badge variant="secondary" className="text-xs">Watch on our site! 🎥</Badge>
                   </div>
                   <div className="space-y-2">
-                    {selectedCourse.resources.videos.map((video: any, idx: number) => (
-                      <a
-                        key={idx}
-                        href={video.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent hover:border-primary transition-all group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
-                            <Play className="w-4 h-4 text-red-600 dark:text-red-400" />
+                    {selectedCourse.resources.videos.map((video: any, idx: number) => {
+                      const completed = video.videoId ? isVideoCompleted(video.videoId) : false;
+                      return (
+                        <div
+                          key={idx}
+                          className={`flex items-center justify-between p-3 rounded-lg border hover:bg-accent hover:border-primary transition-all group ${completed ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800' : ''}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`p-2 rounded-lg ${completed ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20'}`}>
+                              {completed ? (
+                                <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 fill-green-600 dark:fill-green-400" />
+                              ) : (
+                                <Play className="w-4 h-4 text-red-600 dark:text-red-400" />
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium flex items-center gap-2">
+                                {video.title}
+                                {completed && <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">✓ Completed</Badge>}
+                              </p>
+                              <p className="text-xs text-muted-foreground">{video.platform}</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium group-hover:text-primary">{video.title}</p>
-                            <p className="text-xs text-muted-foreground">{video.platform}</p>
+                          <div className="flex gap-2">
+                            {video.videoId && (
+                              <Button
+                                onClick={() => handleWatchVideo(video)}
+                                size="sm"
+                                className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white"
+                              >
+                                <Monitor className="w-3 h-3 mr-1" />
+                                {completed ? 'Rewatch' : 'Watch Here'}
+                              </Button>
+                            )}
+                            <Button
+                              onClick={() => window.open(video.url, '_blank')}
+                              size="sm"
+                              variant="outline"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                            </Button>
                           </div>
                         </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
-                      </a>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -809,6 +1099,32 @@ const Courses = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Video Player Modal with Tracking */}
+      {selectedVideo && selectedCourse && (
+        <VideoPlayerWithTracking
+          isOpen={showVideoPlayer}
+          onClose={() => setShowVideoPlayer(false)}
+          videoTitle={selectedVideo.title}
+          videoId={selectedVideo.videoId}
+          platform={selectedVideo.platform}
+          originalUrl={selectedVideo.url}
+          courseTitle={selectedCourse.title}
+        />
+      )}
+
+      {/* Certificate Modal */}
+      {selectedCourse && (
+        <CourseCertificate
+          isOpen={showCertificate}
+          onClose={() => setShowCertificate(false)}
+          courseTitle={selectedCourse.title}
+          studentName="Student" 
+          completionDate={new Date().toISOString()}
+          courseInstructor={selectedCourse.instructor}
+          courseDuration={selectedCourse.duration}
+        />
+      )}
       
       <Footer />
     </div>

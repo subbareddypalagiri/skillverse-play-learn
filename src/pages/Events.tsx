@@ -1,11 +1,12 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ClubsSection from "@/components/ClubsSection";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Palette, Music, Camera, BookOpen as BookIcon, Dumbbell, Code, Filter } from "lucide-react";
+import { Filter } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar, MapPin, Users, Clock, CheckCircle, Globe, Monitor, Wifi } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, CheckCircle, Globe, Monitor } from "lucide-react";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -16,14 +17,6 @@ const Events = () => {
   const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
-  const hobbies = [
-    { icon: Palette, title: "Art & Painting", members: 234, description: "Express yourself through colors and creativity" },
-    { icon: Music, title: "Music Club", members: 456, description: "Learn instruments and perform with fellow musicians" },
-    { icon: Camera, title: "Photography", members: 189, description: "Capture moments and tell stories through lenses" },
-    { icon: BookIcon, title: "Book Club", members: 312, description: "Read, discuss, and explore new literary worlds" },
-    { icon: Dumbbell, title: "Fitness & Sports", members: 567, description: "Stay active with group workouts and sports" },
-    { icon: Code, title: "Coding Club", members: 789, description: "Build projects and compete in coding challenges" },
-  ];
 
   const events = [
     // Cultural Events
@@ -585,7 +578,7 @@ const Events = () => {
   const handleRegister = (event: any) => {
     setSelectedEvent(event);
     setRegisteredEvents(prev => [...prev, event]);
-    setShowEventDetails(true); // Navigate to event details page
+    setShowSuccessDialog(true); // Show success dialog
   };
 
   const isRegistered = (event: any) => {
@@ -741,86 +734,166 @@ const Events = () => {
               </Card>
             ))}
           </div>
-          {/* Hobbies Section moved under Events */}
-          <div className="mt-16">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold mb-2">Hobbies & Clubs</h2>
-              <p className="text-muted-foreground text-lg">Explore your interests and connect with like-minded students</p>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {hobbies.map((hobby, index) => {
-                const Icon = hobby.icon;
-                return (
-                  <Card key={index} className="p-8 text-center shadow-card hover:shadow-elevated transition-all duration-300 hover:-translate-y-2">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-primary flex items-center justify-center">
-                      <Icon className="w-10 h-10 text-primary-foreground" />
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">{hobby.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">{hobby.description}</p>
-                    <div className="text-sm text-muted-foreground mb-4">{hobby.members} members</div>
-                    <Button className="w-full bg-gradient-primary text-primary-foreground hover:opacity-90">Join Club</Button>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
+          {/* Clubs Section - Interactive Community System */}
+          <ClubsSection />
         </div>
       </div>
       
-      {/* Success Registration Dialog */}
+      {/* Enhanced Success Registration Dialog */}
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <CheckCircle className="w-6 h-6 text-green-500" />
-              Successfully Registered!
+            <DialogTitle className="flex flex-col items-center gap-3 text-center">
+              <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center animate-bounce">
+                <CheckCircle className="w-10 h-10 text-green-500" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-green-600">Registration Successful! 🎉</h2>
+                <p className="text-sm text-muted-foreground mt-1">You're all set for this amazing event!</p>
+              </div>
             </DialogTitle>
           </DialogHeader>
-          <div className="py-4">
+          
+          <div className="py-6">
             {selectedEvent && (
-              <div className="space-y-4">
-                <div className="p-4 bg-muted/50 rounded-lg">
-                  <h3 className="font-bold text-lg mb-2">{selectedEvent.title}</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-primary/70" />
-                      <span>{selectedEvent.date} at {selectedEvent.time}</span>
+              <div className="space-y-6">
+                {/* Event Summary Card */}
+                <Card className="p-6 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/10 dark:to-blue-900/10 border-2 border-green-200">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-gradient-primary flex items-center justify-center flex-shrink-0">
+                      <Calendar className="w-6 h-6 text-white" />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-primary/70" />
-                      <span>{selectedEvent.venue}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {getModeIcon(selectedEvent.mode)}
-                      <span className={getModeColor(selectedEvent.mode)}>
-                        {selectedEvent.mode === 'online' ? 'Online Event' : 'Offline Event'}
-                      </span>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-xl mb-3">{selectedEvent.title}</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-primary" />
+                          <div>
+                            <p className="font-semibold">{selectedEvent.date}</p>
+                            <p className="text-xs text-muted-foreground">{selectedEvent.time}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-primary" />
+                          <div>
+                            <p className="font-semibold">{selectedEvent.venue}</p>
+                            <p className="text-xs text-muted-foreground">{selectedEvent.location}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-primary" />
+                          <p className="font-semibold">{selectedEvent.duration}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {getModeIcon(selectedEvent.mode)}
+                          <p className={`font-semibold ${getModeColor(selectedEvent.mode)}`}>
+                            {selectedEvent.mode === 'online' ? 'Online Event' : 'Offline Event'}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
+                </Card>
+
+                {/* Important Information */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Card className="p-4">
+                    <h4 className="font-bold mb-3 flex items-center gap-2">
+                      <Users className="w-4 h-4 text-blue-500" />
+                      Organizer Details
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">Organization</p>
+                        <p className="font-semibold">{selectedEvent.organizer}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Contact</p>
+                        <p className="font-semibold text-blue-600">{selectedEvent.contact}</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="p-4">
+                    <h4 className="font-bold mb-3 flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      What to Bring
+                    </h4>
+                    <p className="text-sm">{selectedEvent.requirements}</p>
+                  </Card>
                 </div>
-                
-                <div className="text-sm text-muted-foreground">
-                  <p className="mb-2">You have successfully registered for this event. Here are the important details:</p>
-                  <div className="space-y-2">
-                    <div><strong>Organizer:</strong> {selectedEvent.organizer}</div>
-                    <div><strong>Contact:</strong> {selectedEvent.contact}</div>
-                    <div><strong>Requirements:</strong> {selectedEvent.requirements}</div>
-                    {selectedEvent.prizes && <div><strong>Prizes:</strong> {selectedEvent.prizes}</div>}
-                  </div>
-                </div>
-                
-                <p className="text-sm text-muted-foreground">
-                  You will receive a confirmation email shortly with further instructions and event details.
-                </p>
+
+                {/* Prizes Section */}
+                {selectedEvent.prizes && (
+                  <Card className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/10 dark:to-orange-900/10 border-2 border-yellow-300">
+                    <h4 className="font-bold mb-2 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                      Prizes & Rewards
+                    </h4>
+                    <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">{selectedEvent.prizes}</p>
+                  </Card>
+                )}
+
+                {/* Next Steps */}
+                <Card className="p-4 bg-blue-50 dark:bg-blue-900/10 border-blue-200">
+                  <h4 className="font-bold mb-3 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    What Happens Next?
+                  </h4>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>You'll receive a confirmation email at your registered email address within 5 minutes</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>Event reminder will be sent 24 hours before the event starts</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>Join link/venue details will be shared 1 hour before the event</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>Check your dashboard for all registered events</span>
+                    </li>
+                  </ul>
+                </Card>
               </div>
             )}
             
-            <div className="flex gap-2 mt-6">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 mt-6">
               <Button 
                 onClick={() => setShowSuccessDialog(false)}
-                className="flex-1 bg-gradient-primary text-primary-foreground hover:opacity-90"
+                variant="outline"
+                className="flex-1"
               >
-                Got it!
+                Close
+              </Button>
+              <Button 
+                onClick={() => {
+                  setShowSuccessDialog(false);
+                  // Could navigate to dashboard or calendar
+                }}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Add to Calendar
+              </Button>
+              <Button 
+                onClick={() => {
+                  setShowSuccessDialog(false);
+                  // Share functionality
+                }}
+                className="flex-1 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Invite Friends
               </Button>
             </div>
           </div>

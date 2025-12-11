@@ -1,10 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Palette, Award, User, LogIn, UserPlus, Waves } from "lucide-react";
+import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Palette, Award, User, LogIn, UserPlus, Waves, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Home", path: "/", icon: Home },
   { name: "Courses", path: "/courses", icon: BookOpen },
+  { name: "Vibe", path: "/vibe", icon: Zap },
   { name: "Events", path: "/events", icon: Calendar },
   { name: "Career Hub", path: "/career", icon: Briefcase },
   { name: "Sync", path: "/sync", icon: Waves },

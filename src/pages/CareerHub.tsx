@@ -18,43 +18,62 @@ const CareerHub = () => {
   const [error, setError] = useState(null);
   const itemsPerPage = 6;
 
-  // Fetch internships from Indian API
+  // Fetch REAL internships from JSearch API (FREE - aggregates from Indeed, LinkedIn, Glassdoor)
   const fetchInternships = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('https://jobs.indianapi.in/jobs?job_type=Internship&limit=50', {
-        method: 'GET',
-        headers: {
-          'X-Api-Key': 'sk-live-Rql3HLbi2Sm5klZwuSamqlNsphXjcFLUy48DamQp'
+      // JSearch API via RapidAPI - FREE tier: 2500 requests/month
+      // Get your FREE API key from: https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch
+      // Add VITE_RAPIDAPI_KEY=your_key to .env file
+      const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY || 'YOUR_RAPIDAPI_KEY_HERE';
+      
+      const response = await fetch(
+        'https://jsearch.p.rapidapi.com/search?query=internship&page=1&num_pages=1&date_posted=all',
+        {
+          method: 'GET',
+          headers: {
+            'X-RapidAPI-Key': RAPIDAPI_KEY,
+            'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
+          }
         }
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`API Error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const result = await response.json();
+      const jobs = result.data || [];
       
       // Transform API data to match our component structure
-      const transformedData = data.map((job, index) => ({
-        id: job.id || index + 1,
-        title: job.job_title || job.title || 'Internship Position',
-        company: job.company_name || job.company || 'Company',
-        location: job.location || job.job_location || 'India',
-        type: job.job_type || 'Internship',
-        duration: job.duration || 'Not specified',
-        stipend: job.salary || job.stipend || 'Not disclosed',
-        skills: job.skills || job.required_skills || [],
-        applyLink: job.apply_link || job.url || '#',
-        postedDate: job.posted_date || job.created_at || 'Recently'
+      const transformedData = jobs.map((job, index) => ({
+        id: job.job_id || index + 1,
+        title: job.job_title || 'Internship Position',
+        company: job.employer_name || 'Company',
+        location: job.job_city && job.job_country 
+          ? `${job.job_city}, ${job.job_country}` 
+          : job.job_country || 'Remote',
+        type: job.job_employment_type || 'Internship',
+        duration: job.job_employment_type === 'INTERN' ? '3-6 months' : 'Not specified',
+        stipend: job.job_salary || job.job_min_salary 
+          ? `${job.job_min_salary || 'Competitive'} - ${job.job_max_salary || ''}`
+          : 'Not disclosed',
+        skills: job.job_required_skills || [],
+        applyLink: job.job_apply_link || job.job_google_link || '#',
+        postedDate: job.job_posted_at_datetime_utc 
+          ? new Date(job.job_posted_at_datetime_utc * 1000).toLocaleDateString()
+          : 'Recently',
+        description: job.job_description || '',
+        benefits: job.job_highlights?.Benefits || [],
+        qualifications: job.job_highlights?.Qualifications || []
       }));
 
       setAllOpportunities(transformedData);
     } catch (err) {
       console.error('Error fetching internships:', err);
-      setError(err.message || 'Failed to load internships');
+      setError(err.message || 'Failed to load internships. Please check API key.');
     } finally {
       setLoading(false);
     }
