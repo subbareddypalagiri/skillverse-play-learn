@@ -1,6 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Palette, Award, User, LogIn, UserPlus, Waves, Zap } from "lucide-react";
+import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Palette, Award, User, LogIn, UserPlus, Waves, Zap, Moon, Sun, Monitor, ChevronDown, Settings, UserCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useState } from "react";
 
 const navigation = [
   { name: "Home", path: "/", icon: Home },
@@ -12,12 +14,14 @@ const navigation = [
   { name: "Achievements", path: "/achievements", icon: Award },
   { name: "Profile", path: "/profile", icon: User },
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { name: "Login", path: "/login", icon: LogIn },
-  { name: "Signup", path: "/signup", icon: UserPlus },
+  { name: "Account", path: "/login", icon: UserCircle },
+  { name: "Settings", path: "/settings", icon: Settings, iconOnly: true },
 ];
 
 const Navbar = () => {
   const location = useLocation();
+  const { theme, setTheme, colorPalette, setColorPalette, availablePalettes } = useTheme();
+  const [isColorDropdownOpen, setIsColorDropdownOpen] = useState(false);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -56,14 +60,85 @@ const Navbar = () => {
                   )}
                 >
                   <Icon className="w-4 h-4" />
-                  {item.name === "Profile" ? (
-                    <span className="sr-only">Profile</span>
+                  {item.iconOnly || item.name === "Profile" ? (
+                    <span className="sr-only">{item.name}</span>
                   ) : (
                     <span className="text-sm font-medium">{item.name}</span>
                   )}
                 </Link>
               );
             })}
+          </div>
+
+          {/* Color Picker */}
+          <div className="flex items-center space-x-1">
+            {/* Small Color Boxes */}
+            <div className="hidden md:flex items-center space-x-1 border-r border-border pr-2">
+              {availablePalettes.map((palette) => (
+                <button
+                  key={palette.name}
+                  onClick={() => setColorPalette(palette)}
+                  className={cn(
+                    "w-6 h-6 rounded-md transition-all duration-200 hover:scale-110 border-2",
+                    colorPalette.name === palette.name
+                      ? "border-primary shadow-card"
+                      : "border-border hover:border-primary/50"
+                  )}
+                  title={palette.name}
+                  style={{
+                    background: `linear-gradient(135deg, rgb(${palette.primary}), rgb(${palette.secondary}))`
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Mobile Color Picker Dropdown */}
+            <div className="relative md:hidden">
+              <button
+                onClick={() => setIsColorDropdownOpen(!isColorDropdownOpen)}
+                className="flex items-center space-x-1 p-2 rounded-lg transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted"
+                title="Change color theme"
+              >
+                <Palette className="w-4 h-4" />
+                <ChevronDown className="w-3 h-3" />
+              </button>
+
+              {isColorDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-background border border-border rounded-lg shadow-elevated p-2 z-50">
+                  <div className="text-sm font-medium text-foreground mb-2">Color Theme</div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {availablePalettes.map((palette) => (
+                      <button
+                        key={palette.name}
+                        onClick={() => {
+                          setColorPalette(palette);
+                          setIsColorDropdownOpen(false);
+                        }}
+                        className={cn(
+                          "relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105",
+                          colorPalette.name === palette.name
+                            ? "border-primary shadow-card"
+                            : "border-border hover:border-border/80"
+                        )}
+                        title={palette.name}
+                        style={{
+                          background: `linear-gradient(135deg, rgb(${palette.primary}), rgb(${palette.secondary}))`
+                        }}
+                      >
+                        {colorPalette.name === palette.name && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-2 h-2 bg-white rounded-full shadow-lg" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-2 text-xs text-muted-foreground text-center">
+                    {colorPalette.name}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu Button */}

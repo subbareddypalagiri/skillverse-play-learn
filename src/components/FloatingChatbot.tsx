@@ -48,9 +48,10 @@ const FloatingChatbot = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [lastRequestTime, setLastRequestTime] = useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const GEMINI_API_KEY = "AIzaSyAU4Qhcm-vRz1ywUCcqpZl3TuVUgSFi7nw";
+  const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
   // Load bot name, theme, and messages from localStorage
   useEffect(() => {
@@ -108,6 +109,14 @@ const FloatingChatbot = () => {
   const sendMessage = async () => {
     if (!inputMessage.trim()) return;
 
+    // Rate limiting: wait at least 2 seconds between requests for better variety
+    const now = Date.now();
+    const timeSinceLastRequest = now - lastRequestTime;
+    if (timeSinceLastRequest < 2000) {
+      const waitTime = 2000 - timeSinceLastRequest;
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -119,39 +128,63 @@ const FloatingChatbot = () => {
     const currentInput = inputMessage;
     setInputMessage("");
     setLoading(true);
+    setLastRequestTime(Date.now());
 
     try {
+      if (!OPENAI_API_KEY) {
+        throw new Error('OpenAI API key is not configured. Please add your key to the .env file as VITE_OPENAI_API_KEY.');
+      }
+
+      const systemPrompt =
+        "You are Risee AI Assistant, a helpful learning companion. Be specific and avoid repeating the same answer. If the user asks the same question again, respond with a different explanation, new examples, or a new angle.";
+
+      const recent = [...messages, userMessage].slice(-10);
+
+      const chatMessages = [
+        { role: "system" as const, content: systemPrompt },
+        ...recent.map((m) => ({
+          role: m.role === "assistant" ? "assistant" : "user",
+          content: m.content,
+        })),
+      ];
+
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
+        "https://api.openai.com/v1/chat/completions",
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
           },
           body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: currentInput
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 1024,
-            }
+            model: 'gpt-4o-mini',
+            messages: chatMessages,
+            temperature: 0.9,
+            max_tokens: 1024,
+            top_p: 0.95,
           })
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('API Error:', errorData);
-        throw new Error(`API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+        console.error('OpenAI API Error:', errorData);
+
+        if (response.status === 401 || response.status === 403) {
+          throw new Error('OpenAI API key invalid or unauthorized. Check your key and project settings.');
+        } else if (response.status === 429) {
+          throw new Error('Rate limit exceeded by OpenAI. Please wait a moment before trying again.');
+        } else {
+          throw new Error(`OpenAI API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+        }
       }
 
       const data = await response.json();
-      console.log('API Response:', data);
-      
-      const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
+      console.log('OpenAI API Response:', data);
+
+      const aiResponse =
+        data.choices?.[0]?.message?.content ||
+        "Sorry, I couldn't generate a response.";
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),

@@ -7,6 +7,7 @@ import { CourseProvider } from "./contexts/CourseContext";
 import { VideoProgressProvider } from "./contexts/VideoProgressContext";
 import { SocialProvider } from "./contexts/SocialContext";
 import { ClubProvider } from "./contexts/ClubContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Vibe from "./pages/Vibe";
 import Dashboard from "./pages/Dashboard";
@@ -21,6 +22,7 @@ import NotFound from "./pages/NotFound";
 import Sync from "./pages/Sync";
 import AITools from "./pages/AITools";
 import AIAssistant from "./pages/AIAssistant";
+import Settings from "./pages/Settings";
 import FloatingChatbot from "./components/FloatingChatbot";
 
 const queryClient = new QueryClient();
@@ -28,13 +30,14 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <CourseProvider>
-        <VideoProgressProvider>
-          <SocialProvider>
-            <ClubProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
+      <ThemeProvider>
+        <CourseProvider>
+          <VideoProgressProvider>
+            <SocialProvider>
+              <ClubProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/login" element={<Login />} />
@@ -47,6 +50,7 @@ const App = () => (
                   <Route path="/events" element={<Events />} />
                   <Route path="/career" element={<CareerHub />} />
                   <Route path="/sync" element={<Sync />} />
+                  <Route path="/settings" element={<Settings />} />
                   {/* Hobbies & Clubs are now within Events page */}
                   <Route path="/achievements" element={<Achievements />} />
                   <Route path="/profile" element={<Profile />} />
@@ -56,9 +60,10 @@ const App = () => (
                 <FloatingChatbot />
               </BrowserRouter>
             </ClubProvider>
-          </SocialProvider>
-        </VideoProgressProvider>
-      </CourseProvider>
+            </SocialProvider>
+          </VideoProgressProvider>
+        </CourseProvider>
+      </ThemeProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
