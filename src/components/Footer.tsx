@@ -31,7 +31,7 @@ const Footer = () => {
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-lg">
                 <img 
-                  src="/Risee.jpeg" 
+                  src="/Risee.png" 
                   alt="Risee Logo" 
                   className="w-full h-full object-cover animate-shine"
                 />

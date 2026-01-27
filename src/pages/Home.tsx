@@ -72,269 +72,504 @@ const Home = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 px-4 overflow-hidden">
-        {/* Enhanced gradient background aura */}
+      <section className="relative pt-28 pb-20 px-4 overflow-hidden min-h-[90vh] flex items-center">
+        {/* Subtle gradient background */}
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-80 w-[36rem] rounded-full bg-gradient-primary opacity-20 blur-3xl" />
-          <div className="absolute -bottom-24 right-1/4 h-72 w-72 rounded-full bg-primary/30 opacity-20 blur-2xl" />
-          <div className="absolute top-1/2 left-1/4 h-64 w-64 rounded-full bg-purple-500/20 opacity-10 blur-3xl" />
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full bg-primary/5 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full bg-primary/3 blur-3xl" />
         </div>
 
-        {/* Subtle 3D Floating Spheres - Professional Design */}
-        <div className="pointer-events-none absolute inset-0 -z-5">
-          {/* Large Sphere - Top Right */}
-          <div 
-            className="absolute top-24 right-[8%] w-32 h-32 rounded-full opacity-20"
-            style={{
-              animation: 'floatSubtle 8s ease-in-out infinite',
-              background: 'radial-gradient(circle at 30% 30%, rgba(139, 92, 246, 0.4), rgba(139, 92, 246, 0.1))',
-              boxShadow: '0 8px 32px rgba(139, 92, 246, 0.2), inset -8px -8px 16px rgba(139, 92, 246, 0.1)',
-            }}
-          />
-
-          {/* Medium Sphere - Left Side */}
-          <div 
-            className="absolute top-40 left-[10%] w-24 h-24 rounded-full opacity-15"
-            style={{
-              animation: 'floatSubtle 10s ease-in-out infinite 1s',
-              background: 'radial-gradient(circle at 30% 30%, rgba(168, 85, 247, 0.4), rgba(168, 85, 247, 0.1))',
-              boxShadow: '0 8px 32px rgba(168, 85, 247, 0.15), inset -6px -6px 12px rgba(168, 85, 247, 0.1)',
-            }}
-          />
-
-          {/* Small Sphere - Bottom Left */}
-          <div 
-            className="absolute bottom-32 left-[15%] w-20 h-20 rounded-full opacity-18"
-            style={{
-              animation: 'floatSubtle 9s ease-in-out infinite 2s',
-              background: 'radial-gradient(circle at 30% 30%, rgba(147, 51, 234, 0.4), rgba(147, 51, 234, 0.1))',
-              boxShadow: '0 6px 24px rgba(147, 51, 234, 0.15), inset -5px -5px 10px rgba(147, 51, 234, 0.1)',
-            }}
-          />
-
-          {/* Medium Sphere - Right Side */}
-          <div 
-            className="absolute top-1/3 right-[15%] w-28 h-28 rounded-full opacity-16"
-            style={{
-              animation: 'floatSubtle 11s ease-in-out infinite 1.5s',
-              background: 'radial-gradient(circle at 30% 30%, rgba(126, 34, 206, 0.4), rgba(126, 34, 206, 0.1))',
-              boxShadow: '0 8px 32px rgba(126, 34, 206, 0.15), inset -7px -7px 14px rgba(126, 34, 206, 0.1)',
-            }}
-          />
-
-          {/* Small Sphere - Bottom Right */}
-          <div 
-            className="absolute bottom-40 right-[20%] w-16 h-16 rounded-full opacity-20"
-            style={{
-              animation: 'floatSubtle 7s ease-in-out infinite 3s',
-              background: 'radial-gradient(circle at 30% 30%, rgba(139, 92, 246, 0.4), rgba(139, 92, 246, 0.1))',
-              boxShadow: '0 6px 24px rgba(139, 92, 246, 0.2), inset -4px -4px 8px rgba(139, 92, 246, 0.1)',
-            }}
-          />
-
-          {/* Tiny Accent Sphere - Top Left */}
-          <div 
-            className="absolute top-1/4 left-[22%] w-12 h-12 rounded-full opacity-12"
-            style={{
-              animation: 'floatSubtle 6s ease-in-out infinite 0.5s',
-              background: 'radial-gradient(circle at 30% 30%, rgba(168, 85, 247, 0.3), rgba(168, 85, 247, 0.05))',
-              boxShadow: '0 4px 16px rgba(168, 85, 247, 0.1)',
-            }}
-          />
-
-          {/* Tiny Accent Sphere - Middle Right */}
-          <div 
-            className="absolute top-1/2 right-[25%] w-14 h-14 rounded-full opacity-14"
-            style={{
-              animation: 'floatSubtle 8.5s ease-in-out infinite 2.5s',
-              background: 'radial-gradient(circle at 30% 30%, rgba(147, 51, 234, 0.3), rgba(147, 51, 234, 0.05))',
-              boxShadow: '0 4px 16px rgba(147, 51, 234, 0.12)',
-            }}
-          />
+        {/* Falling Stars Animation */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden -z-5">
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white rounded-full opacity-60 animate-falling-star"
+              style={{
+                top: '-5%',
+                right: `${5 + i * 8}%`,
+                animationDelay: `${i * 0.8}s`,
+                animationDuration: `${4 + (i % 3)}s`,
+              }}
+            >
+              <div className="absolute inset-0 bg-white rounded-full blur-[1px]" />
+            </div>
+          ))}
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={`small-${i}`}
+              className="absolute w-0.5 h-0.5 bg-white/80 rounded-full animate-falling-star-slow"
+              style={{
+                top: '-3%',
+                right: `${10 + i * 10}%`,
+                animationDelay: `${i * 1.2 + 0.5}s`,
+                animationDuration: `${6 + (i % 2)}s`,
+              }}
+            />
+          ))}
         </div>
 
         <style>{`
-          @keyframes floatSubtle {
-            0%, 100% {
-              transform: translateY(0px) translateX(0px);
+          @keyframes fallingstar {
+            0% {
+              transform: translate(0, 0) rotate(0deg);
+              opacity: 0;
             }
-            25% {
-              transform: translateY(-15px) translateX(8px);
+            10% {
+              opacity: 0.7;
             }
-            50% {
-              transform: translateY(-25px) translateX(-8px);
+            90% {
+              opacity: 0.5;
             }
-            75% {
-              transform: translateY(-12px) translateX(5px);
+            100% {
+              transform: translate(-150px, 100vh) rotate(15deg);
+              opacity: 0;
             }
           }
+          @keyframes fallingstarslow {
+            0% {
+              transform: translate(0, 0);
+              opacity: 0;
+            }
+            15% {
+              opacity: 0.5;
+            }
+            85% {
+              opacity: 0.3;
+            }
+            100% {
+              transform: translate(-100px, 100vh);
+              opacity: 0;
+            }
+          }
+          .animate-falling-star {
+            animation: fallingstar linear infinite;
+          }
+          .animate-falling-star-slow {
+            animation: fallingstarslow linear infinite;
+          }
+          @keyframes orbitSlow1 {
+            0% { transform: rotate(0deg) translateX(220px) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(220px) rotate(-360deg); }
+          }
+          @keyframes orbitSlow2 {
+            0% { transform: rotate(72deg) translateX(220px) rotate(-72deg); }
+            100% { transform: rotate(432deg) translateX(220px) rotate(-432deg); }
+          }
+          @keyframes orbitSlow3 {
+            0% { transform: rotate(144deg) translateX(220px) rotate(-144deg); }
+            100% { transform: rotate(504deg) translateX(220px) rotate(-504deg); }
+          }
+          @keyframes orbitSlow4 {
+            0% { transform: rotate(216deg) translateX(220px) rotate(-216deg); }
+            100% { transform: rotate(576deg) translateX(220px) rotate(-576deg); }
+          }
+          @keyframes orbitSlow5 {
+            0% { transform: rotate(288deg) translateX(220px) rotate(-288deg); }
+            100% { transform: rotate(648deg) translateX(220px) rotate(-648deg); }
+          }
+          @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes gentlePulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
+          }
+          .animate-orbit-1 { animation: orbitSlow1 40s linear infinite; }
+          .animate-orbit-2 { animation: orbitSlow2 40s linear infinite; }
+          .animate-orbit-3 { animation: orbitSlow3 40s linear infinite; }
+          .animate-orbit-4 { animation: orbitSlow4 40s linear infinite; }
+          .animate-orbit-5 { animation: orbitSlow5 40s linear infinite; }
+          .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+          .animate-gentle-pulse { animation: gentlePulse 4s ease-in-out infinite; }
         `}</style>
 
-        <div className="container mx-auto text-center">
-          {/* Trust badges */}
-          <div className="flex flex-wrap justify-center gap-3 mb-6 animate-in fade-in slide-in-from-top-2 duration-700">
-            <Badge variant="secondary" className="px-4 py-2 text-sm font-medium">
-              <Star className="w-4 h-4 mr-1 fill-yellow-400 text-yellow-400" />
-              4.9/5 Rating
-            </Badge>
-            <Badge variant="secondary" className="px-4 py-2 text-sm font-medium">
-              <Zap className="w-4 h-4 mr-1 text-orange-500" />
-              10K+ Active Students
-            </Badge>
-            <Badge variant="secondary" className="px-4 py-2 text-sm font-medium">
-              <Award className="w-4 h-4 mr-1 text-blue-500" />
-              Industry Recognized
-            </Badge>
-          </div>
+        <div className="container mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            
+            {/* Left Side - Content */}
+            <div className="text-left space-y-8">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-muted/50 backdrop-blur-sm animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+                <span className="text-sm text-muted-foreground font-medium">10,000+ Active Learners</span>
+              </div>
 
-          <div className="inline-block mb-6 px-4 py-2 bg-gradient-primary rounded-full animate-in fade-in slide-in-from-top-2 duration-700 delay-100">
-            <span className="text-sm font-semibold text-primary-foreground">
-              🚀 Where Learning Meets Adventure
-            </span>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent animate-in fade-in-50 zoom-in-50 duration-700 delay-200 leading-tight">
-            Welcome to Risee
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-in fade-in-50 duration-700 delay-300 leading-relaxed">
-            The learning platform that gives equal priority to education and enjoyment.
-            <span className="block mt-2 text-lg md:text-xl font-medium text-foreground">
-              Learn, grow, and have fun - all in one place.
-            </span>
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-in fade-in duration-700 delay-400">
-            <Link to="/dashboard">
-              <Button size="lg" className="bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-elevated group px-8 py-6 text-lg">
-                Get Started Free
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-            <Link to="/courses">
-              <Button size="lg" variant="outline" className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-6 text-lg">
-                Explore Courses
-              </Button>
-            </Link>
-          </div>
+              {/* Main Headline */}
+              <div className="space-y-2 animate-fade-in-up" style={{ animationDelay: '0.2s', opacity: 0 }}>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground leading-tight tracking-tight">
+                  Rise like a
+                </h1>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight">
+                  <span className="bg-gradient-primary bg-clip-text text-transparent">Star</span>
+                </h1>
+              </div>
+              
+              {/* Subheadline */}
+              <p className="text-lg md:text-xl text-muted-foreground font-normal max-w-md leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
+                Enjoy the journey with personalized courses, expert mentorship, and a community built for your success.
+              </p>
+              
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 animate-fade-in-up" style={{ animationDelay: '0.6s', opacity: 0 }}>
+                <Link to="/login">
+                  <Button size="lg" className="bg-gradient-primary text-primary-foreground hover:opacity-90 shadow-lg group px-8 py-6 text-base font-medium rounded-full transition-all duration-300 hover:scale-105 hover:shadow-xl">
+                    Get Started
+                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Link to="/courses">
+                  <Button size="lg" variant="ghost" className="text-foreground hover:bg-muted px-8 py-6 text-base font-medium rounded-full transition-all duration-300 group">
+                    Explore Courses
+                    <ArrowRight className="ml-2 w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                  </Button>
+                </Link>
+              </div>
 
-          {/* Social proof */}
-          <p className="text-sm text-muted-foreground animate-in fade-in duration-700 delay-500">
-            Join 10,000+ students already learning on Risee
-          </p>
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap items-center gap-6 pt-6 animate-fade-in-up" style={{ animationDelay: '0.8s', opacity: 0 }}>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-muted-foreground">Expert-led courses</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-muted-foreground">Hands-on projects</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-muted-foreground">Career support</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Orbital Cards Animation */}
+            <div className="relative hidden lg:block h-[500px]">
+              {/* Orbit center point */}
+              <div className="absolute top-1/2 left-[40%] -translate-x-1/2 -translate-y-1/2">
+                {/* Subtle orbit path indicator */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[440px] h-[440px] rounded-full border border-primary/10" />
+                
+                {/* Main decorative gradient circle */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gradient-to-br from-primary/15 to-primary/5 blur-2xl animate-gentle-pulse" />
+
+                {/* Orbiting Card 1 - Sarah Chen */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-orbit-1">
+                  <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl p-3 shadow-elevated">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-gradient-primary flex items-center justify-center">
+                        <Trophy className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground whitespace-nowrap">Sarah Chen</p>
+                        <p className="text-xs text-muted-foreground whitespace-nowrap">Joined <span className="text-primary font-medium">Google</span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Orbiting Card 2 - 500+ Courses */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-orbit-2">
+                  <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl p-3 shadow-elevated">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                        <BookOpen className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground whitespace-nowrap">500+ Courses</p>
+                        <p className="text-xs text-muted-foreground whitespace-nowrap">Industry recognized</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Orbiting Card 3 - Raj Patel */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-orbit-3">
+                  <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl p-3 shadow-elevated">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Award className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground whitespace-nowrap">Raj Patel</p>
+                        <p className="text-xs text-muted-foreground whitespace-nowrap">Joined <span className="text-primary font-medium">Microsoft</span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Orbiting Card 4 - 95% Success */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-orbit-4">
+                  <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl p-3 shadow-elevated">
+                    <div className="flex items-center gap-3">
+                      <div className="flex -space-x-1">
+                        <div className="w-6 h-6 rounded-full bg-primary/20 border-2 border-card flex items-center justify-center text-[10px] font-medium text-primary">A</div>
+                        <div className="w-6 h-6 rounded-full bg-primary/30 border-2 border-card flex items-center justify-center text-[10px] font-medium text-primary">B</div>
+                        <div className="w-6 h-6 rounded-full bg-primary/40 border-2 border-card flex items-center justify-center text-[10px] font-medium text-primary-foreground">+</div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground whitespace-nowrap">95% Success</p>
+                        <p className="text-xs text-muted-foreground whitespace-nowrap">Placement rate</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Orbiting Card 5 - New Achievement */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-orbit-5">
+                  <div className="bg-card/80 backdrop-blur-xl border border-border rounded-2xl p-3 shadow-elevated">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-gradient-primary flex items-center justify-center">
+                        <Rocket className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground whitespace-nowrap">10K+ Students</p>
+                        <p className="text-xs text-muted-foreground whitespace-nowrap">Learning daily</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Decorative floating dots */}
+              <div className="absolute top-16 left-16 w-2 h-2 rounded-full bg-primary/30 animate-pulse" />
+              <div className="absolute bottom-20 right-20 w-3 h-3 rounded-full bg-primary/20 animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className="absolute top-1/3 right-8 w-2 h-2 rounded-full bg-primary/25 animate-pulse" style={{ animationDelay: '0.5s' }} />
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 px-4 bg-gradient-to-b from-background to-muted/30">
+      <section className="py-12 px-4">
         <div className="container mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <div 
-                  key={index}
-                  className="text-center group hover:scale-105 transition-transform duration-300"
-                >
-                  <div className="flex justify-center mb-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center group-hover:shadow-lg transition-shadow">
-                      <Icon className="w-6 h-6 text-primary-foreground" />
+          <div className="relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 md:p-8 overflow-hidden">
+            {/* Subtle background glow */}
+            <div className="absolute top-0 left-1/4 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 right-1/4 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
+            
+            <div className="relative flex flex-wrap justify-center md:justify-between items-center gap-8 md:gap-4">
+              {stats.map((stat, index) => {
+                const Icon = stat.icon;
+                return (
+                  <div 
+                    key={index}
+                    className="flex items-center gap-3 group animate-fade-in-up"
+                    style={{ animationDelay: `${index * 0.1}s`, opacity: 0 }}
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
+                      <Icon className="w-5 h-5 text-primary" />
                     </div>
+                    <div>
+                      <div className="text-xl md:text-2xl font-semibold text-foreground">
+                        {stat.value}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {stat.label}
+                      </div>
+                    </div>
+                    {index < stats.length - 1 && (
+                      <div className="hidden md:block w-px h-10 bg-border/50 ml-6" />
+                    )}
                   </div>
-                  <div className="text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-                    {stat.value}
-                  </div>
-                  <div className="text-sm md:text-base text-muted-foreground font-medium">
-                    {stat.label}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="py-20 px-4 bg-muted/30">
+      {/* Features Grid - Why Choose Us */}
+      <section className="py-24 px-4 relative overflow-hidden">
+        {/* Subtle background accents */}
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+        
         <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-2">
-              <Zap className="w-4 h-4 mr-2" />
-              Platform Features
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Why Choose Risee?</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to accelerate your learning journey and achieve your goals
+          {/* Section Header */}
+          <div className="max-w-2xl mb-20">
+            <p className="text-sm font-medium text-primary mb-3 tracking-wide uppercase">Why Risee</p>
+            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 leading-tight">
+              Everything you need to succeed
+            </h2>
+            <p className="text-base text-muted-foreground leading-relaxed">
+              A platform designed with precision to accelerate your learning journey.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {/* Features Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-border/50 rounded-2xl overflow-hidden">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <Card 
+                <div 
                   key={index}
-                  className="p-6 bg-gradient-card border-0 shadow-card hover:shadow-elevated transition-all duration-300 hover:-translate-y-2 group"
+                  className="group bg-background p-8 hover:bg-muted/30 transition-all duration-500 relative"
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Icon className="w-7 h-7 text-primary-foreground" />
+                  {/* Hover indicator */}
+                  <div className="absolute top-0 left-0 w-full h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                  
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors duration-300">
+                    <Icon className="w-5 h-5 text-primary" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </Card>
+                  <h3 className="text-base font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                </div>
               );
             })}
           </div>
 
-          {/* Benefits List */}
-          <Card className="p-8 md:p-12 bg-gradient-card border-0 shadow-elevated">
-            <h3 className="text-2xl md:text-3xl font-bold mb-8 text-center">What You'll Get</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              {benefits.map((benefit, index) => (
-                <div key={index} className="flex items-start gap-3 group">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center mt-0.5 group-hover:bg-green-500/30 transition-colors">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
-                  </div>
-                  <span className="text-base text-foreground/90">{benefit}</span>
+          {/* Benefits - Minimal List */}
+          <div className="mt-20 grid md:grid-cols-3 gap-8">
+            {benefits.slice(0, 6).map((benefit, index) => (
+              <div 
+                key={index} 
+                className="flex items-start gap-3 group"
+              >
+                <div className="flex-shrink-0 w-5 h-5 rounded-full border border-primary/30 flex items-center justify-center mt-0.5 group-hover:border-primary group-hover:bg-primary/10 transition-all duration-300">
+                  <CheckCircle2 className="w-3 h-3 text-primary" />
                 </div>
-              ))}
-            </div>
-          </Card>
+                <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-300">{benefit}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 px-4 bg-background">
-        <div className="container mx-auto">
+      <section className="py-24 px-4 relative overflow-hidden">
+        {/* Animated gradient background */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-primary/8 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/3 rounded-full blur-3xl" />
+        </div>
+
+        <style>{`
+          @keyframes testimonialFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+          }
+          @keyframes shimmerBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+          @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.1); }
+            50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.2); }
+          }
+          .testimonial-card {
+            animation: testimonialFloat 6s ease-in-out infinite;
+          }
+          .testimonial-card:nth-child(2) {
+            animation-delay: 1s;
+          }
+          .testimonial-card:nth-child(3) {
+            animation-delay: 2s;
+          }
+          .shimmer-border {
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
+            background-size: 200% 100%;
+            animation: shimmerBorder 3s ease-in-out infinite;
+          }
+          .glow-card {
+            animation: glowPulse 4s ease-in-out infinite;
+          }
+        `}</style>
+
+        <div className="container mx-auto relative">
+          {/* Section Header */}
           <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4 px-4 py-2">
-              <Star className="w-4 h-4 mr-2 fill-yellow-400 text-yellow-400" />
-              Student Success Stories
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Loved by Learners</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              See what our students have to say about their experience
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <Star className="w-4 h-4 text-primary fill-primary" />
+              <span className="text-sm font-medium text-primary">Student Stories</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-semibold text-foreground mb-4">
+              Loved by <span className="bg-gradient-primary bg-clip-text text-transparent">Learners</span>
+            </h2>
+            <p className="text-base text-muted-foreground max-w-lg mx-auto">
+              Join thousands of students who transformed their careers with Risee
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          {/* Testimonials Grid */}
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="p-6 bg-gradient-card border-0 shadow-card hover:shadow-elevated transition-all duration-300">
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  ))}
+              <div 
+                key={index}
+                className="testimonial-card group relative"
+              >
+                {/* Gradient border effect */}
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 via-primary/20 to-primary/50 rounded-2xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500" />
+                
+                <div className="relative bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-6 lg:p-8 h-full glow-card group-hover:border-primary/30 transition-all duration-500">
+                  {/* Rating Stars */}
+                  <div className="flex items-center gap-1 mb-5">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className="w-4 h-4 fill-primary text-primary transition-transform duration-300 group-hover:scale-110" 
+                        style={{ transitionDelay: `${i * 50}ms` }}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Quote */}
+                  <p className="text-sm md:text-base text-foreground/90 mb-6 leading-relaxed">
+                    "{testimonial.content}"
+                  </p>
+
+                  {/* Author */}
+                  <div className="flex items-center gap-3 pt-4 border-t border-border/50">
+                    <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-semibold text-sm">
+                      {testimonial.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{testimonial.name}</p>
+                      <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                    </div>
+                  </div>
+
+                  {/* Decorative corner accent */}
+                  <div className="absolute top-4 right-4 w-8 h-8 opacity-10 group-hover:opacity-30 transition-opacity duration-300">
+                    <Quote className="w-full h-full text-primary" />
+                  </div>
                 </div>
-                <Quote className="w-8 h-8 text-primary/20 mb-3" />
-                <p className="text-foreground/90 mb-6 leading-relaxed">
-                  "{testimonial.content}"
-                </p>
-                <div className="border-t pt-4">
-                  <p className="font-semibold text-foreground">{testimonial.name}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                </div>
-              </Card>
+              </div>
             ))}
+          </div>
+
+          {/* Trust indicators */}
+          <div className="flex flex-wrap justify-center items-center gap-8 mt-16 pt-8 border-t border-border/30">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex -space-x-2">
+                {['S', 'M', 'E', 'R'].map((letter, i) => (
+                  <div 
+                    key={i}
+                    className="w-8 h-8 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-xs font-medium text-primary"
+                  >
+                    {letter}
+                  </div>
+                ))}
+              </div>
+              <span className="text-sm ml-2">10,000+ happy students</span>
+            </div>
+            <div className="h-4 w-px bg-border hidden md:block" />
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                ))}
+              </div>
+              <span className="text-sm text-muted-foreground">4.9/5 average rating</span>
+            </div>
+            <div className="h-4 w-px bg-border hidden md:block" />
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Trophy className="w-4 h-4 text-primary" />
+              <span className="text-sm">Top rated platform</span>
+            </div>
           </div>
         </div>
       </section>
