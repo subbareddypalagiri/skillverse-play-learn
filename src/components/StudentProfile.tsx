@@ -28,6 +28,7 @@ const StudentProfile = () => {
     hobbies: userProfile?.hobbies?.join(', ') || '',
     skills: userProfile?.skills?.join(', ') || '',
   });
+  const [isSaving, setIsSaving] = useState(false);
   const { videoProgress, getCourseProgress } = useVideoProgress();
   const { enrolledCourses } = useCourseContext();
 
@@ -47,14 +48,23 @@ const StudentProfile = () => {
     return acc;
   }, {} as Record<string, number>);
 
-  const handleSaveProfile = () => {
-    updateProfile({
-      name: editData.name,
-      bio: editData.bio,
-      hobbies: editData.hobbies.split(',').map(h => h.trim()).filter(Boolean),
-      skills: editData.skills.split(',').map(s => s.trim()).filter(Boolean),
-    });
-    setShowEditDialog(false);
+  const handleSaveProfile = async () => {
+    try {
+      setIsSaving(true);
+      await updateProfile({
+        name: editData.name,
+        bio: editData.bio,
+        hobbies: editData.hobbies.split(',').map(h => h.trim()).filter(Boolean),
+        skills: editData.skills.split(',').map(s => s.trim()).filter(Boolean),
+      });
+      setShowEditDialog(false);
+    } catch (error) {
+      console.error('Failed to save profile:', error);
+      // Still close dialog but show error
+      alert('Failed to save profile. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleOpenEdit = () => {
@@ -563,16 +573,18 @@ const StudentProfile = () => {
                 variant="outline"
                 onClick={() => setShowEditDialog(false)}
                 className="gap-2"
+                disabled={isSaving}
               >
                 <X className="w-4 h-4" />
                 Cancel
               </Button>
               <Button
                 onClick={handleSaveProfile}
+                disabled={isSaving}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white gap-2"
               >
                 <Save className="w-4 h-4" />
-                Save Profile 🔥
+                {isSaving ? 'Saving...' : 'Save Profile 🔥'}
               </Button>
             </div>
           </div>

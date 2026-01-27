@@ -37,6 +37,85 @@ const userSchema = new mongoose.Schema({
     type: String,
     maxlength: [500, 'Bio cannot be more than 500 characters']
   },
+  hobbies: [{
+    type: String,
+    trim: true
+  }],
+  skills: [{
+    type: String,
+    trim: true
+  }],
+  linkedIn: {
+    type: String,
+    default: null
+  },
+  github: {
+    type: String,
+    default: null
+  },
+  leetcode: {
+    type: String,
+    default: null
+  },
+  codeforces: {
+    type: String,
+    default: null
+  },
+  codechef: {
+    type: String,
+    default: null
+  },
+  hackerrank: {
+    type: String,
+    default: null
+  },
+  kaggle: {
+    type: String,
+    default: null
+  },
+  behance: {
+    type: String,
+    default: null
+  },
+  dribbble: {
+    type: String,
+    default: null
+  },
+  soundcloud: {
+    type: String,
+    default: null
+  },
+  youtube: {
+    type: String,
+    default: null
+  },
+  instagram: {
+    type: String,
+    default: null
+  },
+  githubStats: {
+    repos: { type: Number, default: 0 },
+    stars: { type: Number, default: 0 },
+    followers: { type: Number, default: 0 },
+    contributions: { type: Number, default: 0 }
+  },
+  leetcodeStats: {
+    solved: { type: Number, default: 0 },
+    ranking: { type: Number, default: 0 },
+    badges: [{ type: String }]
+  },
+  followers: {
+    type: Number,
+    default: 0
+  },
+  following: {
+    type: Number,
+    default: 0
+  },
+  totalLikes: {
+    type: Number,
+    default: 0
+  },
   enrolledCourses: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course'

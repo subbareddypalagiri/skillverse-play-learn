@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { updateUserProfile, getUserProfile } from '@/utils/api';
 
 export interface Post {
   id: string;
@@ -76,11 +77,14 @@ export interface UserProfile {
 interface SocialContextType {
   posts: Post[];
   userProfile: UserProfile | null;
+  loading: boolean;
+  error: string | null;
   addPost: (post: Omit<Post, 'id' | 'timestamp' | 'likes' | 'comments' | 'shares'>) => void;
   likePost: (postId: string) => void;
   addComment: (postId: string, comment: Omit<Comment, 'id' | 'timestamp'>) => void;
-  updateProfile: (profile: Partial<UserProfile>) => void;
+  updateProfile: (profile: Partial<UserProfile>) => Promise<void>;
   importFromPlatform: (platform: string, username: string) => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const SocialContext = createContext<SocialContextType | undefined>(undefined);
@@ -95,6 +99,60 @@ export const SocialProvider = ({ children }: { children: ReactNode }) => {
     const saved = localStorage.getItem('userProfile');
     return saved ? JSON.parse(saved) : null;
   });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load profile from server on mount
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        setLoading(true);
+        const profile = await getUserProfile();
+        setUserProfile({
+          id: profile.id,
+          name: profile.name,
+          email: profile.email,
+          avatar: profile.avatar,
+          bio: profile.bio || '',
+          hobbies: profile.hobbies || [],
+          skills: profile.skills || [],
+          linkedIn: profile.linkedIn,
+          github: profile.github,
+          leetcode: profile.leetcode,
+          codeforces: profile.codeforces,
+          codechef: profile.codechef,
+          hackerrank: profile.hackerrank,
+          kaggle: profile.kaggle,
+          behance: profile.behance,
+          dribbble: profile.dribbble,
+          soundcloud: profile.soundcloud,
+          youtube: profile.youtube,
+          instagram: profile.instagram,
+          githubStats: profile.githubStats,
+          leetcodeStats: profile.leetcodeStats,
+          posts: [],
+          achievements: [],
+          projects: [],
+          followers: profile.followers || 0,
+          following: profile.following || 0,
+          totalLikes: profile.totalLikes || 0,
+        });
+        setError(null);
+      } catch (err) {
+        console.log('Not authenticated, using local storage');
+        // If API call fails, use local storage data
+        const saved = localStorage.getItem('userProfile');
+        if (saved) {
+          setUserProfile(JSON.parse(saved));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('socialPosts', JSON.stringify(posts));
@@ -137,8 +195,76 @@ export const SocialProvider = ({ children }: { children: ReactNode }) => {
     ));
   };
 
-  const updateProfile = (profile: Partial<UserProfile>) => {
-    setUserProfile(prev => prev ? { ...prev, ...profile } : null);
+  const updateProfile = async (profile: Partial<UserProfile>) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Update on backend
+      const updatedProfile = await updateUserProfile(profile);
+      
+      // Update local state
+      setUserProfile(prev => prev ? { ...prev, ...updatedProfile } : null);
+      
+      // Also update localStorage
+      if (updatedProfile) {
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to update profile';
+      setError(errorMsg);
+      console.error('Profile update error:', err);
+      
+      // Fallback: Update local state anyway for better UX
+      setUserProfile(prev => prev ? { ...prev, ...profile } : null);
+      
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshProfile = async () => {
+    try {
+      setLoading(true);
+      const profile = await getUserProfile();
+      setUserProfile({
+        id: profile.id,
+        name: profile.name,
+        email: profile.email,
+        avatar: profile.avatar,
+        bio: profile.bio || '',
+        hobbies: profile.hobbies || [],
+        skills: profile.skills || [],
+        linkedIn: profile.linkedIn,
+        github: profile.github,
+        leetcode: profile.leetcode,
+        codeforces: profile.codeforces,
+        codechef: profile.codechef,
+        hackerrank: profile.hackerrank,
+        kaggle: profile.kaggle,
+        behance: profile.behance,
+        dribbble: profile.dribbble,
+        soundcloud: profile.soundcloud,
+        youtube: profile.youtube,
+        instagram: profile.instagram,
+        githubStats: profile.githubStats,
+        leetcodeStats: profile.leetcodeStats,
+        posts: [],
+        achievements: [],
+        projects: [],
+        followers: profile.followers || 0,
+        following: profile.following || 0,
+        totalLikes: profile.totalLikes || 0,
+      });
+      setError(null);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to refresh profile';
+      setError(errorMsg);
+      console.error('Refresh profile error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const importFromPlatform = async (platform: string, username: string) => {
@@ -148,7 +274,7 @@ export const SocialProvider = ({ children }: { children: ReactNode }) => {
     
     // Simulated data import
     if (platform === 'github') {
-      updateProfile({
+      const updated = {
         github: `https://github.com/${username}`,
         githubStats: {
           repos: 45,
@@ -156,16 +282,18 @@ export const SocialProvider = ({ children }: { children: ReactNode }) => {
           followers: 123,
           contributions: 1547,
         }
-      });
+      };
+      await updateProfile(updated);
     } else if (platform === 'leetcode') {
-      updateProfile({
+      const updated = {
         leetcode: `https://leetcode.com/${username}`,
         leetcodeStats: {
           solved: 456,
           ranking: 12345,
           badges: ['50 Days Badge', 'Annual Badge 2024'],
         }
-      });
+      };
+      await updateProfile(updated);
     }
   };
 
@@ -174,11 +302,14 @@ export const SocialProvider = ({ children }: { children: ReactNode }) => {
       value={{
         posts,
         userProfile,
+        loading,
+        error,
         addPost,
         likePost,
         addComment,
         updateProfile,
         importFromPlatform,
+        refreshProfile,
       }}
     >
       {children}

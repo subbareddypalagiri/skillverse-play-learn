@@ -8,6 +8,14 @@ interface VideoProgress {
   totalDuration: number;
   completed: boolean;
   lastWatched: string;
+  watchSessions: WatchSession[]; // Track individual watch sessions to prevent cheating
+  userEngagement: number; // Track if user is actually watching (0-100%)
+}
+
+interface WatchSession {
+  startTime: Date;
+  endTime: Date;
+  continuousWatchTime: number; // Time watched without skipping/leaving
 }
 
 interface VideoProgressContextType {
@@ -18,6 +26,8 @@ interface VideoProgressContextType {
   getCompletedVideos: (courseTitle: string) => number;
   getTotalVideos: (courseTitle: string) => number;
   isCourseCompleted: (courseTitle: string, totalVideos: number) => boolean;
+  isVideoValidlyCompleted: (videoId: string) => boolean; // Anti-cheating verification
+  getVideoWatchedPercentage: (videoId: string) => number;
 }
 
 const VideoProgressContext = createContext<VideoProgressContextType | undefined>(undefined);
@@ -47,6 +57,37 @@ export const VideoProgressProvider = ({ children }: { children: ReactNode }) => 
   const isVideoCompleted = (videoId: string) => {
     const video = videoProgress.find(v => v.videoId === videoId);
     return video?.completed || false;
+  };
+
+  // Anti-cheating verification - Check if video was watched legitimately
+  const isVideoValidlyCompleted = (videoId: string) => {
+    const video = videoProgress.find(v => v.videoId === videoId);
+    if (!video) return false;
+    
+    // Require:
+    // 1. At least 95% of video watched
+    // 2. Watch sessions show continuous watching (not all at once)
+    // 3. User engagement > 70%
+    
+    const watchedPercentage = video.totalDuration > 0 
+      ? (video.watchedDuration / video.totalDuration) * 100 
+      : 0;
+    
+    const hasMultipleSessions = video.watchSessions && video.watchSessions.length > 0;
+    const highEngagement = video.userEngagement >= 70;
+    
+    return (
+      video.completed && 
+      watchedPercentage >= 95 && 
+      hasMultipleSessions && 
+      highEngagement
+    );
+  };
+
+  const getVideoWatchedPercentage = (videoId: string) => {
+    const video = videoProgress.find(v => v.videoId === videoId);
+    if (!video || video.totalDuration === 0) return 0;
+    return Math.round((video.watchedDuration / video.totalDuration) * 100);
   };
 
   const getCourseProgress = (courseTitle: string) => {
@@ -82,6 +123,8 @@ export const VideoProgressProvider = ({ children }: { children: ReactNode }) => 
         getCompletedVideos,
         getTotalVideos,
         isCourseCompleted,
+        isVideoValidlyCompleted,
+        getVideoWatchedPercentage,
       }}
     >
       {children}

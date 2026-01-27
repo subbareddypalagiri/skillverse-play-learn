@@ -12,6 +12,8 @@ import authRoutes from './routes/auth.js';
 import courseRoutes from './routes/courses.js';
 import eventRoutes from './routes/events.js';
 import userRoutes from './routes/users.js';
+import jobRoutes from './routes/jobs.js';
+import problemRoutes from './routes/problems.js';
 
 // Load environment variables
 dotenv.config();
@@ -62,6 +64,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/jobs', jobRoutes);
+app.use('/api/problems', problemRoutes);
 
 // 404 handler
 app.use((req, res) => {

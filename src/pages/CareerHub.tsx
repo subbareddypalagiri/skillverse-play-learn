@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Briefcase, MapPin, DollarSign, Clock, Search, Filter, ChevronLeft, ChevronRight, ExternalLink, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const CareerHub = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
@@ -16,78 +18,87 @@ const CareerHub = () => {
   const [allOpportunities, setAllOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalJobs, setTotalJobs] = useState(0);
   const itemsPerPage = 6;
 
-  // Fetch REAL internships from JSearch API (FREE - aggregates from Indeed, LinkedIn, Glassdoor)
-  const fetchInternships = async () => {
+  // Fetch jobs from backend API
+  const fetchJobs = async (page = 1, search = "", location = "all", type = "all") => {
     try {
       setLoading(true);
       setError(null);
       
-      // JSearch API via RapidAPI - FREE tier: 2500 requests/month
-      // Get your FREE API key from: https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch
-      // Add VITE_RAPIDAPI_KEY=your_key to .env file
-      const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY || 'YOUR_RAPIDAPI_KEY_HERE';
-      
-      const response = await fetch(
-        'https://jsearch.p.rapidapi.com/search?query=internship&page=1&num_pages=1&date_posted=all',
-        {
-          method: 'GET',
-          headers: {
-            'X-RapidAPI-Key': RAPIDAPI_KEY,
-            'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
-          }
-        }
-      );
+      const params = new URLSearchParams({
+        page,
+        limit: itemsPerPage * 2, // Fetch more at once
+        type: type !== 'all' ? type : '',
+        location: location !== 'all' ? location : '',
+        search
+      });
+
+      const response = await fetch(`${API_BASE_URL}/jobs/all?${params}`);
 
       if (!response.ok) {
         throw new Error(`API Error: ${response.status}`);
       }
 
       const result = await response.json();
-      const jobs = result.data || [];
       
-      // Transform API data to match our component structure
-      const transformedData = jobs.map((job, index) => ({
-        id: job.job_id || index + 1,
-        title: job.job_title || 'Internship Position',
-        company: job.employer_name || 'Company',
-        location: job.job_city && job.job_country 
-          ? `${job.job_city}, ${job.job_country}` 
-          : job.job_country || 'Remote',
-        type: job.job_employment_type || 'Internship',
-        duration: job.job_employment_type === 'INTERN' ? '3-6 months' : 'Not specified',
-        stipend: job.job_salary || job.job_min_salary 
-          ? `${job.job_min_salary || 'Competitive'} - ${job.job_max_salary || ''}`
-          : 'Not disclosed',
-        skills: job.job_required_skills || [],
-        applyLink: job.job_apply_link || job.job_google_link || '#',
-        postedDate: job.job_posted_at_datetime_utc 
-          ? new Date(job.job_posted_at_datetime_utc * 1000).toLocaleDateString()
-          : 'Recently',
-        description: job.job_description || '',
-        benefits: job.job_highlights?.Benefits || [],
-        qualifications: job.job_highlights?.Qualifications || []
-      }));
-
-      setAllOpportunities(transformedData);
+      if (result.success && result.data) {
+        setAllOpportunities(result.data);
+        setTotalJobs(result.pagination?.total || result.data.length);
+      } else {
+        setError("Failed to load jobs from backend");
+        setAllOpportunities([]);
+      }
     } catch (err) {
-      console.error('Error fetching internships:', err);
-      setError(err.message || 'Failed to load internships. Please check API key.');
+      console.error('Error fetching jobs:', err);
+      setError(err.message || 'Failed to load jobs from server. Please ensure backend is running.');
+      setAllOpportunities([]);
     } finally {
       setLoading(false);
     }
   };
 
+  // Initial fetch when component mounts
   useEffect(() => {
-    fetchInternships();
+    fetchJobs(1, "", "all", "all");
   }, []);
 
-  // Filter opportunities
+  // Refresh jobs from JSearch API and cache them
+  const refreshJobsFromAPI = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch(`${API_BASE_URL}/jobs/refresh?query=internship&pageNum=1`, {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Fetch the newly cached jobs
+        await fetchJobs(1, "", "all", "all");
+      } else {
+        setError(result.message || "Failed to refresh jobs from API");
+      }
+    } catch (err) {
+      console.error('Error refreshing jobs:', err);
+      setError(err.message || 'Failed to refresh jobs from JSearch API');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter opportunities locally from fetched data
   const filteredOpportunities = allOpportunities.filter(opp => {
     const matchesSearch = opp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          opp.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         opp.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase()));
+                         (opp.skills && opp.skills.some(skill => skill.toLowerCase().includes(searchQuery.toLowerCase())));
     const matchesLocation = locationFilter === "all" || opp.location.toLowerCase().includes(locationFilter.toLowerCase());
     const matchesType = typeFilter === "all" || opp.type === typeFilter;
     return matchesSearch && matchesLocation && matchesType;
@@ -126,11 +137,11 @@ const CareerHub = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={fetchInternships}
+                onClick={refreshJobsFromAPI}
                 disabled={loading}
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
+                Refresh from API
               </Button>
             </div>
           </div>
@@ -204,7 +215,7 @@ const CareerHub = () => {
               <AlertCircle className="w-16 h-16 mx-auto mb-4 text-destructive" />
               <h3 className="text-xl font-semibold mb-2 text-destructive">Error Loading Data</h3>
               <p className="text-muted-foreground mb-4">{error}</p>
-              <Button onClick={fetchInternships} variant="outline">
+              <Button onClick={refreshJobsFromAPI} variant="outline">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Try Again
               </Button>
@@ -213,7 +224,7 @@ const CareerHub = () => {
             <>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {paginatedOpportunities.map((opp) => (
-                  <Card key={opp.id} className="p-6 shadow-card hover:shadow-elevated transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                  <Card key={opp._id || opp.jobId} className="p-6 shadow-card hover:shadow-elevated transition-all duration-300 hover:-translate-y-1 flex flex-col">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
                       <Badge 
@@ -221,7 +232,9 @@ const CareerHub = () => {
                       >
                         {opp.type}
                       </Badge>
-                      <span className="text-xs text-muted-foreground">{opp.postedDate}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {opp.postedDate ? new Date(opp.postedDate).toLocaleDateString() : 'Recently'}
+                      </span>
                     </div>
 
                     {/* Title & Company */}

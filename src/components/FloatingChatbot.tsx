@@ -51,7 +51,7 @@ const FloatingChatbot = () => {
   const [lastRequestTime, setLastRequestTime] = useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
   // Load bot name, theme, and messages from localStorage
   useEffect(() => {
@@ -109,11 +109,11 @@ const FloatingChatbot = () => {
   const sendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    // Rate limiting: wait at least 2 seconds between requests for better variety
+    // Rate limiting: wait at least 1 second between requests
     const now = Date.now();
     const timeSinceLastRequest = now - lastRequestTime;
-    if (timeSinceLastRequest < 2000) {
-      const waitTime = 2000 - timeSinceLastRequest;
+    if (timeSinceLastRequest < 1000) {
+      const waitTime = 1000 - timeSinceLastRequest;
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
 
@@ -131,59 +131,54 @@ const FloatingChatbot = () => {
     setLastRequestTime(Date.now());
 
     try {
-      if (!OPENAI_API_KEY) {
-        throw new Error('OpenAI API key is not configured. Please add your key to the .env file as VITE_OPENAI_API_KEY.');
+      if (!GEMINI_API_KEY) {
+        throw new Error('Gemini API key is not configured. Please add your key to the .env file as VITE_GEMINI_API_KEY.');
       }
 
       const systemPrompt =
         "You are Risee AI Assistant, a helpful learning companion. Be specific and avoid repeating the same answer. If the user asks the same question again, respond with a different explanation, new examples, or a new angle.";
 
-      const recent = [...messages, userMessage].slice(-10);
-
-      const chatMessages = [
-        { role: "system" as const, content: systemPrompt },
-        ...recent.map((m) => ({
-          role: m.role === "assistant" ? "assistant" : "user",
-          content: m.content,
-        })),
-      ];
+      const recentMessages = [...messages, userMessage].slice(-10);
 
       const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${OPENAI_API_KEY}`,
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: chatMessages,
-            temperature: 0.9,
-            max_tokens: 1024,
-            top_p: 0.95,
+            contents: [{
+              parts: [{
+                text: `${systemPrompt}\n\nConversation history:\n${recentMessages.map(m => `${m.role}: ${m.content}`).join('\n')}\n\nRespond naturally and helpfully.`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.9,
+              maxOutputTokens: 1024,
+            }
           })
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('OpenAI API Error:', errorData);
+        console.error('Gemini API Error:', errorData);
 
         if (response.status === 401 || response.status === 403) {
-          throw new Error('OpenAI API key invalid or unauthorized. Check your key and project settings.');
+          throw new Error('Gemini API key invalid or unauthorized. Check your key and project settings.');
         } else if (response.status === 429) {
-          throw new Error('Rate limit exceeded by OpenAI. Please wait a moment before trying again.');
+          throw new Error('Rate limit exceeded by Gemini. Free tier allows 60 requests/minute. Please wait 30-60 seconds before trying again.');
         } else {
-          throw new Error(`OpenAI API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+          throw new Error(`Gemini API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
         }
       }
 
       const data = await response.json();
-      console.log('OpenAI API Response:', data);
+      console.log('Gemini API Response:', data);
 
       const aiResponse =
-        data.choices?.[0]?.message?.content ||
+        data.candidates?.[0]?.content?.parts?.[0]?.text ||
         "Sorry, I couldn't generate a response.";
 
       const assistantMessage: Message = {

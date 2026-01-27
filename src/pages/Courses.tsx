@@ -585,70 +585,260 @@ const Courses = () => {
       category: "Engineering",
       subjects: ["CS", "EC", "EE", "ME", "CE"],
       duration: "6 months prep",
-      icon: GraduationCap
+      icon: GraduationCap,
+      resources: {
+        videos: [
+          { title: "GATE CSE Foundations - NPTEL IIT", url: "https://nptel.ac.in/courses/106105152", platform: "NPTEL" },
+          { title: "GATE Digital Logic Design - NPTEL", url: "https://nptel.ac.in/courses/106105232", platform: "NPTEL" },
+          { title: "GATE Data Structures - NPTEL IIT Madras", url: "https://nptel.ac.in/courses/106105162", platform: "NPTEL" },
+          { title: "GATE Algorithms - NPTEL IIT Kharagpur", url: "https://nptel.ac.in/courses/106105033", platform: "NPTEL" },
+          { title: "GATE Mathematics - IIT Bombay", url: "https://nptel.ac.in/courses/111108133", platform: "NPTEL" },
+          { title: "GATE OS & DBMS Complete", url: "https://www.youtube.com/watch?v=GH-QY0cYhf0", platform: "YouTube", videoId: "GH-QY0cYhf0" }
+        ],
+        pdfs: [
+          { title: "GATE Previous Papers (10 Years)", url: "https://gate.iitbombay.ac.in/previous-question-papers" },
+          { title: "NPTEL GATE Study Materials", url: "https://nptel.ac.in/courses" },
+          { title: "Data Structures & Algorithms Notes", url: "https://www.geeksforgeeks.org/gate-cs-notes/" },
+          { title: "Digital Logic Design Complete", url: "https://en.wikibooks.org/wiki/Digital_Circuits" }
+        ],
+        links: [
+          { title: "NPTEL GATE Portal", url: "https://nptel.ac.in" },
+          { title: "IIT GATE Official", url: "https://gate.iitbombay.ac.in/" },
+          { title: "GeeksforGeeks GATE", url: "https://www.geeksforgeeks.org/gate/" },
+          { title: "GATE CSE Curriculum", url: "https://gate.iitbombay.ac.in/gate-exam-details/syllabus" }
+        ]
+      }
     },
     {
       name: "GRE (Graduate Record Examination)",
       category: "International",
       subjects: ["Verbal", "Quant", "Analytical Writing"],
       duration: "4 months prep",
-      icon: Award
+      icon: Award,
+      resources: {
+        videos: [
+          { title: "GRE Full Course - 40 Hours", url: "https://www.youtube.com/watch?v=J6Y8gHmMXZQ", platform: "YouTube", videoId: "J6Y8gHmMXZQ" },
+          { title: "GRE Quantitative Reasoning", url: "https://www.youtube.com/watch?v=c3XsfwlhkI4", platform: "YouTube", videoId: "c3XsfwlhkI4" },
+          { title: "GRE Verbal Reasoning", url: "https://www.youtube.com/watch?v=TtMD01-PuBs", platform: "YouTube", videoId: "TtMD01-PuBs" },
+          { title: "GRE AWA Writing Guide", url: "https://www.youtube.com/watch?v=CxJeK9tQ0Ks", platform: "YouTube", videoId: "CxJeK9tQ0Ks" }
+        ],
+        pdfs: [
+          { title: "Official GRE Guide (Free)", url: "https://www.ets.org/gre" },
+          { title: "GRE Vocabulary List", url: "https://www.vocabularysize.com/gre" },
+          { title: "GRE Math Practice Book", url: "https://www.ets.org/gre/free" }
+        ],
+        links: [
+          { title: "ETS Official GRE Site", url: "https://www.ets.org/gre" },
+          { title: "Khan Academy GRE Prep", url: "https://www.khanacademy.org/test-prep/gre" },
+          { title: "Magoosh GRE Free Resources", url: "https://gre.magoosh.com/lessons" }
+        ]
+      }
     },
     {
       name: "TOEFL/IELTS",
       category: "International",
       subjects: ["Reading", "Writing", "Listening", "Speaking"],
       duration: "3 months prep",
-      icon: FileText
+      icon: FileText,
+      resources: {
+        videos: [
+          { title: "IELTS Full Course - 20 Hours", url: "https://www.youtube.com/watch?v=DdKAG5xYrB4", platform: "YouTube", videoId: "DdKAG5xYrB4" },
+          { title: "TOEFL IBT Complete Guide", url: "https://www.youtube.com/watch?v=4jjxzXJpKHc", platform: "YouTube", videoId: "4jjxzXJpKHc" },
+          { title: "IELTS Speaking Tips", url: "https://www.youtube.com/watch?v=LFQZ1kp9_3A", platform: "YouTube", videoId: "LFQZ1kp9_3A" },
+          { title: "TOEFL Writing Tasks", url: "https://www.youtube.com/watch?v=S7fFfPYGNZc", platform: "YouTube", videoId: "S7fFfPYGNZc" }
+        ],
+        pdfs: [
+          { title: "IELTS Official Practice Tests", url: "https://www.ielts.org/" },
+          { title: "TOEFL Practice Book", url: "https://www.ets.org/toefl" },
+          { title: "Academic Vocabulary List", url: "https://academic.englishforums.com/vocabulary" }
+        ],
+        links: [
+          { title: "IELTS Official Portal", url: "https://www.ielts.org/" },
+          { title: "TOEFL Home Edition", url: "https://www.ets.org/toefl/test-takers/ibt/about/what-is" },
+          { title: "BBC Learning English", url: "https://www.bbc.co.uk/learningenglish/" }
+        ]
+      }
     },
     {
       name: "UPSC (Civil Services)",
       category: "Government",
       subjects: ["Prelims", "Mains", "Interview"],
       duration: "12 months prep",
-      icon: Trophy
+      icon: Trophy,
+      resources: {
+        videos: [
+          { title: "UPSC IAS Complete Course", url: "https://www.youtube.com/watch?v=I9oKGEWNF7E", platform: "YouTube", videoId: "I9oKGEWNF7E" },
+          { title: "UPSC Polity by Laxmikanth", url: "https://www.youtube.com/watch?v=h0T0VB3yBz4", platform: "YouTube", videoId: "h0T0VB3yBz4" },
+          { title: "UPSC History NCERT Insights", url: "https://www.youtube.com/watch?v=uQqh4bDdVcc", platform: "YouTube", videoId: "uQqh4bDdVcc" },
+          { title: "UPSC Geography for IAS", url: "https://www.youtube.com/watch?v=OwKvb0jMDY4", platform: "YouTube", videoId: "OwKvb0jMDY4" },
+          { title: "UPSC Essay & Answer Writing", url: "https://www.youtube.com/watch?v=vRcgp4W-PFc", platform: "YouTube", videoId: "vRcgp4W-PFc" }
+        ],
+        pdfs: [
+          { title: "NCERT Books 6-12 (Free)", url: "https://ncert.nic.in/" },
+          { title: "UPSC Prelims Papers (20 Years)", url: "https://www.upsc.gov.in/" },
+          { title: "Indian Polity - M Laxmikanth", url: "https://www.upsc.gov.in/examination/civil-service-examination-cse" }
+        ],
+        links: [
+          { title: "UPSC Official Portal", url: "https://www.upsc.gov.in/" },
+          { title: "NCERT Official Site", url: "https://ncert.nic.in/" },
+          { title: "Civil Services Syllabus", url: "https://www.upsc.gov.in/examination/civil-service-examination-cse" }
+        ]
+      }
     },
     {
       name: "SSC CGL/CHSL",
       category: "Government",
       subjects: ["Reasoning", "Quant", "English", "GK"],
       duration: "6 months prep",
-      icon: FileText
+      icon: FileText,
+      resources: {
+        videos: [
+          { title: "SSC CGL Full Course - 100 Hours", url: "https://www.youtube.com/watch?v=M5lxTmf9BvU", platform: "YouTube", videoId: "M5lxTmf9BvU" },
+          { title: "SSC Quantitative Aptitude", url: "https://www.youtube.com/watch?v=8wfE7GYY5UM", platform: "YouTube", videoId: "8wfE7GYY5UM" },
+          { title: "SSC English Grammar Complete", url: "https://www.youtube.com/watch?v=ycnSVRBk5EM", platform: "YouTube", videoId: "ycnSVRBk5EM" },
+          { title: "SSC Reasoning Tricks", url: "https://www.youtube.com/watch?v=8Cv-Dy47zcg", platform: "YouTube", videoId: "8Cv-Dy47zcg" }
+        ],
+        pdfs: [
+          { title: "SSC Previous Papers (10 Years)", url: "https://ssc.nic.in/" },
+          { title: "Quantitative Aptitude Shortcuts", url: "https://www.sscadda.com/" },
+          { title: "English for SSC - Complete Guide", url: "https://www.studysmarter.co.uk/" }
+        ],
+        links: [
+          { title: "SSC Official Portal", url: "https://ssc.nic.in/" },
+          { title: "SSC Adda - Study Materials", url: "https://www.sscadda.com/" },
+          { title: "Testbook SSC Prep", url: "https://testbook.com/ssc" }
+        ]
+      }
     },
     {
       name: "Banking Exams (IBPS/SBI)",
       category: "Government",
       subjects: ["Reasoning", "Quant", "English", "Banking Awareness"],
       duration: "5 months prep",
-      icon: Award
+      icon: Award,
+      resources: {
+        videos: [
+          { title: "SBI PO Complete Course", url: "https://www.youtube.com/watch?v=DWRxL5r7fFo", platform: "YouTube", videoId: "DWRxL5r7fFo" },
+          { title: "IBPS RRB Prep - 50 Hours", url: "https://www.youtube.com/watch?v=9pGXLBxYaWE", platform: "YouTube", videoId: "9pGXLBxYaWE" },
+          { title: "Banking Awareness 2024", url: "https://www.youtube.com/watch?v=3Jm8bH3k1p8", platform: "YouTube", videoId: "3Jm8bH3k1p8" },
+          { title: "Banking Quantitative Aptitude", url: "https://www.youtube.com/watch?v=8Cv-Dy47zcg", platform: "YouTube", videoId: "8Cv-Dy47zcg" }
+        ],
+        pdfs: [
+          { title: "SBI/IBPS Previous Papers", url: "https://www.ibps.in/" },
+          { title: "Banking Awareness PDF", url: "https://www.sscadda.com/bank-awareness" },
+          { title: "Current Affairs Monthly", url: "https://www.edudose.com/" }
+        ],
+        links: [
+          { title: "IBPS Official Portal", url: "https://www.ibps.in/" },
+          { title: "SBI Official Site", url: "https://www.sbi.co.in/" },
+          { title: "Banking & Finance News", url: "https://economictimes.indiatimes.com/markets" }
+        ]
+      }
     },
     {
       name: "CAT/XAT/GMAT",
       category: "Management",
       subjects: ["Quant", "Verbal", "DILR"],
       duration: "8 months prep",
-      icon: GraduationCap
+      icon: GraduationCap,
+      resources: {
+        videos: [
+          { title: "CAT Complete Course - 80 Hours", url: "https://www.youtube.com/watch?v=gqmhJ5BvjV0", platform: "YouTube", videoId: "gqmhJ5BvjV0" },
+          { title: "CAT DILR Masterclass", url: "https://www.youtube.com/watch?v=5-Qs_5k8kok", platform: "YouTube", videoId: "5-Qs_5k8kok" },
+          { title: "CAT Verbal Ability & RC", url: "https://www.youtube.com/watch?v=pLGaJ7h5m_4", platform: "YouTube", videoId: "pLGaJ7h5m_4" },
+          { title: "GMAT Quantitative Reasoning", url: "https://www.youtube.com/watch?v=ZZxPx1A9wjk", platform: "YouTube", videoId: "ZZxPx1A9wjk" }
+        ],
+        pdfs: [
+          { title: "CAT Previous Papers (20 Years)", url: "https://www.iimcat.ac.in/" },
+          { title: "GMAT Official Guide", url: "https://www.mba.com/" },
+          { title: "XAT Preparation Books", url: "https://www.xlri.ac.in/" }
+        ],
+        links: [
+          { title: "IIM CAT Portal", url: "https://www.iimcat.ac.in/" },
+          { title: "GMAT Official", url: "https://www.mba.com/" },
+          { title: "XAT Official", url: "https://www.xlri.ac.in/" },
+          { title: "MBA Entrance Exams", url: "https://www.testfunda.com/" }
+        ]
+      }
     },
     {
       name: "Coding Interviews (FAANG)",
       category: "Private Sector",
       subjects: ["DSA", "System Design", "Problem Solving"],
       duration: "6 months prep",
-      icon: Trophy
+      icon: Trophy,
+      resources: {
+        videos: [
+          { title: "DSA & Coding Interview - 200 Hours", url: "https://www.youtube.com/watch?v=WO4sEKrKWec", platform: "YouTube", videoId: "WO4sEKrKWec" },
+          { title: "System Design Masterclass", url: "https://www.youtube.com/watch?v=UzLMhqg3XX0", platform: "YouTube", videoId: "UzLMhqg3XX0" },
+          { title: "NPTEL Data Structures - IIT Delhi", url: "https://nptel.ac.in/courses/106104166", platform: "NPTEL" },
+          { title: "Algorithms - NPTEL IIT Bombay", url: "https://nptel.ac.in/courses/106104001", platform: "NPTEL" }
+        ],
+        pdfs: [
+          { title: "Cracking Coding Interview Book", url: "https://www.crackingthecodinginterview.com/" },
+          { title: "LeetCode DSA Problems", url: "https://leetcode.com/explore/" },
+          { title: "System Design Interview Guide", url: "https://github.com/donnemartin/system-design-primer" }
+        ],
+        links: [
+          { title: "LeetCode Platform", url: "https://leetcode.com/" },
+          { title: "HackerRank Coding", url: "https://www.hackerrank.com/" },
+          { title: "GeeksforGeeks DSA", url: "https://www.geeksforgeeks.org/data-structures/" },
+          { title: "AlgoExpert", url: "https://www.algoexpert.io/" }
+        ]
+      }
     },
     {
       name: "AWS/Azure/GCP Certifications",
       category: "IT Certifications",
       subjects: ["Cloud Architecture", "DevOps", "Security"],
       duration: "3 months prep",
-      icon: Award
+      icon: Award,
+      resources: {
+        videos: [
+          { title: "AWS Solutions Architect - 20 Hours", url: "https://www.youtube.com/watch?v=ZccRLXICtG0", platform: "YouTube", videoId: "ZccRLXICtG0" },
+          { title: "Azure Administrator - 25 Hours", url: "https://www.youtube.com/watch?v=4PmAIbNrHKI", platform: "YouTube", videoId: "4PmAIbNrHKI" },
+          { title: "GCP Associate Cloud Engineer", url: "https://www.youtube.com/watch?v=jpno8FSqpc8", platform: "YouTube", videoId: "jpno8FSqpc8" },
+          { title: "Kubernetes Complete Course", url: "https://www.youtube.com/watch?v=d6WC5n9G_sM", platform: "YouTube", videoId: "d6WC5n9G_sM" }
+        ],
+        pdfs: [
+          { title: "AWS Certified Solutions Architect Guide", url: "https://d1.awsstatic.com/training-and-certification/docs-sa-assoc/AWS-Certified-Solutions-Architect-Associate_Exam-Guide.pdf" },
+          { title: "Azure Learning Path", url: "https://learn.microsoft.com/en-us/azure/" },
+          { title: "Kubernetes Official Docs", url: "https://kubernetes.io/docs/" }
+        ],
+        links: [
+          { title: "AWS Training", url: "https://aws.amazon.com/training/" },
+          { title: "Azure Learn", url: "https://learn.microsoft.com/en-us/azure/" },
+          { title: "Google Cloud Training", url: "https://cloud.google.com/training" },
+          { title: "Linux Academy", url: "https://www.pluralsight.com/" }
+        ]
+      }
     },
     {
       name: "Online Coding Contests",
       category: "Competitive Programming",
       subjects: ["Codeforces", "LeetCode", "HackerRank"],
       duration: "Ongoing",
-      icon: Trophy
+      icon: Trophy,
+      resources: {
+        videos: [
+          { title: "Competitive Programming - NPTEL IIT BHU", url: "https://nptel.ac.in/courses/106104015", platform: "NPTEL" },
+          { title: "CP Full Course 100 Hours", url: "https://www.youtube.com/watch?v=8hly31xrwQE", platform: "YouTube", videoId: "8hly31xrwQE" },
+          { title: "Graph Algorithms Masterclass", url: "https://www.youtube.com/watch?v=tWVWeAqZ0WU", platform: "YouTube", videoId: "tWVWeAqZ0WU" },
+          { title: "Dynamic Programming Complete", url: "https://www.youtube.com/watch?v=aPQY3dAyzS0", platform: "YouTube", videoId: "aPQY3dAyzS0" }
+        ],
+        pdfs: [
+          { title: "Competitive Programming Book", url: "https://cpbook.net/" },
+          { title: "ICPC Problem Database", url: "https://codeforces.com/problemsets/acmsgru" },
+          { title: "Algorithm Notes Collection", url: "https://github.com/Ashishgup/Competitive-Programming" }
+        ],
+        links: [
+          { title: "Codeforces Contests", url: "https://codeforces.com/" },
+          { title: "AtCoder Contests", url: "https://atcoder.jp/" },
+          { title: "HackerRank Challenges", url: "https://www.hackerrank.com/challenges" },
+          { title: "SPOJ Problem Archive", url: "https://www.spoj.com/" },
+          { title: "Competitive Programming Guide", url: "https://github.com/topics/competitive-programming" }
+        ]
+      }
     }
   ];
 
@@ -878,6 +1068,7 @@ const Courses = () => {
                       {/* CTA Button with Gradient */}
                       <Button 
                         size="sm"
+                        onClick={() => handleViewResources(exam)}
                         className={`w-full bg-gradient-to-r ${gradient} text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border-0`}
                       >
                         <span className="flex items-center justify-center gap-2">

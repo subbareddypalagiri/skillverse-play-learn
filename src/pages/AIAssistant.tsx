@@ -41,7 +41,7 @@ const AIAssistant = () => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const GEMINI_API_KEY = "AIzaSyAU4Qhcm-vRz1ywUCcqpZl3TuVUgSFi7nw";
+  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
   // Load bot name from localStorage
   useEffect(() => {

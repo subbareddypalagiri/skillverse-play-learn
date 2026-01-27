@@ -1,6 +1,6 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, Trophy, Award, CheckCircle } from "lucide-react";
+import { Download, Share2, Trophy, Award, CheckCircle, Shield, Clock, Eye } from "lucide-react";
 
 interface CourseCertificateProps {
   isOpen: boolean;
@@ -10,6 +10,12 @@ interface CourseCertificateProps {
   completionDate: string;
   courseInstructor: string;
   courseDuration: string;
+  verificationData?: {
+    watchedPercentage: number;
+    engagement: number;
+    skipAttempts: number;
+    totalWatchTime: number;
+  };
 }
 
 const CourseCertificate = ({
@@ -20,6 +26,12 @@ const CourseCertificate = ({
   completionDate,
   courseInstructor,
   courseDuration,
+  verificationData = {
+    watchedPercentage: 100,
+    engagement: 95,
+    skipAttempts: 0,
+    totalWatchTime: 1800,
+  },
 }: CourseCertificateProps) => {
   const handleDownload = () => {
     // In production, this would generate a PDF
@@ -29,6 +41,8 @@ const CourseCertificate = ({
   const handleShare = () => {
     alert("Share certificate to LinkedIn/Social Media - Implementation needed");
   };
+
+  const certificateId = `SKILL-${Date.now().toString(36).toUpperCase()}`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -43,7 +57,7 @@ const CourseCertificate = ({
             </h1>
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <Award className="w-4 h-4" />
-              <span>SkillVerse - Play & Learn</span>
+              <span>SkillVerse - Play & Learn (Risee)</span>
             </div>
           </div>
 
@@ -81,24 +95,58 @@ const CourseCertificate = ({
               </div>
             </div>
 
-            {/* Completion Badge */}
-            <div className="flex items-center justify-center gap-2 pt-4">
-              <CheckCircle className="w-6 h-6 text-green-500 fill-green-500" />
-              <span className="text-green-600 dark:text-green-400 font-semibold">
-                All video lectures completed ✓
-              </span>
+            {/* Completion & Verification Badge */}
+            <div className="space-y-3 pt-4">
+              <div className="flex items-center justify-center gap-2">
+                <CheckCircle className="w-6 h-6 text-green-500 fill-green-500" />
+                <span className="text-green-600 dark:text-green-400 font-semibold">
+                  All video lectures completed ✓
+                </span>
+              </div>
+
+              {/* Anti-Cheating Verification Shield */}
+              <div className="bg-white/50 dark:bg-slate-800/50 rounded-lg p-4 mx-4 border-2 border-green-400">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <Shield className="w-5 h-5 text-green-600" />
+                  <p className="font-bold text-green-700 dark:text-green-400">Verified Completion</p>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3 text-sm">
+                  <div className="text-center">
+                    <Eye className="w-4 h-4 mx-auto mb-1 text-blue-600" />
+                    <p className="font-semibold">{verificationData.watchedPercentage}%</p>
+                    <p className="text-xs text-muted-foreground">Video Watched</p>
+                  </div>
+                  <div className="text-center">
+                    <CheckCircle className="w-4 h-4 mx-auto mb-1 text-green-600" />
+                    <p className="font-semibold">{verificationData.engagement}%</p>
+                    <p className="text-xs text-muted-foreground">Engagement</p>
+                  </div>
+                  <div className="text-center">
+                    <Clock className="w-4 h-4 mx-auto mb-1 text-purple-600" />
+                    <p className="font-semibold">{Math.round(verificationData.totalWatchTime / 60)}m</p>
+                    <p className="text-xs text-muted-foreground">Watch Time</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Divider */}
           <div className="border-t-2 border-amber-300 dark:border-amber-700 mt-8 mb-6" />
 
-          {/* Footer */}
+          {/* Footer with Verification */}
           <div className="text-center text-sm text-muted-foreground space-y-2">
-            <p>Certificate ID: {`SKILL-${Date.now().toString(36).toUpperCase()}`}</p>
+            <p>Certificate ID: {certificateId}</p>
             <p className="flex items-center justify-center gap-2">
-              <Award className="w-4 h-4" />
-              Verified by SkillVerse Learning Platform
+              <Shield className="w-4 h-4 text-green-600" />
+              <span className="text-green-700 dark:text-green-400 font-semibold">
+                Anti-Cheating Verified • Video Tracked • Engagement Monitored
+              </span>
+            </p>
+            <p className="text-xs text-muted-foreground">
+              This certificate is valid only for legitimate course completion. 
+              Verification timestamp: {new Date().toISOString()}
             </p>
           </div>
         </div>

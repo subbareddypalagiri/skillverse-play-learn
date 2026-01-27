@@ -115,6 +115,7 @@ export const login = async (req, res, next) => {
 export const getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id)
+      .select('-password')
       .populate('enrolledCourses')
       .populate('registeredEvents');
 
@@ -132,17 +133,46 @@ export const getMe = async (req, res, next) => {
 // @access  Private
 export const updateDetails = async (req, res, next) => {
   try {
-    const fieldsToUpdate = {
-      name: req.body.name,
-      email: req.body.email,
-      bio: req.body.bio,
-      avatar: req.body.avatar
-    };
+    // Fields that are allowed to be updated
+    const allowedFields = [
+      'name',
+      'email',
+      'bio',
+      'avatar',
+      'hobbies',
+      'skills',
+      'linkedIn',
+      'github',
+      'leetcode',
+      'codeforces',
+      'codechef',
+      'hackerrank',
+      'kaggle',
+      'behance',
+      'dribbble',
+      'soundcloud',
+      'youtube',
+      'instagram',
+      'githubStats',
+      'leetcodeStats',
+      'followers',
+      'following',
+      'totalLikes'
+    ];
+
+    const fieldsToUpdate = {};
+    
+    // Only include fields that are in the allowedFields array
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        fieldsToUpdate[field] = req.body[field];
+      }
+    });
 
     const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
       new: true,
       runValidators: true
-    });
+    }).select('-password');
 
     res.status(200).json({
       status: 'success',
