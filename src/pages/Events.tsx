@@ -594,138 +594,156 @@ const Events = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
       <Navbar />
       
       <div className="pt-24 pb-12 px-4">
-        <div className="container mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Upcoming Events</h1>
-            <p className="text-muted-foreground text-lg">
-              Join us for exciting trips, hackathons, and learning experiences
+        <div className="container mx-auto max-w-6xl">
+          {/* Header */}
+          <div className="mb-8" style={{ opacity: 0, animation: 'fadeInUp 0.5s ease-out forwards' }}>
+            <h1 className="text-3xl font-semibold tracking-tight mb-1">Events</h1>
+            <p className="text-muted-foreground">
+              Discover and join exciting events, hackathons, and learning experiences
             </p>
           </div>
 
           {/* Filter Section */}
-          <div className="mb-8 space-y-4">
+          <div className="mb-6 space-y-4" style={{ opacity: 0, animation: 'fadeInUp 0.5s ease-out 50ms forwards' }}>
             {/* Category Filter */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Filter className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold">Event Category</h3>
-              </div>
-              <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
-                <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 gap-2 h-auto bg-muted/50 p-2">
-                  <TabsTrigger value="all" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
-                    All Events
-                  </TabsTrigger>
-                  <TabsTrigger value="cultural" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
-                    Cultural
-                  </TabsTrigger>
-                  <TabsTrigger value="technical" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
-                    Technical
-                  </TabsTrigger>
-                  <TabsTrigger value="non-technical" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
-                    Non-Technical
-                  </TabsTrigger>
-                  <TabsTrigger value="fun-tours" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
-                    Fun Tours
-                  </TabsTrigger>
-                  <TabsTrigger value="industrial-tours" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
-                    Industrial Tours
-                  </TabsTrigger>
-                  <TabsTrigger value="hackathons" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
-                    Hackathons
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: 'all', label: 'All' },
+                { value: 'cultural', label: 'Cultural' },
+                { value: 'technical', label: 'Technical' },
+                { value: 'non-technical', label: 'Non-Technical' },
+                { value: 'fun-tours', label: 'Fun Tours' },
+                { value: 'industrial-tours', label: 'Industrial Tours' },
+                { value: 'hackathons', label: 'Hackathons' },
+              ].map((category) => (
+                <button
+                  key={category.value}
+                  onClick={() => setSelectedCategory(category.value)}
+                  className={`px-3 py-1.5 text-sm rounded-full transition-all duration-300 ${
+                    selectedCategory === category.value
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary'
+                  }`}
+                >
+                  {category.label}
+                </button>
+              ))}
             </div>
 
             {/* Location Filter */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-semibold">Location</h3>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">Location:</span>
+              <div className="flex gap-2">
+                {[
+                  { value: 'all', label: 'All' },
+                  { value: 'In Campus', label: 'In Campus' },
+                  { value: 'Out of Campus', label: 'Out of Campus' },
+                ].map((location) => (
+                  <button
+                    key={location.value}
+                    onClick={() => setSelectedLocation(location.value)}
+                    className={`px-3 py-1 text-sm rounded-full transition-all duration-300 ${
+                      selectedLocation === location.value
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary'
+                    }`}
+                  >
+                    {location.label}
+                  </button>
+                ))}
               </div>
-              <Tabs value={selectedLocation} onValueChange={setSelectedLocation} className="w-full">
-                <TabsList className="grid w-full grid-cols-3 lg:w-1/2 gap-2 h-auto bg-muted/50 p-2">
-                  <TabsTrigger value="all" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
-                    All Locations
-                  </TabsTrigger>
-                  <TabsTrigger value="In Campus" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
-                    In Campus
-                  </TabsTrigger>
-                  <TabsTrigger value="Out of Campus" className="data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground">
-                    Out of Campus
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
             </div>
           </div>
 
           {/* Events Count */}
-          <div className="mb-4">
+          <div className="mb-4" style={{ opacity: 0, animation: 'fadeInUp 0.5s ease-out 100ms forwards' }}>
             <p className="text-sm text-muted-foreground">
-              Showing <span className="font-semibold text-foreground">{filteredEvents.length}</span> event{filteredEvents.length !== 1 ? 's' : ''}
+              {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''} found
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredEvents.map((event, index) => (
-              <Card key={index} className="overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300 hover:-translate-y-1 border-0 bg-gradient-to-br from-card to-card/50">
-                {/* Event Mode Indicator */}
-                <div className={`h-2 w-full ${event.mode === 'online' ? 'bg-gradient-to-r from-blue-400 to-blue-600' : 'bg-gradient-to-r from-green-400 to-green-600'}`} />
-                
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex flex-col gap-2">
-                      <Badge variant={getBadgeVariant(event.type)} className="w-fit">
+              <Card 
+                key={index} 
+                className="overflow-hidden bg-card rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
+                style={{ opacity: 0, animation: `fadeInUp 0.5s ease-out ${150 + index * 40}ms forwards` }}
+              >
+                <div className="p-4">
+                  {/* Header Row */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-primary/10 text-primary">
                         {event.type}
-                      </Badge>
-                      <div className={`flex items-center gap-1 text-xs font-medium ${getModeColor(event.mode)}`}>
-                        {getModeIcon(event.mode)}
-                        {event.mode === 'online' ? 'Online Event' : 'Offline Event'}
-                      </div>
+                      </span>
+                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                        event.mode === 'online' 
+                          ? 'bg-primary/5 text-primary' 
+                          : 'bg-primary/5 text-primary'
+                      }`}>
+                        {event.mode === 'online' ? 'Online' : 'Offline'}
+                      </span>
                     </div>
-                    <div className="flex items-center text-sm text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-                      <Users className="w-3 h-3 mr-1" />
-                      {event.attendees}/{event.maxAttendees}
-                    </div>
-                  </div>
-                  
-                  <h3 className="text-xl font-bold mb-2 text-foreground">{event.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{event.description}</p>
-                  
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center text-sm text-foreground">
-                      <Calendar className="w-4 h-4 mr-3 text-primary/70" />
-                      <div>
-                        <div className="font-medium">{event.date}</div>
-                        <div className="text-xs text-muted-foreground">{event.time}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center text-sm text-foreground">
-                      <MapPin className="w-4 h-4 mr-3 text-primary/70" />
-                      <div>
-                        <div className="font-medium">{event.venue}</div>
-                        <div className="text-xs text-muted-foreground">{event.location}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center text-sm text-foreground">
-                      <Clock className="w-4 h-4 mr-3 text-primary/70" />
-                      <span className="font-medium">{event.duration}</span>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Users className="w-3 h-3" />
+                      <span>{event.attendees}/{event.maxAttendees}</span>
                     </div>
                   </div>
                   
-                  {/* Registration Status */}
+                  {/* Title & Description */}
+                  <h3 className="text-base font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-1">
+                    {event.title}
+                  </h3>
+                  <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{event.description}</p>
+                  
+                  {/* Event Details */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="p-1.5 rounded-md bg-primary/10">
+                        <Calendar className="w-3 h-3 text-primary" />
+                      </div>
+                      <span>{event.date} · {event.time}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="p-1.5 rounded-md bg-primary/10">
+                        <MapPin className="w-3 h-3 text-primary" />
+                      </div>
+                      <span className="line-clamp-1">{event.venue}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div className="p-1.5 rounded-md bg-primary/10">
+                        <Clock className="w-3 h-3 text-primary" />
+                      </div>
+                      <span>{event.duration}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Registration Button */}
                   {isRegistered(event) ? (
-                    <div className="flex items-center justify-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700">
-                      <CheckCircle className="w-4 h-4" />
-                      <span className="text-sm font-medium">Registered</span>
+                    <div className="flex items-center justify-center gap-2 py-2 bg-primary/10 rounded-lg text-primary">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span className="text-xs font-medium">Registered</span>
                     </div>
                   ) : (
                     <Button 
                       onClick={() => handleRegister(event)}
-                      className="w-full bg-gradient-primary text-primary-foreground hover:opacity-90 transition-all duration-200"
+                      size="sm"
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-xs h-8"
                     >
                       Register Now
                     </Button>
@@ -739,161 +757,87 @@ const Events = () => {
         </div>
       </div>
       
-      {/* Enhanced Success Registration Dialog */}
+      {/* Success Registration Dialog */}
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex flex-col items-center gap-3 text-center">
-              <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center animate-bounce">
-                <CheckCircle className="w-10 h-10 text-green-500" />
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-green-600">Registration Successful! 🎉</h2>
-                <p className="text-sm text-muted-foreground mt-1">You're all set for this amazing event!</p>
+                <h2 className="text-xl font-semibold">Registration Successful</h2>
+                <p className="text-sm text-muted-foreground mt-1">You're all set for this event</p>
               </div>
             </DialogTitle>
           </DialogHeader>
           
-          <div className="py-6">
+          <div className="py-4">
             {selectedEvent && (
-              <div className="space-y-6">
-                {/* Event Summary Card */}
-                <Card className="p-6 bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900/10 dark:to-blue-900/10 border-2 border-green-200">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-gradient-primary flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-6 h-6 text-white" />
+              <div className="space-y-4">
+                {/* Event Summary */}
+                <Card className="p-4 bg-primary/5 border-primary/20">
+                  <h3 className="font-semibold text-sm mb-3">{selectedEvent.title}</h3>
+                  <div className="space-y-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5 text-primary" />
+                      <span>{selectedEvent.date} · {selectedEvent.time}</span>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-xl mb-3">{selectedEvent.title}</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-primary" />
-                          <div>
-                            <p className="font-semibold">{selectedEvent.date}</p>
-                            <p className="text-xs text-muted-foreground">{selectedEvent.time}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-primary" />
-                          <div>
-                            <p className="font-semibold">{selectedEvent.venue}</p>
-                            <p className="text-xs text-muted-foreground">{selectedEvent.location}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-primary" />
-                          <p className="font-semibold">{selectedEvent.duration}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {getModeIcon(selectedEvent.mode)}
-                          <p className={`font-semibold ${getModeColor(selectedEvent.mode)}`}>
-                            {selectedEvent.mode === 'online' ? 'Online Event' : 'Offline Event'}
-                          </p>
-                        </div>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-3.5 h-3.5 text-primary" />
+                      <span>{selectedEvent.venue}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5 text-primary" />
+                      <span>{selectedEvent.duration}</span>
                     </div>
                   </div>
                 </Card>
 
-                {/* Important Information */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Card className="p-4">
-                    <h4 className="font-bold mb-3 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-blue-500" />
-                      Organizer Details
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Organization</p>
-                        <p className="font-semibold">{selectedEvent.organizer}</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Contact</p>
-                        <p className="font-semibold text-blue-600">{selectedEvent.contact}</p>
-                      </div>
-                    </div>
+                {/* Quick Info */}
+                <div className="grid grid-cols-2 gap-3">
+                  <Card className="p-3 border-border/50">
+                    <p className="text-xs text-muted-foreground mb-1">Organizer</p>
+                    <p className="text-xs font-medium">{selectedEvent.organizer}</p>
                   </Card>
-
-                  <Card className="p-4">
-                    <h4 className="font-bold mb-3 flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      What to Bring
-                    </h4>
-                    <p className="text-sm">{selectedEvent.requirements}</p>
+                  <Card className="p-3 border-border/50">
+                    <p className="text-xs text-muted-foreground mb-1">Mode</p>
+                    <p className="text-xs font-medium">{selectedEvent.mode === 'online' ? 'Online' : 'Offline'}</p>
                   </Card>
                 </div>
 
-                {/* Prizes Section */}
-                {selectedEvent.prizes && (
-                  <Card className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/10 dark:to-orange-900/10 border-2 border-yellow-300">
-                    <h4 className="font-bold mb-2 flex items-center gap-2">
-                      <svg className="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                      Prizes & Rewards
-                    </h4>
-                    <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">{selectedEvent.prizes}</p>
-                  </Card>
-                )}
-
-                {/* Next Steps */}
-                <Card className="p-4 bg-blue-50 dark:bg-blue-900/10 border-blue-200">
-                  <h4 className="font-bold mb-3 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    What Happens Next?
-                  </h4>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>You'll receive a confirmation email at your registered email address within 5 minutes</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Event reminder will be sent 24 hours before the event starts</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Join link/venue details will be shared 1 hour before the event</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span>Check your dashboard for all registered events</span>
-                    </li>
-                  </ul>
-                </Card>
+                {/* What's Next */}
+                <div className="text-xs text-muted-foreground space-y-1.5">
+                  <p className="font-medium text-foreground">What happens next:</p>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Confirmation email sent to your inbox</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                    <span>Reminder 24 hours before the event</span>
+                  </div>
+                </div>
               </div>
             )}
             
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <div className="flex gap-2 mt-4">
               <Button 
                 onClick={() => setShowSuccessDialog(false)}
                 variant="outline"
-                className="flex-1"
+                size="sm"
+                className="flex-1 border-border/50 hover:border-primary/30 transition-all duration-300"
               >
                 Close
               </Button>
               <Button 
-                onClick={() => {
-                  setShowSuccessDialog(false);
-                  // Could navigate to dashboard or calendar
-                }}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                onClick={() => setShowSuccessDialog(false)}
+                size="sm"
+                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
               >
-                <Calendar className="w-4 h-4 mr-2" />
+                <Calendar className="w-3.5 h-3.5 mr-1.5" />
                 Add to Calendar
-              </Button>
-              <Button 
-                onClick={() => {
-                  setShowSuccessDialog(false);
-                  // Share functionality
-                }}
-                className="flex-1 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white"
-              >
-                <Users className="w-4 h-4 mr-2" />
-                Invite Friends
               </Button>
             </div>
           </div>

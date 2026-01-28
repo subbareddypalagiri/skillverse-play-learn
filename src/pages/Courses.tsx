@@ -873,234 +873,224 @@ const Courses = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      <div className="pt-24 pb-12 px-4">
-        <div className="container mx-auto">
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
+      <div className="pt-24 pb-16 px-4">
+        <div className="container mx-auto max-w-7xl">
+          
+          {/* Clean Header Section */}
+          <div className="mb-12">
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
               <div>
-                <h1 className="text-4xl font-bold mb-2">Explore Courses</h1>
-                <p className="text-muted-foreground text-lg">
-                  Choose from our curated selection of engaging courses
+                <p className="text-sm font-medium text-primary mb-2">Learning Paths</p>
+                <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight mb-2">
+                  Explore Courses
+                </h1>
+                <p className="text-muted-foreground">
+                  Curated courses with free resources from top educators
                 </p>
               </div>
-              <div className="flex gap-3">
+              
+              <div className="flex items-center gap-3">
                 <Button 
                   onClick={() => navigate('/ai-tools')}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:opacity-90 transition-all duration-300 hover:scale-105"
+                  variant="outline"
+                  className="border-primary/20 hover:border-primary hover:bg-primary/5 transition-all"
                 >
                   <Wrench className="w-4 h-4 mr-2" />
                   AI Tools
                 </Button>
                 <Button 
                   onClick={() => setShowDashboard(true)}
-                  className="bg-gradient-primary text-primary-foreground hover:opacity-90"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
                 >
                   <BookOpen className="w-4 h-4 mr-2" />
-                  Course Dashboard
+                  Dashboard
                 </Button>
               </div>
             </div>
             
-            {/* Search Bar */}
-            <div className="relative w-full max-w-md mt-6">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            {/* Minimal Search Bar */}
+            <div className="relative w-full max-w-lg mt-8">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Search courses by title, category, or instructor..."
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-muted/60 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm"
+                placeholder="Search courses..."
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-border/50 bg-muted/30 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all"
               />
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Course Grid - Clean Cards with Animations */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {courses.map((course, index) => {
-              // Map categories to consistent Unsplash image topics
-              const getCategoryImage = (category: string) => {
-                const imageMap: { [key: string]: string } = {
-                  "Web Development": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=400&fit=crop",
-                  "Cloud & DevOps": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=400&fit=crop",
-                  "AI & ML": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=400&fit=crop",
-                  "Data Science": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop",
-                  "Blockchain": "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=400&fit=crop",
-                  "IoT": "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?w=800&h=400&fit=crop",
-                  "AR/VR": "https://images.unsplash.com/photo-1617802690992-15d93263d3a9?w=800&h=400&fit=crop",
-                  "Programming": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&h=400&fit=crop",
-                  "Cybersecurity": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=400&fit=crop",
-                  "Quantum Tech": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=400&fit=crop"
-                };
-                return imageMap[category] || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=400&fit=crop";
-              };
-              
               return (
-              <Card key={index} className="overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300 hover:-translate-y-1">
-                <div className="h-48 relative overflow-hidden">
-                  <img 
-                    src={getCategoryImage(course.category)} 
-                    alt={course.category}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                </div>
-                
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge variant="secondary">{course.category}</Badge>
-                    <Badge variant="outline">{course.level}</Badge>
-                  </div>
+                <div 
+                  key={index} 
+                  className="group relative bg-card rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
+                  style={{ 
+                    opacity: 0,
+                    animation: `fadeInUp 0.5s ease-out ${index * 40}ms forwards`
+                  }}
+                >
+                  {/* Top accent line */}
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
-                  <h3 className="text-xl font-bold mb-2">{course.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">by {course.instructor}</p>
-                  <p className="text-xs text-muted-foreground mb-4">{course.description}</p>
-                  
-                  <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" />
-                      {course.duration}
+                  <div className="p-6">
+                    {/* Category & Level */}
+                    <div className="flex items-center justify-between mb-4">
+                      <Badge variant="secondary" className="bg-muted/50 text-xs font-medium">
+                        {course.category}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground font-medium">
+                        {course.level}
+                      </span>
                     </div>
-                    <div className="flex items-center">
-                      <Users className="w-4 h-4 mr-1" />
-                      {course.students.toLocaleString()}
+                    
+                    {/* Title & Instructor */}
+                    <h3 className="text-lg font-semibold mb-1 group-hover:text-primary transition-colors duration-300 line-clamp-2">
+                      {course.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {course.instructor}
+                    </p>
+                    
+                    {/* Description */}
+                    <p className="text-sm text-muted-foreground/80 mb-4 line-clamp-2">
+                      {course.description}
+                    </p>
+                    
+                    {/* Stats Row */}
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground mb-5 pb-5 border-b border-border/50">
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{course.duration}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5" />
+                        <span>{course.students.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Star className="w-3.5 h-3.5 fill-primary text-primary" />
+                        <span className="font-medium text-foreground">{course.rating}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center">
-                      <Star className="w-4 h-4 mr-1 fill-accent text-accent" />
-                      {course.rating}
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={() => handleEnroll(course)}
-                      className="flex-1 bg-gradient-primary text-primary-foreground hover:opacity-90"
-                    >
-                      Enroll Now
-                    </Button>
-                    {course.resources && (
+                    
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
                       <Button 
-                        onClick={() => handleViewResources(course)}
-                        variant="outline"
-                        size="icon"
-                        className="hover:bg-primary hover:text-primary-foreground"
-                        title="View Free Resources"
+                        onClick={() => handleEnroll(course)}
+                        className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 transition-all h-10"
                       >
-                        <BookOpen className="w-4 h-4" />
+                        Enroll Now
                       </Button>
-                    )}
+                      {course.resources && (
+                        <Button 
+                          onClick={() => handleViewResources(course)}
+                          variant="outline"
+                          size="icon"
+                          className="h-10 w-10 border-border/50 hover:border-primary hover:bg-primary/5"
+                          title="View Free Resources"
+                        >
+                          <BookOpen className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </Card>
-            );
+              );
             })}
           </div>
 
-          {/* Competitive Exams Section - ENERGETIC VERSION */}
-          <div className="mt-20 relative">
-            {/* Animated Background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-orange-500/5 rounded-3xl blur-3xl -z-10" />
+          {/* Competitive Exams Section - Clean Design */}
+          <div className="mt-24">
+            {/* Section divider */}
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-border to-transparent mb-16" />
             
-            <div className="mb-10 text-center">
-              <div className="inline-flex items-center gap-3 mb-4 px-6 py-3 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full shadow-lg animate-pulse">
-                <Trophy className="w-8 h-8 text-white animate-bounce" />
-                <h2 className="text-3xl font-black text-white tracking-tight">
-                  COMPETITIVE EXAMS
+            {/* Clean Section Header */}
+            <div className="mb-10">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Trophy className="w-5 h-5 text-primary" />
+                </div>
+                <h2 className="text-2xl font-semibold tracking-tight">
+                  Competitive Exams
                 </h2>
-                <Trophy className="w-8 h-8 text-white animate-bounce" />
               </div>
-              <p className="text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                🚀 Crack GATE, GRE, UPSC & Land Your Dream Job! 🎯
+              <p className="text-muted-foreground">
+                Prepare for GATE, GRE, UPSC, and land your dream opportunity
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {competitiveExams.map((exam, index) => {
                 const Icon = exam.icon;
-                const gradients = [
-                  'from-purple-500 to-pink-500',
-                  'from-blue-500 to-cyan-500',
-                  'from-green-500 to-emerald-500',
-                  'from-orange-500 to-red-500',
-                  'from-yellow-500 to-orange-500',
-                  'from-indigo-500 to-purple-500',
-                  'from-pink-500 to-rose-500',
-                  'from-teal-500 to-green-500',
-                  'from-red-500 to-pink-500',
-                  'from-cyan-500 to-blue-500',
-                ];
-                const gradient = gradients[index % gradients.length];
                 
                 return (
-                  <Card 
+                  <div 
                     key={index} 
-                    className="group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 border-0"
+                    className="group relative bg-card rounded-xl border border-border/50 overflow-hidden hover:border-primary/30 transition-all duration-300 hover:shadow-md hover:shadow-primary/5"
+                    style={{ 
+                      opacity: 0,
+                      animation: `fadeInUp 0.5s ease-out ${index * 40}ms forwards`
+                    }}
                   >
-                    {/* Gradient Border Effect */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
-                    <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${gradient}`} />
+                    {/* Top accent line */}
+                    <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     
-                    <div className="relative p-5">
-                      {/* Icon with Glow */}
+                    <div className="p-5">
+                      {/* Icon and Title */}
                       <div className="flex items-start gap-3 mb-4">
-                        <div className={`p-3 bg-gradient-to-br ${gradient} rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                          <Icon className="w-6 h-6 text-white" />
+                        <div className="p-2.5 bg-primary/10 rounded-xl group-hover:bg-primary/15 transition-colors duration-300">
+                          <Icon className="w-5 h-5 text-primary" />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-base mb-1 group-hover:text-primary transition-colors">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm mb-1 group-hover:text-primary transition-colors duration-300 truncate">
                             {exam.name}
                           </h3>
                           <Badge 
                             variant="secondary" 
-                            className={`text-xs font-semibold bg-gradient-to-r ${gradient} text-white border-0`}
+                            className="text-xs bg-muted/50"
                           >
                             {exam.category}
                           </Badge>
                         </div>
                       </div>
                       
-                      {/* Duration with Icon */}
-                      <div className="flex items-center gap-2 mb-3 text-sm font-medium">
-                        <Clock className="w-4 h-4 text-primary" />
-                        <span className="text-muted-foreground">{exam.duration}</span>
+                      {/* Duration */}
+                      <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>{exam.duration}</span>
                       </div>
                       
                       {/* Subjects Tags */}
                       <div className="flex flex-wrap gap-1.5 mb-4">
-                        {exam.subjects.map((subject, idx) => (
+                        {exam.subjects.slice(0, 3).map((subject, idx) => (
                           <Badge 
                             key={idx} 
                             variant="outline" 
-                            className="text-xs font-semibold hover:scale-110 transition-transform cursor-default"
+                            className="text-xs border-border/50"
                           >
                             {subject}
                           </Badge>
                         ))}
+                        {exam.subjects.length > 3 && (
+                          <Badge variant="outline" className="text-xs border-border/50">
+                            +{exam.subjects.length - 3}
+                          </Badge>
+                        )}
                       </div>
                       
-                      {/* CTA Button with Gradient */}
+                      {/* CTA Button */}
                       <Button 
                         size="sm"
                         onClick={() => handleViewResources(exam)}
-                        className={`w-full bg-gradient-to-r ${gradient} text-white font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 border-0`}
+                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
                       >
-                        <span className="flex items-center justify-center gap-2">
-                          🔥 Start Now
-                        </span>
+                        Start Now
                       </Button>
                     </div>
-                    
-                    {/* Shine Effect on Hover */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  </Card>
+                  </div>
                 );
               })}
-            </div>
-            
-            {/* Bottom CTA */}
-            <div className="mt-12 text-center">
-              <div className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 cursor-pointer">
-                <Star className="w-5 h-5 text-yellow-300 animate-spin" />
-                <span className="text-white font-bold text-lg">View All Exam Resources →</span>
-                <Star className="w-5 h-5 text-yellow-300 animate-spin" />
-              </div>
             </div>
           </div>
         </div>
@@ -1108,21 +1098,21 @@ const Courses = () => {
       
       {/* Success Dialog */}
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md border-border/50">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <CheckCircle className="w-6 h-6 text-green-500" />
+              <CheckCircle className="w-5 h-5 text-primary" />
               Successfully Enrolled!
             </DialogTitle>
           </DialogHeader>
           <div className="py-4">
-            <p className="text-center text-muted-foreground mb-4">
+            <p className="text-center text-muted-foreground mb-5">
               You have successfully enrolled in the course. You can now access your course materials.
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Button 
                 onClick={handleViewDashboard}
-                className="flex-1 bg-gradient-primary text-primary-foreground hover:opacity-90"
+                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <Play className="w-4 h-4 mr-2" />
                 Go to Dashboard
@@ -1130,7 +1120,7 @@ const Courses = () => {
               <Button 
                 variant="outline" 
                 onClick={() => setShowSuccessDialog(false)}
-                className="flex-1"
+                className="flex-1 border-border/50"
               >
                 Continue Browsing
               </Button>
@@ -1139,17 +1129,17 @@ const Courses = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Free Resources Dialog */}
+      {/* Free Resources Dialog - Clean Design */}
       <Dialog open={showResourcesDialog} onOpenChange={setShowResourcesDialog}>
-        <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto border-border/50">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-2xl">
-              <BookOpen className="w-7 h-7 text-primary" />
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <BookOpen className="w-5 h-5 text-primary" />
               Free Learning Resources
             </DialogTitle>
             {selectedCourse && (
-              <p className="text-sm text-muted-foreground mt-2">
-                {selectedCourse.title} - All resources are 100% free and legal
+              <p className="text-sm text-muted-foreground mt-1">
+                {selectedCourse.title || selectedCourse.name}
               </p>
             )}
           </DialogHeader>
@@ -1160,9 +1150,8 @@ const Courses = () => {
               {selectedCourse.resources.videos && selectedCourse.resources.videos.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Video className="w-5 h-5 text-red-500" />
-                    <h3 className="font-bold text-lg">Video Lectures</h3>
-                    <Badge variant="secondary" className="text-xs">Watch on our site! 🎥</Badge>
+                    <Video className="w-4 h-4 text-primary" />
+                    <h3 className="font-semibold">Video Lectures</h3>
                   </div>
                   <div className="space-y-2">
                     {selectedCourse.resources.videos.map((video: any, idx: number) => {
@@ -1170,20 +1159,20 @@ const Courses = () => {
                       return (
                         <div
                           key={idx}
-                          className={`flex items-center justify-between p-3 rounded-lg border hover:bg-accent hover:border-primary transition-all group ${completed ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800' : ''}`}
+                          className={`flex items-center justify-between p-3 rounded-xl border border-border/50 hover:border-primary/30 transition-all group ${completed ? 'bg-primary/5 border-primary/20' : ''}`}
                         >
                           <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-lg ${completed ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20'}`}>
+                            <div className={`p-2 rounded-lg ${completed ? 'bg-primary/10' : 'bg-muted/50'}`}>
                               {completed ? (
-                                <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 fill-green-600 dark:fill-green-400" />
+                                <CheckCircle className="w-4 h-4 text-primary" />
                               ) : (
-                                <Play className="w-4 h-4 text-red-600 dark:text-red-400" />
+                                <Play className="w-4 h-4 text-muted-foreground" />
                               )}
                             </div>
                             <div className="flex-1">
-                              <p className="font-medium flex items-center gap-2">
+                              <p className="font-medium text-sm flex items-center gap-2">
                                 {video.title}
-                                {completed && <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">✓ Completed</Badge>}
+                                {completed && <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">Completed</Badge>}
                               </p>
                               <p className="text-xs text-muted-foreground">{video.platform}</p>
                             </div>
@@ -1193,16 +1182,17 @@ const Courses = () => {
                               <Button
                                 onClick={() => handleWatchVideo(video)}
                                 size="sm"
-                                className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white"
+                                className="bg-primary text-primary-foreground hover:bg-primary/90"
                               >
                                 <Monitor className="w-3 h-3 mr-1" />
-                                {completed ? 'Rewatch' : 'Watch Here'}
+                                {completed ? 'Rewatch' : 'Watch'}
                               </Button>
                             )}
                             <Button
                               onClick={() => window.open(video.url, '_blank')}
                               size="sm"
                               variant="outline"
+                              className="border-border/50"
                             >
                               <ExternalLink className="w-3 h-3" />
                             </Button>
@@ -1218,8 +1208,8 @@ const Courses = () => {
               {selectedCourse.resources.pdfs && selectedCourse.resources.pdfs.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Download className="w-5 h-5 text-blue-500" />
-                    <h3 className="font-bold text-lg">PDF Books & Guides</h3>
+                    <Download className="w-4 h-4 text-primary" />
+                    <h3 className="font-semibold">PDF Books & Guides</h3>
                   </div>
                   <div className="space-y-2">
                     {selectedCourse.resources.pdfs.map((pdf: any, idx: number) => (
@@ -1228,15 +1218,15 @@ const Courses = () => {
                         href={pdf.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent hover:border-primary transition-all group"
+                        className="flex items-center justify-between p-3 rounded-xl border border-border/50 hover:border-primary/30 transition-all group"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                            <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          <div className="p-2 bg-muted/50 rounded-lg group-hover:bg-primary/10 transition-colors">
+                            <FileText className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                           </div>
-                          <p className="font-medium group-hover:text-primary">{pdf.title}</p>
+                          <p className="font-medium text-sm group-hover:text-primary transition-colors">{pdf.title}</p>
                         </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
+                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                       </a>
                     ))}
                   </div>
@@ -1247,8 +1237,8 @@ const Courses = () => {
               {selectedCourse.resources.links && selectedCourse.resources.links.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <ExternalLink className="w-5 h-5 text-green-500" />
-                    <h3 className="font-bold text-lg">Official Documentation & Websites</h3>
+                    <ExternalLink className="w-4 h-4 text-primary" />
+                    <h3 className="font-semibold">Documentation & Resources</h3>
                   </div>
                   <div className="space-y-2">
                     {selectedCourse.resources.links.map((link: any, idx: number) => (
@@ -1257,15 +1247,15 @@ const Courses = () => {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent hover:border-primary transition-all group"
+                        className="flex items-center justify-between p-3 rounded-xl border border-border/50 hover:border-primary/30 transition-all group"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                            <BookOpen className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          <div className="p-2 bg-muted/50 rounded-lg group-hover:bg-primary/10 transition-colors">
+                            <BookOpen className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                           </div>
-                          <p className="font-medium group-hover:text-primary">{link.title}</p>
+                          <p className="font-medium text-sm group-hover:text-primary transition-colors">{link.title}</p>
                         </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
+                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                       </a>
                     ))}
                   </div>
@@ -1273,18 +1263,19 @@ const Courses = () => {
               )}
 
               {/* Info Banner */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                <p className="text-sm text-center">
-                  🎓 <strong>All resources are completely FREE and from legitimate sources</strong> like YouTube, official documentation, and open-source books. Happy learning! 🚀
+              <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                <p className="text-sm text-center text-muted-foreground">
+                  All resources are free and from legitimate sources
                 </p>
               </div>
             </div>
           )}
           
-          <div className="flex justify-end gap-2 pt-4 border-t">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
             <Button
               variant="outline"
               onClick={() => setShowResourcesDialog(false)}
+              className="border-border/50"
             >
               Close
             </Button>
@@ -1293,7 +1284,7 @@ const Courses = () => {
                 handleEnroll(selectedCourse);
                 setShowResourcesDialog(false);
               }}
-              className="bg-gradient-primary text-primary-foreground hover:opacity-90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Enroll in Course
             </Button>
@@ -1310,7 +1301,7 @@ const Courses = () => {
           videoId={selectedVideo.videoId}
           platform={selectedVideo.platform}
           originalUrl={selectedVideo.url}
-          courseTitle={selectedCourse.title}
+          courseTitle={selectedCourse.title || selectedCourse.name}
         />
       )}
 
@@ -1319,13 +1310,27 @@ const Courses = () => {
         <CourseCertificate
           isOpen={showCertificate}
           onClose={() => setShowCertificate(false)}
-          courseTitle={selectedCourse.title}
+          courseTitle={selectedCourse.title || selectedCourse.name}
           studentName="Student" 
           completionDate={new Date().toISOString()}
           courseInstructor={selectedCourse.instructor}
           courseDuration={selectedCourse.duration}
         />
       )}
+      
+      {/* CSS Animation */}
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
       
       <Footer />
     </div>

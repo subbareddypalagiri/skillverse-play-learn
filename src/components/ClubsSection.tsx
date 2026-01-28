@@ -32,14 +32,14 @@ const ClubsSection = () => {
   });
 
   const clubTypes = [
-    { type: 'art', icon: Palette, label: 'Art & Design', color: 'text-purple-500' },
-    { type: 'music', icon: Music, label: 'Music', color: 'text-pink-500' },
-    { type: 'sports', icon: Dumbbell, label: 'Sports', color: 'text-green-500' },
-    { type: 'tech', icon: Code, label: 'Technology', color: 'text-blue-500' },
-    { type: 'photography', icon: Camera, label: 'Photography', color: 'text-orange-500' },
-    { type: 'reading', icon: BookOpen, label: 'Reading', color: 'text-indigo-500' },
-    { type: 'gaming', icon: Gamepad2, label: 'Gaming', color: 'text-red-500' },
-    { type: 'other', icon: Coffee, label: 'Other', color: 'text-gray-500' },
+    { type: 'art', icon: Palette, label: 'Art & Design' },
+    { type: 'music', icon: Music, label: 'Music' },
+    { type: 'sports', icon: Dumbbell, label: 'Sports' },
+    { type: 'tech', icon: Code, label: 'Technology' },
+    { type: 'photography', icon: Camera, label: 'Photography' },
+    { type: 'reading', icon: BookOpen, label: 'Reading' },
+    { type: 'gaming', icon: Gamepad2, label: 'Gaming' },
+    { type: 'other', icon: Coffee, label: 'Other' },
   ];
 
   const handleCreateClub = () => {
@@ -90,53 +90,70 @@ const ClubsSection = () => {
   const selectedClubData = clubs.find(c => c.id === selectedClub);
 
   return (
-    <div className="mt-16">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="mt-12">
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+      <div className="mb-6 flex items-center justify-between" style={{ opacity: 0, animation: 'fadeInUp 0.5s ease-out forwards' }}>
         <div>
-          <h2 className="text-3xl font-bold mb-2">Hobbies & Clubs 🎨</h2>
-          <p className="text-muted-foreground text-lg">Create communities, join clubs, and connect with students!</p>
+          <h2 className="text-2xl font-semibold tracking-tight mb-1">Clubs & Communities</h2>
+          <p className="text-muted-foreground text-sm">Join clubs and connect with like-minded students</p>
         </div>
         <Button 
           onClick={() => setShowCreateDialog(true)}
-          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white gap-2"
+          size="sm"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 gap-2"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           Create Club
         </Button>
       </div>
 
-      <Tabs defaultValue="all" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="all">All Clubs</TabsTrigger>
-          <TabsTrigger value="my-clubs">My Clubs</TabsTrigger>
+      <Tabs defaultValue="all" className="space-y-4">
+        <TabsList className="bg-muted/30 p-1">
+          <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm px-4 transition-all duration-300">All Clubs</TabsTrigger>
+          <TabsTrigger value="my-clubs" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm px-4 transition-all duration-300">My Clubs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {clubs.map((club) => {
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {clubs.map((club, index) => {
               const typeConfig = clubTypes.find(t => t.type === club.type);
               const Icon = typeConfig?.icon || Coffee;
               const isMember = isUserMember(club.id, currentUser.id);
               const isAdmin = isUserAdmin(club.id, currentUser.id);
 
               return (
-                <Card key={club.id} className="overflow-hidden hover:shadow-lg transition-all">
-                  <div className="h-32 bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center">
-                    <Icon className="w-16 h-16 text-white" />
+                <Card 
+                  key={club.id} 
+                  className="overflow-hidden bg-card rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
+                  style={{ opacity: 0, animation: `fadeInUp 0.5s ease-out ${index * 40}ms forwards` }}
+                >
+                  <div className="h-20 bg-primary/10 flex items-center justify-center">
+                    <Icon className="w-10 h-10 text-primary group-hover:scale-110 transition-transform duration-300" />
                   </div>
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-bold text-lg">{club.name}</h3>
-                      {isAdmin && <Crown className="w-5 h-5 text-yellow-500" />}
+                      <h3 className="font-semibold text-sm group-hover:text-primary transition-colors duration-300">{club.name}</h3>
+                      {isAdmin && <Crown className="w-4 h-4 text-primary" />}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{club.description}</p>
+                    <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{club.description}</p>
                     
                     <div className="flex items-center gap-2 mb-3">
-                      <Badge variant="secondary">{club.category}</Badge>
-                      <Badge variant="outline">{typeConfig?.label}</Badge>
+                      <span className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary">{club.category}</span>
+                      <span className="px-2 py-0.5 text-xs rounded-full bg-muted/50 text-muted-foreground">{typeConfig?.label}</span>
                     </div>
 
-                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
                       <span>{club.members.length} members</span>
                       <span>{club.posts.length} posts</span>
                     </div>
@@ -144,16 +161,19 @@ const ClubsSection = () => {
                     {isMember ? (
                       <Button 
                         onClick={() => setSelectedClub(club.id)}
-                        className="w-full"
+                        size="sm"
+                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-xs h-8"
                       >
                         Open Club
                       </Button>
                     ) : (
                       <Button 
                         onClick={() => handleJoinClub(club.id)}
-                        className="w-full bg-green-600 hover:bg-green-700"
+                        size="sm"
+                        variant="outline"
+                        className="w-full border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 text-xs h-8"
                       >
-                        <UserPlus className="w-4 h-4 mr-2" />
+                        <UserPlus className="w-3.5 h-3.5 mr-1.5" />
                         Join Club
                       </Button>
                     )}
@@ -165,37 +185,42 @@ const ClubsSection = () => {
         </TabsContent>
 
         <TabsContent value="my-clubs">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {clubs.filter(c => isUserMember(c.id, currentUser.id)).map((club) => {
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {clubs.filter(c => isUserMember(c.id, currentUser.id)).map((club, index) => {
               const typeConfig = clubTypes.find(t => t.type === club.type);
               const Icon = typeConfig?.icon || Coffee;
               const isAdmin = isUserAdmin(club.id, currentUser.id);
 
               return (
-                <Card key={club.id} className="overflow-hidden hover:shadow-lg transition-all border-2 border-purple-200">
-                  <div className="h-32 bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center">
-                    <Icon className="w-16 h-16 text-white" />
+                <Card 
+                  key={club.id} 
+                  className="overflow-hidden bg-card rounded-xl border border-primary/20 hover:border-primary/40 hover:shadow-lg transition-all duration-300 group"
+                  style={{ opacity: 0, animation: `fadeInUp 0.5s ease-out ${index * 40}ms forwards` }}
+                >
+                  <div className="h-20 bg-primary/10 flex items-center justify-center">
+                    <Icon className="w-10 h-10 text-primary group-hover:scale-110 transition-transform duration-300" />
                   </div>
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-bold text-lg">{club.name}</h3>
+                      <h3 className="font-semibold text-sm group-hover:text-primary transition-colors duration-300">{club.name}</h3>
                       {isAdmin && (
-                        <Badge className="bg-yellow-400 text-yellow-900">
-                          <Crown className="w-3 h-3 mr-1" />
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary flex items-center gap-1">
+                          <Crown className="w-3 h-3" />
                           Admin
-                        </Badge>
+                        </span>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-3">{club.description}</p>
+                    <p className="text-xs text-muted-foreground mb-3">{club.description}</p>
                     
-                    <div className="flex items-center justify-between text-sm mb-4">
+                    <div className="flex items-center justify-between text-xs mb-3 text-muted-foreground">
                       <span>{club.members.length} members</span>
                       <span>{club.posts.length} posts</span>
                     </div>
 
                     <Button 
                       onClick={() => setSelectedClub(club.id)}
-                      className="w-full"
+                      size="sm"
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-xs h-8"
                     >
                       Open Club
                     </Button>
@@ -209,30 +234,33 @@ const ClubsSection = () => {
 
       {/* Create Club Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-              <Plus className="w-6 h-6" />
-              Create New Club 🚀
+            <DialogTitle className="text-lg font-semibold flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-primary/10">
+                <Plus className="w-4 h-4 text-primary" />
+              </div>
+              Create New Club
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-semibold mb-2 block">Club Name</label>
+              <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Club Name</label>
               <Input
                 value={newClub.name}
                 onChange={(e) => setNewClub({ ...newClub, name: e.target.value })}
                 placeholder="e.g., Digital Art Enthusiasts"
+                className="h-9 text-sm border-border/50 focus:border-primary/50"
               />
             </div>
 
             <div>
-              <label className="text-sm font-semibold mb-2 block">Type</label>
+              <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Type</label>
               <select
                 value={newClub.type}
                 onChange={(e) => setNewClub({ ...newClub, type: e.target.value })}
-                className="w-full p-2 border rounded-lg"
+                className="w-full h-9 px-3 text-sm border border-border/50 rounded-lg bg-background focus:border-primary/50 focus:outline-none transition-colors duration-300"
               >
                 {clubTypes.map((type) => (
                   <option key={type.type} value={type.type}>{type.label}</option>
@@ -241,24 +269,31 @@ const ClubsSection = () => {
             </div>
 
             <div>
-              <label className="text-sm font-semibold mb-2 block">Description</label>
+              <label className="text-xs font-medium mb-1.5 block text-muted-foreground">Description</label>
               <Textarea
                 value={newClub.description}
                 onChange={(e) => setNewClub({ ...newClub, description: e.target.value })}
                 placeholder="Tell everyone what this club is about..."
-                rows={4}
+                rows={3}
+                className="text-sm border-border/50 focus:border-primary/50 resize-none"
               />
             </div>
 
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+            <div className="flex gap-2 justify-end pt-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowCreateDialog(false)}
+                className="border-border/50 hover:border-primary/30 transition-all duration-300"
+              >
                 Cancel
               </Button>
               <Button 
                 onClick={handleCreateClub}
-                className="bg-gradient-to-r from-purple-600 to-pink-600"
+                size="sm"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
               >
-                Create Club 🎉
+                Create Club
               </Button>
             </div>
           </div>
@@ -268,83 +303,84 @@ const ClubsSection = () => {
       {/* Club View Dialog */}
       {selectedClubData && (
         <Dialog open={!!selectedClub} onOpenChange={() => setSelectedClub(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold">{selectedClubData.name}</DialogTitle>
-              <p className="text-muted-foreground">{selectedClubData.description}</p>
+              <DialogTitle className="text-lg font-semibold">{selectedClubData.name}</DialogTitle>
+              <p className="text-sm text-muted-foreground">{selectedClubData.description}</p>
             </DialogHeader>
 
-            <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Badge>{selectedClubData.members.length} members</Badge>
-                <Badge variant="outline">{selectedClubData.posts.length} posts</Badge>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="px-2 py-0.5 text-xs rounded-full bg-primary/10 text-primary">{selectedClubData.members.length} members</span>
+                <span className="px-2 py-0.5 text-xs rounded-full bg-muted/50 text-muted-foreground">{selectedClubData.posts.length} posts</span>
               </div>
 
               {/* Create Post */}
-              <Card className="p-4">
-                <h4 className="font-semibold mb-3">Share with the club 🎉</h4>
+              <Card className="p-3 border-border/50">
+                <h4 className="font-medium text-sm mb-2">Share with the club</h4>
                 <Textarea
                   value={newPost.content}
                   onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
                   placeholder="What's on your mind?"
-                  rows={3}
-                  className="mb-2"
+                  rows={2}
+                  className="mb-2 text-sm border-border/50 focus:border-primary/50 resize-none"
                 />
                 <Button 
                   onClick={() => handleAddPost(selectedClubData.id)}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  size="sm"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 h-8 text-xs"
                 >
-                  <Send className="w-4 h-4 mr-2" />
+                  <Send className="w-3.5 h-3.5 mr-1.5" />
                   Post
                 </Button>
               </Card>
 
               {/* Posts */}
-              <div className="space-y-4">
-                <h4 className="font-semibold">Club Feed</h4>
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm">Club Feed</h4>
                 {selectedClubData.posts.map((post) => (
-                  <Card key={post.id} className="p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold">
+                  <Card key={post.id} className="p-3 border-border/50 hover:border-primary/30 transition-all duration-300">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-semibold">
                         {post.userName[0]}
                       </div>
                       <div>
-                        <p className="font-semibold">{post.userName}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="font-medium text-xs">{post.userName}</p>
+                        <p className="text-[10px] text-muted-foreground">
                           {new Date(post.timestamp).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
 
-                    <p className="mb-3">{post.content}</p>
+                    <p className="text-sm mb-2">{post.content}</p>
 
-                    <div className="flex items-center gap-4 mb-3">
+                    <div className="flex items-center gap-3 mb-2">
                       <Button 
                         variant="ghost" 
                         size="sm"
                         onClick={() => likePost(selectedClubData.id, post.id)}
-                        className="gap-1"
+                        className="gap-1 h-7 px-2 hover:bg-primary/10 transition-all duration-300"
                       >
-                        <Heart className={`w-4 h-4 ${post.likes > 0 ? 'fill-red-500 text-red-500' : ''}`} />
-                        {post.likes}
+                        <Heart className={`w-3.5 h-3.5 ${post.likes > 0 ? 'fill-primary text-primary' : ''}`} />
+                        <span className="text-xs">{post.likes}</span>
                       </Button>
-                      <Button variant="ghost" size="sm" className="gap-1">
-                        <MessageCircle className="w-4 h-4" />
-                        {post.comments.length}
+                      <Button variant="ghost" size="sm" className="gap-1 h-7 px-2 hover:bg-primary/10 transition-all duration-300">
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span className="text-xs">{post.comments.length}</span>
                       </Button>
                     </div>
 
                     {/* Comments */}
                     {post.comments.length > 0 && (
-                      <div className="space-y-2 mt-3 border-t pt-3">
+                      <div className="space-y-2 mt-2 border-t border-border/30 pt-2">
                         {post.comments.map((comment, idx) => (
                           <div key={idx} className="flex gap-2">
-                            <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-white text-sm font-bold">
+                            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-[10px] font-semibold">
                               {comment.userName[0]}
                             </div>
-                            <div className="flex-1 bg-muted rounded-lg p-2">
-                              <p className="font-semibold text-sm">{comment.userName}</p>
-                              <p className="text-sm">{comment.text}</p>
+                            <div className="flex-1 bg-muted/30 rounded-lg p-2">
+                              <p className="font-medium text-[10px]">{comment.userName}</p>
+                              <p className="text-xs">{comment.text}</p>
                             </div>
                           </div>
                         ))}
@@ -352,7 +388,7 @@ const ClubsSection = () => {
                     )}
 
                     {/* Add Comment */}
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex gap-2 mt-2">
                       <Input
                         placeholder="Add a comment..."
                         value={newComment}
@@ -362,12 +398,14 @@ const ClubsSection = () => {
                             handleAddComment(selectedClubData.id, post.id);
                           }
                         }}
+                        className="h-8 text-xs border-border/50 focus:border-primary/50"
                       />
                       <Button 
                         size="sm"
                         onClick={() => handleAddComment(selectedClubData.id, post.id)}
+                        className="h-8 px-3 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
                       >
-                        <Send className="w-4 h-4" />
+                        <Send className="w-3.5 h-3.5" />
                       </Button>
                     </div>
                   </Card>

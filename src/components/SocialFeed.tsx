@@ -77,26 +77,27 @@ const SocialFeed = () => {
     const typeConfig = postTypes.find(t => t.type === type);
     if (!typeConfig) return null;
     const Icon = typeConfig.icon;
-    return <Icon className={`w-5 h-5 ${typeConfig.color}`} />;
+    return <Icon className="w-4 h-4 text-primary" />;
   };
 
   return (
-    <div className="space-y-6">
-      {/* Create Post Button */}
-      <Card className="p-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-2 border-dashed border-purple-300 dark:border-purple-700">
+    <div className="space-y-5">
+      {/* Create Post Button - Clean Design */}
+      <div className="relative bg-card rounded-2xl border border-border/50 p-6 hover:border-primary/30 transition-all duration-300">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center">
-            <Plus className="w-6 h-6 text-white" />
+          <div className="p-3 bg-primary/10 rounded-xl">
+            <Plus className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1">
-            <h3 className="font-bold text-lg mb-1">Share Your Talent!</h3>
+            <h3 className="font-semibold mb-0.5">Share Your Talent</h3>
             <p className="text-sm text-muted-foreground">
-              Post your artwork, music, travel stories, or achievements
+              Post artwork, music, travel stories, or achievements
             </p>
           </div>
           <Button 
             onClick={() => setShowCreatePost(true)}
-            className="bg-gradient-primary text-white"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Camera className="w-4 h-4 mr-2" />
             Create Post
@@ -106,50 +107,52 @@ const SocialFeed = () => {
         {/* Quick Post Types */}
         <div className="flex gap-2 mt-4 flex-wrap">
           {postTypes.map((type) => (
-            <Button
+            <button
               key={type.type}
               onClick={() => {
                 setNewPost({ ...newPost, type: type.type as Post['type'] });
                 setShowCreatePost(true);
               }}
-              variant="outline"
-              size="sm"
-              className="gap-2"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-all duration-300"
             >
-              <type.icon className={`w-4 h-4 ${type.color}`} />
+              <type.icon className="w-3.5 h-3.5" />
               {type.label}
-            </Button>
+            </button>
           ))}
         </div>
-      </Card>
+      </div>
 
       {/* Posts Feed */}
-      <div className="space-y-6">
+      <div className="space-y-4">
         {posts.length === 0 ? (
-          <Card className="p-12 text-center">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 flex items-center justify-center">
-              <ImageIcon className="w-10 h-10 text-purple-500" />
+          <div className="bg-card rounded-2xl border border-border/50 p-12 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <ImageIcon className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-xl font-bold mb-2">No Posts Yet</h3>
-            <p className="text-muted-foreground mb-4">
-              Be the first to share your talent with the community!
+            <h3 className="text-lg font-semibold mb-2">No Posts Yet</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Be the first to share your talent with the community
             </p>
-            <Button onClick={() => setShowCreatePost(true)} className="bg-gradient-primary">
+            <Button onClick={() => setShowCreatePost(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
               Create First Post
             </Button>
-          </Card>
+          </div>
         ) : (
-          posts.map((post) => (
-            <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+          posts.map((post, index) => (
+            <div 
+              key={post.id} 
+              className="bg-card rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 transition-all duration-300"
+              style={{ opacity: 0, animation: `fadeInUp 0.4s ease-out ${index * 50}ms forwards` }}
+            >
               {/* Post Header */}
-              <div className="p-4 flex items-center justify-between border-b">
+              <div className="p-4 flex items-center justify-between border-b border-border/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
                     {post.userName[0]}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="font-semibold">{post.userName}</h4>
+                      <h4 className="font-semibold text-sm">{post.userName}</h4>
                       {getTypeIcon(post.type)}
                     </div>
                     <p className="text-xs text-muted-foreground">
@@ -162,17 +165,17 @@ const SocialFeed = () => {
                     </p>
                   </div>
                 </div>
-                <Badge variant="secondary">{post.category || post.type}</Badge>
+                <Badge variant="secondary" className="bg-muted/50 text-xs">{post.category || post.type}</Badge>
               </div>
 
               {/* Post Content */}
               <div className="p-4">
-                <h3 className="font-bold text-lg mb-2">{post.title}</h3>
-                <p className="text-muted-foreground mb-4">{post.description}</p>
+                <h3 className="font-semibold mb-2">{post.title}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{post.description}</p>
 
                 {/* Media Display */}
                 {post.mediaUrl && (
-                  <div className="rounded-lg overflow-hidden mb-4 bg-black">
+                  <div className="rounded-xl overflow-hidden mb-4 bg-muted/30">
                     {post.mediaType === 'image' && (
                       <img 
                         src={post.mediaUrl} 
@@ -199,69 +202,60 @@ const SocialFeed = () => {
                 {post.tags.length > 0 && (
                   <div className="flex gap-2 flex-wrap mb-4">
                     {post.tags.map((tag, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">
+                      <span key={idx} className="text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
                         #{tag}
-                      </Badge>
+                      </span>
                     ))}
                   </div>
                 )}
               </div>
 
               {/* Post Actions */}
-              <div className="px-4 py-3 border-t flex items-center justify-between">
-                <div className="flex gap-6">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
+              <div className="px-4 py-3 border-t border-border/50 flex items-center justify-between">
+                <div className="flex gap-4">
+                  <button 
                     onClick={() => likePost(post.id)}
-                    className="gap-2"
+                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
-                    <Heart className={`w-4 h-4 ${post.likes > 0 ? 'fill-red-500 text-red-500' : ''}`} />
+                    <Heart className={`w-4 h-4 ${post.likes > 0 ? 'fill-primary text-primary' : ''}`} />
                     {post.likes}
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
+                  </button>
+                  <button 
                     onClick={() => setSelectedPost(post)}
-                    className="gap-2"
+                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     <MessageCircle className="w-4 h-4" />
                     {post.comments.length}
-                  </Button>
-                  <Button variant="ghost" size="sm" className="gap-2">
+                  </button>
+                  <button className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                     <Share2 className="w-4 h-4" />
                     {post.shares}
-                  </Button>
+                  </button>
                 </div>
               </div>
 
               {/* Comments Preview */}
               {post.comments.length > 0 && (
-                <div className="px-4 pb-4 border-t pt-3 bg-muted/30">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {post.comments.length} {post.comments.length === 1 ? 'comment' : 'comments'}
-                  </p>
-                  <Button 
-                    variant="link" 
-                    size="sm"
+                <div className="px-4 pb-4 border-t border-border/50 pt-3 bg-muted/20">
+                  <button 
                     onClick={() => setSelectedPost(post)}
-                    className="p-0 h-auto"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
-                    View all comments
-                  </Button>
+                    View all {post.comments.length} {post.comments.length === 1 ? 'comment' : 'comments'}
+                  </button>
                 </div>
               )}
-            </Card>
+            </div>
           ))
         )}
       </div>
 
       {/* Create Post Dialog */}
       <Dialog open={showCreatePost} onOpenChange={setShowCreatePost}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl border-border/50">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Camera className="w-5 h-5" />
+              <Camera className="w-5 h-5 text-primary" />
               Create New Post
             </DialogTitle>
           </DialogHeader>

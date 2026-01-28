@@ -189,7 +189,7 @@ const Home = () => {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             
             {/* Left Side - Content */}
-            <div className="text-left space-y-8">
+            <div className="text-left space-y-8 lg:pl-8 xl:pl-16">
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-muted/50 backdrop-blur-sm animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                 <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -574,44 +574,86 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="container mx-auto">
-          <Card className="bg-gradient-primary border-0 shadow-elevated p-12 md:p-16 text-center relative overflow-hidden">
-            {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+      {/* CTA Section - Purple Theme */}
+      <section className="py-16 px-4">
+        <style>{`
+          @keyframes ctaShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+          @keyframes ctaPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+          }
+          @keyframes ctaFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+          }
+          .cta-shimmer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: ctaShimmer 3s ease-in-out infinite;
+          }
+          .cta-glow {
+            animation: ctaPulse 3s ease-in-out infinite;
+          }
+          .cta-float {
+            animation: ctaFloat 4s ease-in-out infinite;
+          }
+        `}</style>
+        <div className="container mx-auto max-w-4xl">
+          <div className="relative bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 border border-primary/30 rounded-2xl p-8 md:p-12 overflow-hidden group hover:border-primary/50 transition-all duration-500 cta-shimmer">
+            {/* Animated glow orbs */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl cta-glow" />
+            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-primary/15 rounded-full blur-2xl cta-glow" style={{ animationDelay: '1s' }} />
             
-            <div className="relative z-10">
-              <Badge variant="secondary" className="mb-6 px-4 py-2">
-                <Rocket className="w-4 h-4 mr-2" />
-                Start Your Journey Today
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-primary-foreground mb-4">
-                Ready to Transform Your Future?
-              </h2>
-              <p className="text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-                Join thousands of students who are learning, growing, and having fun on Risee.
-                Start your free trial today - no credit card required.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/dashboard">
-                  <Button size="lg" variant="secondary" className="bg-background text-foreground hover:bg-background/90 px-8 py-6 text-lg group">
-                    Join Risee Now
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            {/* Floating accent dots */}
+            <div className="absolute top-6 right-8 w-2 h-2 rounded-full bg-primary/50 cta-float" />
+            <div className="absolute bottom-8 left-12 w-1.5 h-1.5 rounded-full bg-primary/40 cta-float" style={{ animationDelay: '0.5s' }} />
+            
+            {/* Top accent line */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent" />
+            
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+              {/* Left - Text */}
+              <div className="lg:max-w-md">
+                <h2 className="text-2xl md:text-3xl font-semibold text-foreground mb-3 leading-tight">
+                  Start your journey <span className="text-primary">today</span>
+                </h2>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Join 10,000+ learners building their future with Risee.
+                </p>
+              </div>
+              
+              {/* Right - CTA */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <Link to="/login">
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-5 text-sm font-medium rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary/30 group/btn">
+                    Get Started
+                    <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-0.5 transition-transform" />
                   </Button>
                 </Link>
-                <Link to="/courses">
-                  <Button size="lg" variant="outline" className="border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary px-8 py-6 text-lg">
-                    View Courses
-                  </Button>
+                <Link to="/courses" className="text-sm text-muted-foreground hover:text-primary transition-colors duration-300 flex items-center gap-1 group/link">
+                  Explore courses
+                  <ArrowRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all duration-300" />
                 </Link>
               </div>
-              <p className="text-sm text-primary-foreground/80 mt-6">
-                ✓ Free 14-day trial · ✓ No credit card required · ✓ Cancel anytime
-              </p>
             </div>
-          </Card>
+
+            {/* Bottom trust line */}
+            <div className="relative z-10 flex items-center gap-4 mt-8 pt-6 border-t border-primary/20 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="text-primary">✓</span> Free trial</span>
+              <span className="w-1 h-1 rounded-full bg-primary/30" />
+              <span className="flex items-center gap-1"><span className="text-primary">✓</span> No credit card</span>
+              <span className="w-1 h-1 rounded-full bg-primary/30" />
+              <span className="flex items-center gap-1"><span className="text-primary">✓</span> Cancel anytime</span>
+            </div>
+          </div>
         </div>
       </section>
       <Footer />
