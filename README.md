@@ -1,6 +1,4 @@
-# Welcome to your Lovable project
-
-## Project info
+WELCOME TO RISE
 
 **URL**: https://lovable.dev/projects/7ac452ad-db5e-4bd9-a79d-7af69e3d459b
 
