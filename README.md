@@ -1,71 +1,133 @@
-WELCOME TO RISE
+# SkillVerse - Play Learn Platform
 
-**URL**: https://lovable.dev/projects/7ac452ad-db5e-4bd9-a79d-7af69e3d459b
+A comprehensive learning and career development platform combining skill-building, competitive programming, and career guidance.
 
-## How can I edit this code?
+## Project Structure
 
-There are several ways of editing your application.
+```
+skillverse-play-learn/
+├── frontend/              # React + Vite frontend application
+│   ├── src/              # React components, pages, utilities
+│   ├── public/           # Static assets
+│   ├── index.html        # HTML entry point
+│   ├── package.json      # Frontend dependencies
+│   ├── vite.config.ts    # Vite configuration
+│   ├── tailwind.config.ts # TailwindCSS configuration
+│   ├── tsconfig.json     # TypeScript configuration
+│   └── ...
+│
+├── backend/              # Node.js + Express backend server
+│   ├── server.js         # Main server file
+│   ├── config/           # Configuration files
+│   ├── controllers/      # Business logic
+│   ├── models/           # Database schemas
+│   ├── routes/           # API endpoints
+│   ├── middleware/       # Custom middleware
+│   ├── package.json      # Backend dependencies
+│   ├── .env              # Environment variables
+│   ├── start-server.bat  # Server startup script
+│   ├── supabase/         # Supabase configuration
+│   └── ...
+│
+├── docs/                 # Documentation
+│   ├── CAREER_HUB_*.md
+│   ├── CERTIFICATE_*.md
+│   ├── COMPETITIVE_PROBLEMS_*.md
+│   ├── PROFILE_EDIT_*.md
+│   └── ...
+│
+└── README.md            # This file
+```
 
-**Use Lovable**
+## Getting Started
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7ac452ad-db5e-4bd9-a79d-7af69e3d459b) and start prompting.
+### Frontend Setup
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The frontend will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Backend Setup
 
-**Use GitHub Codespaces**
+```bash
+cd backend
+npm install
+npm run dev
+# or
+node server.js
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The backend API will be available at `http://localhost:5000`
 
-## What technologies are used for this project?
+## Features
 
-This project is built with:
+- **Skill-based Learning**: Comprehensive course content and skill tracking
+- **Competitive Programming**: Algorithm challenges and problem solving
+- **Career Hub**: Internship opportunities and job listings
+- **Certificates**: Achievement certificates for completed courses
+- **Social Features**: Club system and user interactions
+- **Event Management**: Event registration and management
+- **Profile Management**: User profile editing and customization
 
-- Vite
+## Technology Stack
+
+### Frontend
+- React 18+
 - TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Vite
+- TailwindCSS
+- Shadcn/UI Components
 
-## How can I deploy this project?
+### Backend
+- Node.js + Express
+- MongoDB
+- JWT Authentication
+- MongoDB Atlas
 
-Simply open [Lovable](https://lovable.dev/projects/7ac452ad-db5e-4bd9-a79d-7af69e3d459b) and click on Share -> Publish.
+## Environment Configuration
 
-## Can I connect a custom domain to my Lovable project?
+Each service has its own `.env` file:
+- `frontend/.env` - Frontend API configuration
+- `backend/.env` - Backend database and API keys
 
-Yes, you can!
+See the `.env.example` files in each directory for required variables.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Documentation
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Comprehensive documentation is available in the `docs/` folder covering:
+- Feature implementation guides
+- API specifications
+- Setup instructions
+- Architecture decisions
+
+## Development
+
+### Running both services simultaneously
+
+1. Open two terminals
+2. Terminal 1: `cd frontend && npm run dev`
+3. Terminal 2: `cd backend && npm run dev`
+
+### Building for Production
+
+```bash
+# Frontend
+cd frontend
+npm run build
+
+# Backend
+cd backend
+# No build step needed, node runs directly
+```
+
+## Contributing
+
+Please follow the project structure and maintain the separation between frontend and backend code.
+
+## License
+
+Proprietary - SkillVerse Platform
