@@ -21,98 +21,104 @@ export default function PremiumHero() {
   return (
     <section className="relative min-h-screen overflow-hidden bg-black pt-20 pb-20">
       <style>{`
-        /* ULTRA-PREMIUM CINEMATIC BACKGROUND */
+        /* SPACE-DEVOTIONAL HERO - EXACT REFERENCE MATCH */
         .hero-bg {
-          background: linear-gradient(180deg, #0a0a1f 0%, #0f0f2e 50%, #1a0a2e 100%);
+          background: linear-gradient(180deg, #050510 0%, #0a0515 25%, #150820 50%, #0f051a 75%, #050510 100%);
           position: relative;
           overflow: hidden;
         }
 
-        /* Noise/grain overlay for realism */
-        .hero-bg::before {
-          content: '';
+        /* STRONG AURORA GRADIENTS - Devotional Space Feel */
+        .aurora-glow-main {
           position: absolute;
           inset: 0;
-          background-image: 
-            url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' result='noise' /%3E%3C/filter%3E%3Crect width='100' height='100' fill='%23000' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
-          opacity: 0.5;
-          z-index: 2;
+          z-index: 1;
+          background: 
+            /* Primary purple-pink aurora - center-left, STRONG */
+            radial-gradient(ellipse 1200px 900px at 35% 35%, rgba(168, 85, 247, 0.4) 0%, rgba(236, 72, 153, 0.2) 30%, transparent 60%),
+            /* Secondary blue aurora - right side, STRONG */
+            radial-gradient(ellipse 1100px 800px at 75% 25%, rgba(59, 130, 246, 0.35) 0%, rgba(34, 211, 238, 0.15) 35%, transparent 65%);
+          filter: blur(150px);
+          animation: auroraBreathing 8s ease-in-out infinite;
           pointer-events: none;
-          mix-blend-mode: overlay;
         }
 
-        .hero-bg::after {
-          content: '';
+        .aurora-glow-accent {
           position: absolute;
           inset: 0;
-          z-index: 3;
-          pointer-events: none;
-          mix-blend-mode: screen;
-        }
-
-        /* ANIMATED AURORA GRADIENTS - Slow floating motion */
-        .aurora-layer-1 {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          background: 
-            radial-gradient(ellipse 900px 700px at 20% 30%, rgba(139, 92, 246, 0.3) 0%, transparent 40%),
-            radial-gradient(ellipse 1000px 600px at 80% 70%, rgba(59, 130, 246, 0.25) 0%, transparent 45%);
-          filter: blur(120px);
-          animation: auroraFloat1 20s ease-in-out infinite;
-          opacity: 0.8;
-        }
-
-        .aurora-layer-2 {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          background: 
-            radial-gradient(ellipse 800px 800px at 70% 20%, rgba(236, 72, 153, 0.2) 0%, transparent 50%),
-            radial-gradient(ellipse 700px 900px at 30% 80%, rgba(34, 211, 238, 0.2) 0%, transparent 48%);
-          filter: blur(130px);
-          animation: auroraFloat2 25s ease-in-out infinite;
-          opacity: 0.7;
-        }
-
-        .aurora-layer-3 {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          background: 
-            radial-gradient(ellipse 1100px 600px at 50% 50%, rgba(168, 85, 247, 0.15) 0%, transparent 55%),
-            radial-gradient(ellipse 600px 1000px at 15% 50%, rgba(8, 145, 178, 0.15) 0%, transparent 50%);
+          z-index: 1;
+          background:
+            /* Pink accent glow */
+            radial-gradient(ellipse 900px 1000px at 45% 50%, rgba(236, 72, 153, 0.25) 0%, transparent 50%),
+            /* Cyan accent - bottom right */
+            radial-gradient(ellipse 800px 700px at 85% 75%, rgba(34, 211, 238, 0.2) 0%, transparent 55%);
           filter: blur(140px);
-          animation: auroraFloat3 30s ease-in-out infinite;
-          opacity: 0.6;
+          animation: auroraFloat 12s ease-in-out infinite;
+          pointer-events: none;
         }
 
-        @keyframes auroraFloat1 {
+        @keyframes auroraBreathing {
           0%, 100% {
-            background-position: 0% 0%;
-            transform: translate(0, 0);
+            opacity: 0.7;
+            filter: blur(150px);
           }
           50% {
-            transform: translate(30px, -40px);
+            opacity: 0.85;
+            filter: blur(160px);
           }
         }
 
-        @keyframes auroraFloat2 {
-          0%, 100% {
-            transform: translate(0, 0);
-          }
-          50% {
-            transform: translate(-40px, 30px);
-          }
-        }
-
-        @keyframes auroraFloat3 {
+        @keyframes auroraFloat {
           0%, 100% {
             transform: translate(0, 0);
           }
           50% {
-            transform: translate(20px, 20px);
+            transform: translate(20px, 30px);
           }
+        }
+
+        /* BRIGHT STARS - Light sources with glow halos */
+        @keyframes starTwinkle {
+          0%, 100% {
+            opacity: 0.4;
+            box-shadow: 0 0 8px currentColor, 0 0 20px currentColor;
+          }
+          50% {
+            opacity: 1;
+            box-shadow: 0 0 12px currentColor, 0 0 30px currentColor;
+          }
+        }
+
+        .star {
+          position: absolute;
+          background: radial-gradient(circle, #ffffff, rgba(255,255,255,0.5));
+          border-radius: 50%;
+          pointer-events: none;
+          animation: starTwinkle 3s ease-in-out infinite;
+        }
+
+        .star-tiny {
+          width: 1.5px;
+          height: 1.5px;
+          box-shadow: 0 0 6px #ffffff, 0 0 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .star-small {
+          width: 2.5px;
+          height: 2.5px;
+          box-shadow: 0 0 8px #ffffff, 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+
+        .star-medium {
+          width: 3.5px;
+          height: 3.5px;
+          box-shadow: 0 0 10px #ffffff, 0 0 25px rgba(139, 92, 246, 0.6);
+        }
+
+        .star-large {
+          width: 5px;
+          height: 5px;
+          box-shadow: 0 0 12px #ffffff, 0 0 30px rgba(139, 92, 246, 0.7);
         }
 
         /* Premium smooth easing curve */
@@ -292,22 +298,27 @@ export default function PremiumHero() {
         .delay-500 { animation-delay: 0.5s; }
       `}</style>
 
-      {/* Background layers */}
+      {/* Background - deep space */}
       <div className="hero-bg absolute inset-0 -z-20" />
-      <div className="aurora-layer-1 absolute inset-0 -z-20" />
-      <div className="aurora-layer-2 absolute inset-0 -z-20" />
-      <div className="aurora-layer-3 absolute inset-0 -z-20" />
+      
+      {/* STRONG Aurora Glows - Devotional Space Feel */}
+      <div className="aurora-glow-main absolute inset-0 -z-20" />
+      <div className="aurora-glow-accent absolute inset-0 -z-20" />
 
-      {/* Ultra-subtle starfield particles */}
-      {[...Array(30)].map((_, i) => {
-        const particleType = i % 3 === 0 ? "particle-small" : i % 3 === 1 ? "particle-medium" : "particle-large";
+      {/* BRIGHT TWINKLING STARS - Scattered throughout (EXACT match) */}
+      {[...Array(80)].map((_, i) => {
+        const starTypes = ['star-tiny', 'star-small', 'star-medium', 'star-large'];
+        const starType = starTypes[Math.floor(Math.random() * starTypes.length)];
+        const tweetDelay = Math.random() * 4;
+        
         return (
           <div
             key={i}
-            className={`particle ${particleType}`}
+            className={`star ${starType}`}
             style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 4}s`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${tweetDelay}s`,
             }}
           />
         );
