@@ -5,6 +5,7 @@ import compression from 'compression';
 import helmet from 'helmet';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import path from 'path';
 import logger from './config/logger.js';
 import connectDB from './config/database.js';
 
@@ -114,7 +115,10 @@ import jobRoutes from './routes/jobRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import companyRoutes from './routes/companyRoutes.js';
 import opportunityRoutes from './routes/opportunities.routes.js';
+import reelRoutes from './routes/reelRoutes.js';
 import startScheduler from './workers/jobFetcher.worker.js';
+
+const uploadsDirectory = path.resolve(process.cwd(), 'uploads');
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
@@ -124,6 +128,8 @@ app.use('/api/v1/jobs', jobRoutes);
 app.use('/api/v1/events', eventRoutes);
 app.use('/api/v1/companies', companyRoutes);
 app.use('/api/v1/opportunities', opportunityRoutes);
+app.use('/api/v1/reels', reelRoutes);
+app.use('/uploads', express.static(uploadsDirectory));
 
 app.get('/api/v1', (req, res) => {
   res.json({

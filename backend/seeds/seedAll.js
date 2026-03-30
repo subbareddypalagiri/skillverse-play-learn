@@ -55,7 +55,7 @@ const seedAll = async () => {
     const instructorId = users[1]._id;
     logger.info(`✅ Seeded ${users.length} users`);
 
-    // 2. Seed Courses
+    // 2. Seed Courses with Web Dev Videos
     const courses = await Course.create([
       {
         title: "Full Stack Web Development",
@@ -65,7 +65,83 @@ const seedAll = async () => {
         ownerId: instructorId,
         isPublished: true,
         duration: "12 Weeks",
-        price: 0
+        price: 0,
+        resources: {
+          videos: [
+            {
+              title: "HTML Fundamentals - Tags & Structure",
+              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+              platform: "Web",
+              videoId: "html-fundamentals-001",
+              duration: 3600
+            },
+            {
+              title: "CSS Styling & Layouts",
+              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+              platform: "Web",
+              videoId: "css-styling-002",
+              duration: 3480
+            },
+            {
+              title: "Flexbox & Responsive Design",
+              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+              platform: "Web",
+              videoId: "flexbox-responsive-003",
+              duration: 3600
+            },
+            {
+              title: "CSS Grid & Advanced Layouts",
+              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+              platform: "Web",
+              videoId: "grid-advanced-004",
+              duration: 3420
+            },
+            {
+              title: "JavaScript Variables & Functions",
+              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+              platform: "Web",
+              videoId: "js-fundamentals-005",
+              duration: 3600
+            },
+            {
+              title: "DOM Manipulation & Selectors",
+              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+              platform: "Web",
+              videoId: "dom-manipulation-006",
+              duration: 3480
+            },
+            {
+              title: "Event Handling & Listeners",
+              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+              platform: "Web",
+              videoId: "events-listeners-007",
+              duration: 3300
+            },
+            {
+              title: "Fetch API & Promises",
+              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+              platform: "Web",
+              videoId: "fetch-promises-008",
+              duration: 3600
+            },
+            {
+              title: "React Components & JSX",
+              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+              platform: "Web",
+              videoId: "react-components-009",
+              duration: 3480
+            },
+            {
+              title: "Node.js & Express Basics",
+              url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+              platform: "Web",
+              videoId: "nodejs-express-010",
+              duration: 3600
+            }
+          ],
+          pdfs: [],
+          links: []
+        }
       },
       {
         title: "AI & Machine Learning Foundations",
@@ -77,7 +153,7 @@ const seedAll = async () => {
         duration: "10 Weeks"
       }
     ]);
-    logger.info(`✅ Seeded ${courses.length} courses`);
+    logger.info(`✅ Seeded ${courses.length} courses with Web Dev video resources`);
 
     // 3. Seed Problems
     const problems = await Problem.create([

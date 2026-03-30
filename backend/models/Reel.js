@@ -11,6 +11,9 @@ const reelSchema = new mongoose.Schema({
   // Content
   title: { type: String, required: true, trim: true },
   description: String,
+  caption: String,
+  hookText: String,
+  subtitleText: String,
   
   // Video Asset Management
   videoUrl: {
@@ -18,8 +21,22 @@ const reelSchema = new mongoose.Schema({
     required: true
   },
   thumbnailUrl: String,
-  duration: { type: Number, required: true }, // in seconds
+  duration: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 60
+  }, // in seconds
   videoSize: Number, // in bytes
+  clipStartSeconds: Number,
+  clipEndSeconds: Number,
+  
+  // Course Source Tracking (for reels extracted from courses)
+  sourceCourseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+  sourceCourseTitle: String,
+  sourceVideoId: String,
+  topicKey: String,
+  courseLink: String,
   
   // Classification
   category: String,
@@ -35,6 +52,16 @@ const reelSchema = new mongoose.Schema({
   likesCount: { type: Number, default: 0 },
   commentsCount: { type: Number, default: 0 },
   sharesCount: { type: Number, default: 0 },
+  savesCount: { type: Number, default: 0 },
+
+  // Engagement Actors
+  likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  comments: [{
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    text: { type: String, required: true, trim: true, maxlength: 500 },
+    createdAt: { type: Date, default: Date.now }
+  }],
   
   // Learning Metadata (for recommendations)
   avgEngagementTime: Number, // seconds watched
@@ -74,10 +101,12 @@ const reelSchema = new mongoose.Schema({
 // Indexes (optimized for video timeline)
 reelSchema.index({ userId: 1, createdAt: -1 });
 reelSchema.index({ createdAt: -1, viewsCount: -1 });
+reelSchema.index({ category: 1, createdAt: -1 });
+reelSchema.index({ likesCount: -1, commentsCount: -1, sharesCount: -1, viewsCount: -1 });
 reelSchema.index({ tags: 1 });
 reelSchema.index({ isPublished: 1 });
 reelSchema.index({ createdAt: -1 });
-reelSchema.createIndex({ title: 'text', description: 'text', tags: 'text' });
+reelSchema.index({ title: 'text', description: 'text', tags: 'text' });
 
 // Query middleware
 reelSchema.pre(['find', 'findOne'], function (next) {
