@@ -77,50 +77,6 @@ export default function PremiumHero() {
           }
         }
 
-        /* BRIGHT STARS - Light sources with glow halos */
-        @keyframes starTwinkle {
-          0%, 100% {
-            opacity: 0.4;
-            box-shadow: 0 0 8px currentColor, 0 0 20px currentColor;
-          }
-          50% {
-            opacity: 1;
-            box-shadow: 0 0 12px currentColor, 0 0 30px currentColor;
-          }
-        }
-
-        .star {
-          position: absolute;
-          background: radial-gradient(circle, #ffffff, rgba(255,255,255,0.5));
-          border-radius: 50%;
-          pointer-events: none;
-          animation: starTwinkle 3s ease-in-out infinite;
-        }
-
-        .star-tiny {
-          width: 1.5px;
-          height: 1.5px;
-          box-shadow: 0 0 6px #ffffff, 0 0 15px rgba(139, 92, 246, 0.4);
-        }
-
-        .star-small {
-          width: 2.5px;
-          height: 2.5px;
-          box-shadow: 0 0 8px #ffffff, 0 0 20px rgba(139, 92, 246, 0.5);
-        }
-
-        .star-medium {
-          width: 3.5px;
-          height: 3.5px;
-          box-shadow: 0 0 10px #ffffff, 0 0 25px rgba(139, 92, 246, 0.6);
-        }
-
-        .star-large {
-          width: 5px;
-          height: 5px;
-          box-shadow: 0 0 12px #ffffff, 0 0 30px rgba(139, 92, 246, 0.7);
-        }
-
         /* Premium smooth easing curve */
         @keyframes smoothPulse {
           0%, 100% {
@@ -304,25 +260,6 @@ export default function PremiumHero() {
       {/* STRONG Aurora Glows - Devotional Space Feel */}
       <div className="aurora-glow-main absolute inset-0 -z-20" />
       <div className="aurora-glow-accent absolute inset-0 -z-20" />
-
-      {/* BRIGHT TWINKLING STARS - Scattered throughout (EXACT match) */}
-      {[...Array(80)].map((_, i) => {
-        const starTypes = ['star-tiny', 'star-small', 'star-medium', 'star-large'];
-        const starType = starTypes[Math.floor(Math.random() * starTypes.length)];
-        const tweetDelay = Math.random() * 4;
-        
-        return (
-          <div
-            key={i}
-            className={`star ${starType}`}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${tweetDelay}s`,
-            }}
-          />
-        );
-      })}
 
       {/* Main container */}
       <div className="container mx-auto relative z-10 px-4">
