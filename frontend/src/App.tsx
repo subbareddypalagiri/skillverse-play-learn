@@ -11,7 +11,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
-import Vibe from "./pages/Vibe";
+import VibeTabs from "./pages/VibeTabs";
 import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
 import Events from "./pages/Events";
@@ -55,7 +55,7 @@ const App = () => (
                   <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                   <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
-                  <Route path="/vibe" element={<ProtectedRoute><Vibe /></ProtectedRoute>} />
+                  <Route path="/vibe" element={<ProtectedRoute><VibeTabs /></ProtectedRoute>} />
                   <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />
                   <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
                   <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />

@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useRef, useState } from "react";
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ReelItem,
@@ -20,11 +19,13 @@ import {
   Play,
   Loader2,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Plus
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { ReelUploadModal } from "./ReelUploadModal";
 
 const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5002/api/v1").replace(/\/api\/v1\/?$/, "");
 
@@ -35,7 +36,7 @@ const resolveMediaUrl = (url: string) => {
 };
 
 // Instagram-style Centered Reel Component
-const FullScreenReel = ({
+const CenteredReel = ({
   reel,
   isActive,
   isMuted,
@@ -67,7 +68,6 @@ const FullScreenReel = ({
       videoRef.current.play().catch(() => {});
       setIsPlaying(true);
       
-      // Track view after 3 seconds
       if (!hasTrackedView.current) {
         const timer = setTimeout(() => {
           onViewed();
@@ -102,87 +102,73 @@ const FullScreenReel = ({
 
   return (
     <div className="relative w-full h-screen bg-zinc-950 snap-start snap-always flex-shrink-0 flex items-center justify-center">
-      {/* Centered Reel Container - Instagram-style */}
-      <div className="relative h-full max-h-[100vh] w-full max-w-[420px] flex items-center justify-center">
-        {/* Video Container with 9:16 aspect ratio */}
-        <div className="relative w-full h-full max-h-[calc(100vh-40px)] flex items-center justify-center">
-          <div 
-            className="relative bg-black rounded-lg overflow-hidden shadow-2xl"
-            style={{ 
-              width: '100%',
-              maxWidth: '420px',
-              aspectRatio: '9/16',
-              maxHeight: 'calc(100vh - 40px)'
-            }}
-          >
-            {/* Video */}
-            <video
-              ref={videoRef}
-              src={resolveMediaUrl(reel.videoUrl)}
-              className="absolute inset-0 w-full h-full object-contain bg-black"
-              loop
-              playsInline
-              muted={isMuted}
-              onClick={togglePlayPause}
-            />
+      <div className="relative h-full w-full flex items-center justify-center px-4">
+        <div 
+          className="relative bg-black rounded-xl overflow-hidden shadow-2xl"
+          style={{ 
+            width: '100%',
+            maxWidth: '400px',
+            aspectRatio: '9/16',
+            maxHeight: 'calc(100vh - 60px)'
+          }}
+        >
+          <video
+            ref={videoRef}
+            src={resolveMediaUrl(reel.videoUrl)}
+            className="absolute inset-0 w-full h-full object-contain bg-black"
+            loop
+            playsInline
+            muted={isMuted}
+            onClick={togglePlayPause}
+          />
 
-            {/* Play/Pause Overlay (center of video) */}
-            {!isPlaying && isActive && (
-              <div 
-                className="absolute inset-0 flex items-center justify-center z-10"
-                onClick={togglePlayPause}
-              >
-                <div className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-transform hover:scale-110">
-                  <Play className="w-8 h-8 text-white ml-1" />
-                </div>
+          {!isPlaying && isActive && (
+            <div 
+              className="absolute inset-0 flex items-center justify-center z-10"
+              onClick={togglePlayPause}
+            >
+              <div className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center transition-transform hover:scale-110">
+                <Play className="w-8 h-8 text-white ml-1" />
               </div>
+            </div>
+          )}
+
+          <button
+            onClick={onToggleMute}
+            className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-black/80 transition-colors"
+          >
+            {isMuted ? (
+              <VolumeX className="w-4 h-4 text-white" />
+            ) : (
+              <Volume2 className="w-4 h-4 text-white" />
+            )}
+          </button>
+
+          <div className="absolute bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+                {(reel.creator?.name || "U").charAt(0).toUpperCase()}
+              </div>
+              <span className="text-white font-semibold text-sm">{reel.creator?.name || "Creator"}</span>
+            </div>
+
+            <h2 className="text-white font-bold text-base mb-1 line-clamp-1">{reel.title}</h2>
+
+            {reel.caption && (
+              <p className="text-white/80 text-sm line-clamp-2">{reel.caption}</p>
             )}
 
-            {/* Mute/Unmute Button (top right of video) */}
-            <button
-              onClick={onToggleMute}
-              className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-black/80 transition-colors"
-            >
-              {isMuted ? (
-                <VolumeX className="w-4 h-4 text-white" />
-              ) : (
-                <Volume2 className="w-4 h-4 text-white" />
-              )}
-            </button>
-
-            {/* Bottom Overlay - Creator Info & Caption (inside video) */}
-            <div className="absolute bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
-              {/* Creator */}
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
-                  {(reel.creator?.name || "U").charAt(0).toUpperCase()}
-                </div>
-                <span className="text-white font-semibold text-sm">{reel.creator?.name || "Creator"}</span>
+            {reel.category && (
+              <div className="mt-2">
+                <span className="inline-block px-2.5 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs">
+                  #{reel.category}
+                </span>
               </div>
-
-              {/* Title */}
-              <h2 className="text-white font-bold text-base mb-1 line-clamp-1">{reel.title}</h2>
-
-              {/* Caption */}
-              {reel.caption && (
-                <p className="text-white/80 text-sm line-clamp-2">{reel.caption}</p>
-              )}
-
-              {/* Category Tag */}
-              {reel.category && (
-                <div className="mt-2">
-                  <span className="inline-block px-2.5 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs">
-                    #{reel.category}
-                  </span>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Right Side Actions - Outside video container (Instagram-style) */}
-        <div className="absolute right-[-60px] bottom-1/4 z-20 flex flex-col items-center gap-5">
-          {/* Like */}
+        <div className="absolute right-4 md:right-[calc(50%-260px)] bottom-1/3 z-20 flex flex-col items-center gap-5">
           <button onClick={onLike} className="flex flex-col items-center gap-1 group">
             <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
               reel.isLiked ? "bg-red-500" : "bg-zinc-800/80 group-hover:bg-zinc-700"
@@ -192,7 +178,6 @@ const FullScreenReel = ({
             <span className="text-white/90 text-xs font-medium">{reel.stats?.likes || 0}</span>
           </button>
 
-          {/* Comment */}
           <button onClick={onComment} className="flex flex-col items-center gap-1 group">
             <div className="w-11 h-11 rounded-full bg-zinc-800/80 group-hover:bg-zinc-700 flex items-center justify-center transition-colors">
               <MessageCircle className="w-5 h-5 text-white" />
@@ -200,7 +185,6 @@ const FullScreenReel = ({
             <span className="text-white/90 text-xs font-medium">{reel.stats?.comments || 0}</span>
           </button>
 
-          {/* Bookmark */}
           <button onClick={onSave} className="flex flex-col items-center gap-1 group">
             <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
               reel.isSaved ? "bg-yellow-500" : "bg-zinc-800/80 group-hover:bg-zinc-700"
@@ -209,7 +193,6 @@ const FullScreenReel = ({
             </div>
           </button>
 
-          {/* Share */}
           <button onClick={onShare} className="flex flex-col items-center gap-1 group">
             <div className="w-11 h-11 rounded-full bg-zinc-800/80 group-hover:bg-zinc-700 flex items-center justify-center transition-colors">
               <Share2 className="w-5 h-5 text-white" />
@@ -218,7 +201,6 @@ const FullScreenReel = ({
         </div>
       </div>
 
-      {/* Scroll Indicator */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 animate-bounce">
         <ChevronDown className="w-5 h-5 text-white/40" />
       </div>
@@ -226,13 +208,13 @@ const FullScreenReel = ({
   );
 };
 
-const Vibe = () => {
-  const { user } = useAuth();
+export default function ReelsTab() {
   const queryClient = useQueryClient();
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [activeCommentReelId, setActiveCommentReelId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
 
@@ -254,7 +236,6 @@ const Vibe = () => {
 
   const reels = feedQuery.data?.pages.flatMap((page) => page.data) || [];
 
-  // Handle scroll snap detection
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -268,7 +249,6 @@ const Vibe = () => {
         setCurrentIndex(newIndex);
       }
 
-      // Load more when near end
       if (newIndex >= reels.length - 2 && feedQuery.hasNextPage && !feedQuery.isFetchingNextPage) {
         feedQuery.fetchNextPage();
       }
@@ -278,7 +258,6 @@ const Vibe = () => {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [currentIndex, reels.length, feedQuery]);
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const container = containerRef.current;
@@ -362,14 +341,13 @@ const Vibe = () => {
 
   return (
     <>
-      {/* Instagram-style Centered Reels Container */}
       <div
         ref={containerRef}
         className="h-screen w-full overflow-y-scroll snap-y snap-mandatory bg-zinc-950"
         style={{ scrollSnapType: "y mandatory" }}
       >
         {reels.map((reel, index) => (
-          <FullScreenReel
+          <CenteredReel
             key={reel._id}
             reel={reel}
             isActive={index === currentIndex}
@@ -383,7 +361,6 @@ const Vibe = () => {
           />
         ))}
 
-        {/* Loading indicator */}
         {feedQuery.isFetchingNextPage && (
           <div className="h-screen w-full bg-zinc-950 flex items-center justify-center snap-start">
             <Loader2 className="w-8 h-8 animate-spin text-white/70" />
@@ -391,7 +368,6 @@ const Vibe = () => {
         )}
       </div>
 
-      {/* Navigation Controls - Left side */}
       <div className="fixed left-6 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-3">
         <button
           onClick={() => {
@@ -426,7 +402,14 @@ const Vibe = () => {
         </button>
       </div>
 
-      {/* Comment Dialog */}
+      <button
+        onClick={() => setUploadModalOpen(true)}
+        className="fixed right-6 top-24 z-40 w-14 h-14 rounded-full bg-yellow-400 hover:bg-yellow-500 flex items-center justify-center shadow-lg transition-transform hover:scale-110"
+        title="Upload reel"
+      >
+        <Plus className="w-6 h-6 text-black" />
+      </button>
+
       <Dialog open={commentDialogOpen} onOpenChange={setCommentDialogOpen}>
         <DialogContent className="bg-zinc-900 border-zinc-700 text-white">
           <DialogHeader>
@@ -455,8 +438,8 @@ const Vibe = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ReelUploadModal isOpen={uploadModalOpen} onClose={() => setUploadModalOpen(false)} />
     </>
   );
-};
-
-export default Vibe;
+}

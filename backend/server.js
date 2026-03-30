@@ -116,6 +116,8 @@ import eventRoutes from './routes/eventRoutes.js';
 import companyRoutes from './routes/companyRoutes.js';
 import opportunityRoutes from './routes/opportunities.routes.js';
 import reelRoutes from './routes/reelRoutes.js';
+import showcaseRoutes from './routes/showcaseRoutes.js';
+import postRoutes from './routes/postRoutes.js';
 import startScheduler from './workers/jobFetcher.worker.js';
 
 const uploadsDirectory = path.resolve(process.cwd(), 'uploads');
@@ -129,6 +131,8 @@ app.use('/api/v1/events', eventRoutes);
 app.use('/api/v1/companies', companyRoutes);
 app.use('/api/v1/opportunities', opportunityRoutes);
 app.use('/api/v1/reels', reelRoutes);
+app.use('/api/v1/showcase', showcaseRoutes);
+app.use('/api/v1/posts', postRoutes);
 app.use('/uploads', express.static(uploadsDirectory));
 
 app.get('/api/v1', (req, res) => {

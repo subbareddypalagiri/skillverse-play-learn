@@ -174,6 +174,26 @@ const Home = () => {
             0%, 100% { opacity: 0.4; transform: scale(1); }
             50% { opacity: 0.6; transform: scale(1.05); }
           }
+          @keyframes cardHover {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-8px) scale(1.02); }
+          }
+          @keyframes bounceIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+          }
+          @keyframes slideInRight {
+            0% { transform: translateX(-20px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+          }
+          @keyframes slideInLeft {
+            0% { transform: translateX(20px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+          }
+          @keyframes glowBorder {
+            0%, 100% { box-shadow: 0 0 10px rgba(139, 92, 246, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(139, 92, 246, 0.4); }
+          }
           .animate-orbit-1 { animation: orbitSlow1 40s linear infinite; }
           .animate-orbit-2 { animation: orbitSlow2 40s linear infinite; }
           .animate-orbit-3 { animation: orbitSlow3 40s linear infinite; }
@@ -181,6 +201,13 @@ const Home = () => {
           .animate-orbit-5 { animation: orbitSlow5 40s linear infinite; }
           .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
           .animate-gentle-pulse { animation: gentlePulse 4s ease-in-out infinite; }
+          .gesture-card-hover { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+          .gesture-card-hover:hover { animation: cardHover 0.6s ease-out forwards; }
+          .gesture-icon-bounce { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+          .gesture-card-hover:hover .gesture-icon-bounce { transform: translateY(-4px) scale(1.1); }
+          .gesture-glow { animation: glowBorder 2s ease-in-out infinite; }
+          .gesture-text-slide { transition: transform 0.3s ease-out, color 0.3s ease-out; }
+          .gesture-card-hover:hover .gesture-text-slide { transform: translateX(4px); }
         `}</style>
 
         <div className="container mx-auto">
@@ -353,22 +380,22 @@ const Home = () => {
                 return (
                   <div 
                     key={index}
-                    className="flex items-center gap-3 group animate-fade-in-up"
+                    className="flex items-center gap-3 group gesture-card-hover px-4 py-2 rounded-lg cursor-pointer"
                     style={{ animationDelay: `${index * 0.1}s`, opacity: 0 }}
                   >
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
-                      <Icon className="w-5 h-5 text-primary" />
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/25 group-hover:scale-110 transition-all duration-300 gesture-icon-bounce">
+                      <Icon className="w-5 h-5 text-primary transition-transform duration-300 group-hover:rotate-12" />
                     </div>
-                    <div>
-                      <div className="text-xl md:text-2xl font-semibold text-foreground">
+                    <div className="gesture-text-slide transition-all duration-300">
+                      <div className="text-xl md:text-2xl font-semibold text-foreground group-hover:text-primary transition-colors duration-300">
                         {stat.value}
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
                         {stat.label}
                       </div>
                     </div>
                     {index < stats.length - 1 && (
-                      <div className="hidden md:block w-px h-10 bg-border/50 ml-6" />
+                      <div className="hidden md:block w-px h-10 bg-border/50 ml-6 group-hover:bg-border transition-colors duration-300" />
                     )}
                   </div>
                 );
@@ -403,16 +430,22 @@ const Home = () => {
               return (
                 <div 
                   key={index}
-                  className="group bg-background p-8 hover:bg-muted/30 transition-all duration-500 relative"
+                  className="group gesture-card-hover bg-background p-8 relative cursor-pointer"
+                  style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Hover indicator */}
-                  <div className="absolute top-0 left-0 w-full h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+                  <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                   
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors duration-300">
-                    <Icon className="w-5 h-5 text-primary" />
+                  {/* Glow effect on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-br from-primary/5 to-transparent rounded-lg transition-opacity duration-500" />
+                  
+                  <div className="relative z-10">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors duration-300 gesture-icon-bounce">
+                      <Icon className="w-5 h-5 text-primary" />
+                    </div>
+                    <h3 className="text-base font-semibold text-foreground mb-2 gesture-text-slide">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed gesture-text-slide">{feature.description}</p>
                   </div>
-                  <h3 className="text-base font-semibold text-foreground mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
                 </div>
               );
             })}
@@ -423,12 +456,13 @@ const Home = () => {
             {benefits.slice(0, 6).map((benefit, index) => (
               <div 
                 key={index} 
-                className="flex items-start gap-3 group"
+                className="flex items-start gap-3 group gesture-card-hover p-4 rounded-lg cursor-pointer"
+                style={{ animationDelay: `${index * 0.05}s` }}
               >
-                <div className="flex-shrink-0 w-5 h-5 rounded-full border border-primary/30 flex items-center justify-center mt-0.5 group-hover:border-primary group-hover:bg-primary/10 transition-all duration-300">
-                  <CheckCircle2 className="w-3 h-3 text-primary" />
+                <div className="flex-shrink-0 w-5 h-5 rounded-full border-2 border-primary/30 flex items-center justify-center mt-0.5 group-hover:border-primary group-hover:bg-primary/20 transition-all duration-300 gesture-icon-bounce">
+                  <CheckCircle2 className="w-3 h-3 text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
-                <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-300">{benefit}</span>
+                <span className="text-sm text-muted-foreground group-hover:text-foreground transition-all duration-300 gesture-text-slide">{benefit}</span>
               </div>
             ))}
           </div>
@@ -497,41 +531,45 @@ const Home = () => {
             {testimonials.map((testimonial, index) => (
               <div 
                 key={index}
-                className="testimonial-card group relative"
+                className="testimonial-card group relative gesture-card-hover cursor-pointer"
+                style={{ animationDelay: `${index * 0.15}s` }}
               >
-                {/* Gradient border effect */}
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 via-primary/20 to-primary/50 rounded-2xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500" />
+                {/* Gradient border effect - Enhanced */}
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 via-primary/20 to-primary/50 rounded-2xl opacity-0 group-hover:opacity-100 blur-sm transition-all duration-500 gesture-glow" />
                 
-                <div className="relative bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-6 lg:p-8 h-full glow-card group-hover:border-primary/30 transition-all duration-500">
-                  {/* Rating Stars */}
+                <div className="relative bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-6 lg:p-8 h-full glow-card group-hover:border-primary/50 transition-all duration-500">
+                  {/* Rating Stars with stagger animation */}
                   <div className="flex items-center gap-1 mb-5">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star 
                         key={i} 
-                        className="w-4 h-4 fill-primary text-primary transition-transform duration-300 group-hover:scale-110" 
-                        style={{ transitionDelay: `${i * 50}ms` }}
+                        className="w-4 h-4 fill-primary text-primary transition-all duration-300 group-hover:scale-125 group-hover:rotate-12" 
+                        style={{ 
+                          transitionDelay: `${i * 80}ms`,
+                          transformOrigin: 'center'
+                        }}
                       />
                     ))}
                   </div>
 
-                  {/* Quote */}
-                  <p className="text-sm md:text-base text-foreground/90 mb-6 leading-relaxed">
+                  {/* Quote with slide effect */}
+                  <p className="text-sm md:text-base text-foreground/90 mb-6 leading-relaxed gesture-text-slide transition-all duration-300 group-hover:text-foreground">
                     "{testimonial.content}"
                   </p>
 
                   {/* Author */}
                   <div className="flex items-center gap-3 pt-4 border-t border-border/50">
-                    <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-semibold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-semibold text-sm group-hover:scale-110 transition-transform duration-300">
                       {testimonial.name.split(' ').map(n => n[0]).join('')}
                     </div>
-                    <div>
+                    <div className="gesture-text-slide transition-all duration-300">
                       <p className="text-sm font-semibold text-foreground">{testimonial.name}</p>
-                      <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                      <p className="text-xs text-muted-foreground group-hover:text-primary/80 transition-colors duration-300">{testimonial.role}</p>
                     </div>
                   </div>
 
-                  {/* Decorative corner accent */}
-                  <div className="absolute top-4 right-4 w-8 h-8 opacity-10 group-hover:opacity-30 transition-opacity duration-300">
+                  {/* Decorative corner accent - Enhanced */}
+                  <div className="absolute top-4 right-4 w-8 h-8 opacity-10 group-hover:opacity-40 transition-all duration-300 group-hover:scale-125 group-hover:rotate-12">
                     <Quote className="w-full h-full text-primary" />
                   </div>
                 </div>
