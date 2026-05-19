@@ -916,143 +916,122 @@ const Courses = () => {
   return (
     <PageLayout>
           
-          {/* Clean Header Section */}
-          <div className="mb-12">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+          {/* Header Section */}
+          <div className="mb-10 animate-reveal-up">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
               <div>
-                <p className="text-sm font-medium text-primary mb-2">Learning Paths</p>
-                <h1 className="text-3xl lg:text-4xl font-semibold tracking-tight mb-2">
+                <div className="badge-gradient inline-flex mb-4">
+                  <BookOpen className="w-3 h-3" />
+                  Learning Paths
+                </div>
+                <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
                   Explore Courses
                 </h1>
                 <p className="text-muted-foreground">
-                  Curated courses with free resources from top educators
+                  Expert-curated courses with free resources from top educators worldwide
                 </p>
               </div>
-              
-              <div className="flex items-center gap-3">
-                <Button 
-                  onClick={() => navigate('/ai-tools')}
-                  variant="outline"
-                  className="border-primary/20 hover:border-primary hover:bg-primary/5 transition-all"
-                >
-                  <Wrench className="w-4 h-4 mr-2" />
+              <div className="flex items-center gap-2.5 flex-shrink-0">
+                <button onClick={() => navigate('/ai-tools')}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-white/3 transition-all duration-200">
+                  <Wrench className="w-3.5 h-3.5" />
                   AI Tools
-                </Button>
-                <Button 
-                  onClick={() => setShowDashboard(true)}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
-                >
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  Dashboard
-                </Button>
+                </button>
+                <button onClick={() => setShowDashboard(true)}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]"
+                  style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                  <BookOpen className="w-3.5 h-3.5" />
+                  My Dashboard
+                </button>
               </div>
             </div>
-            
-            {/* Minimal Search Bar */}
-            <div className="relative w-full max-w-lg mt-8">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search courses..."
-                className="w-full pl-11 pr-4 py-3 rounded-xl border border-border/50 bg-muted/30 text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all"
-              />
+            <div className="relative w-full max-w-lg mt-7">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
+              <input type="text" placeholder="Search courses, instructors..."
+                className="premium-input pl-11" />
             </div>
           </div>
 
-          {/* Course Grid - Clean Cards with Animations */}
+          {/* Course Grid */}
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
-                <p className="text-muted-foreground">Loading courses...</p>
-              </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="rounded-2xl border border-border/30 p-5 animate-pulse" style={{ background: 'rgba(255,255,255,0.015)' }}>
+                  <div className="h-4 w-20 bg-border/40 rounded-lg mb-3" />
+                  <div className="h-5 w-3/4 bg-border/40 rounded-lg mb-2" />
+                  <div className="h-3 w-1/2 bg-border/30 rounded mb-3" />
+                  <div className="h-3 w-full bg-border/25 rounded mb-5" />
+                  <div className="h-9 bg-primary/15 rounded-xl" />
+                </div>
+              ))}
             </div>
           ) : error ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="text-center">
-                <p className="text-red-500 mb-4">{error}</p>
-                <Button onClick={() => window.location.reload()}>
-                  Try Again
-                </Button>
-              </div>
+            <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-12 text-center">
+              <p className="text-red-400 text-sm mb-4">{error}</p>
+              <button onClick={() => window.location.reload()}
+                className="px-5 py-2.5 rounded-xl text-sm font-medium text-white"
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                Try Again
+              </button>
             </div>
           ) : courses.length === 0 ? (
-            <div className="flex items-center justify-center py-12">
-              <p className="text-muted-foreground">No courses available</p>
+            <div className="text-center py-16 text-muted-foreground">
+              <BookOpen className="w-10 h-10 mx-auto mb-3 text-muted-foreground/40" />
+              <p>No courses available</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {courses.map((course, index) => {
               return (
-                <div 
-                  key={course._id || index} 
-                  className="group relative bg-card rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
-                  style={{ 
-                    opacity: 0,
-                    animation: `fadeInUp 0.5s ease-out ${index * 40}ms forwards`
-                  }}
+                <div
+                  key={course._id || index}
+                  className="group relative rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 card-lift transition-all duration-300 animate-reveal-up"
+                  style={{ background: 'rgba(255,255,255,0.02)', animationDelay: `${index * 0.04}s` }}
                 >
-                  {/* Top accent line */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{ background: 'radial-gradient(ellipse at top, rgba(124,58,237,0.05) 0%, transparent 60%)' }} />
                   <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  
-                  <div className="p-6">
+
+                  <div className="relative z-10 p-5">
                     {/* Category & Level */}
                     <div className="flex items-center justify-between mb-4">
-                      <Badge variant="secondary" className="bg-muted/50 text-xs font-medium">
+                      <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/15 text-primary">
                         {course.category}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground font-medium">
+                      </span>
+                      <span className="text-[10px] font-medium text-muted-foreground px-2 py-0.5 rounded-lg bg-border/30">
                         {course.level}
                       </span>
                     </div>
-                    
+
                     {/* Title & Instructor */}
-                    <h3 className="text-lg font-semibold mb-1 group-hover:text-primary transition-colors duration-300 line-clamp-2">
+                    <h3 className="font-bold text-foreground mb-1 group-hover:text-primary transition-colors duration-200 line-clamp-2 leading-snug"
+                      style={{ fontFamily: 'Sora, sans-serif', fontSize: '0.95rem' }}>
                       {course.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {course.instructor}
-                    </p>
-                    
-                    {/* Description */}
-                    <p className="text-sm text-muted-foreground/80 mb-4 line-clamp-2">
-                      {course.description}
-                    </p>
-                    
-                    {/* Stats Row */}
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground mb-5 pb-5 border-b border-border/50">
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{course.duration}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5" />
-                        <span>{(course.students || course.enrollmentCount || 0).toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Star className="w-3.5 h-3.5 fill-primary text-primary" />
-                        <span className="font-medium text-foreground">{course.rating}</span>
-                      </div>
+                    <p className="text-xs text-muted-foreground mb-2.5">{course.instructor}</p>
+                    <p className="text-xs text-muted-foreground/80 mb-4 line-clamp-2 leading-relaxed">{course.description}</p>
+
+                    {/* Stats */}
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-5 pb-4 border-b border-border/30">
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{course.duration}</span>
+                      <span className="flex items-center gap-1"><Users className="w-3 h-3" />{(course.students || course.enrollmentCount || 0).toLocaleString()}</span>
+                      <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-amber-400 text-amber-400" /><span className="font-semibold text-foreground">{course.rating}</span></span>
                     </div>
-                    
-                    {/* Action Buttons */}
+
+                    {/* Actions */}
                     <div className="flex gap-2">
-                      <Button 
-                        onClick={() => handleEnroll(course)}
-                        className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 transition-all h-10"
-                      >
-                        Enroll Now
-                      </Button>
+                      <button onClick={() => handleEnroll(course)}
+                        className="relative flex-1 py-2.5 rounded-xl text-xs font-semibold text-white overflow-hidden group/btn transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]"
+                        style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                        <span className="relative z-10">Enroll Now</span>
+                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-12" />
+                      </button>
                       {course.resources && (
-                        <Button 
-                          onClick={() => handleViewResources(course)}
-                          variant="outline"
-                          size="icon"
-                          className="h-10 w-10 border-border/50 hover:border-primary hover:bg-primary/5"
-                          title="View Free Resources"
-                        >
+                        <button onClick={() => handleViewResources(course)}
+                          className="w-9 h-9 rounded-xl border border-border/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all"
+                          title="View Free Resources">
                           <BookOpen className="w-4 h-4" />
-                        </Button>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -1062,93 +1041,60 @@ const Courses = () => {
             </div>
           )}
 
-          {/* Competitive Exams Section - Clean Design */}
-          <div className="mt-24">
-            {/* Section divider */}
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-border to-transparent mb-16" />
-            
-            {/* Clean Section Header */}
-            <div className="mb-10">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Trophy className="w-5 h-5 text-primary" />
-                </div>
-                <h2 className="text-2xl font-semibold tracking-tight">
-                  Competitive Exams
-                </h2>
+          {/* Competitive Exams Section */}
+          <div className="mt-20">
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-border/60 to-transparent mb-14" />
+            <div className="mb-8">
+              <div className="badge-gradient inline-flex mb-4">
+                <Trophy className="w-3 h-3" />
+                Competitive Exams
               </div>
+              <h2 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
+                Crack Your Dream Exam
+              </h2>
               <p className="text-muted-foreground">
-                Prepare for GATE, GRE, UPSC, and land your dream opportunity
+                Prepare for GATE, GRE, UPSC and more with expert resources
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {competitiveExams.map((exam, index) => {
                 const Icon = exam.icon;
-                
                 return (
-                  <div 
-                    key={index} 
-                    className="group relative bg-card rounded-xl border border-border/50 overflow-hidden hover:border-primary/30 transition-all duration-300 hover:shadow-md hover:shadow-primary/5"
-                    style={{ 
-                      opacity: 0,
-                      animation: `fadeInUp 0.5s ease-out ${index * 40}ms forwards`
-                    }}
-                  >
-                    {/* Top accent line */}
+                  <div key={index}
+                    className="group relative rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 card-lift transition-all duration-300 animate-reveal-up"
+                    style={{ background: 'rgba(255,255,255,0.02)', animationDelay: `${index * 0.04}s` }}>
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{ background: 'radial-gradient(ellipse at top, rgba(124,58,237,0.05) 0%, transparent 60%)' }} />
                     <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    <div className="p-5">
-                      {/* Icon and Title */}
+                    <div className="relative z-10 p-5">
                       <div className="flex items-start gap-3 mb-4">
-                        <div className="p-2.5 bg-primary/10 rounded-xl group-hover:bg-primary/15 transition-colors duration-300">
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                           <Icon className="w-5 h-5 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm mb-1 group-hover:text-primary transition-colors duration-300 truncate">
+                          <h3 className="font-bold text-foreground text-sm mb-1 group-hover:text-primary transition-colors truncate"
+                            style={{ fontFamily: 'Sora, sans-serif' }}>
                             {exam.name}
                           </h3>
-                          <Badge 
-                            variant="secondary" 
-                            className="text-xs bg-muted/50"
-                          >
-                            {exam.category}
-                          </Badge>
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-primary/8 border border-primary/15 text-primary">{exam.category}</span>
                         </div>
                       </div>
-                      
-                      {/* Duration */}
-                      <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{exam.duration}</span>
+                      <div className="flex items-center gap-1.5 mb-3 text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3" />{exam.duration}
                       </div>
-                      
-                      {/* Subjects Tags */}
                       <div className="flex flex-wrap gap-1.5 mb-4">
-                        {exam.subjects.slice(0, 3).map((subject, idx) => (
-                          <Badge 
-                            key={idx} 
-                            variant="outline" 
-                            className="text-xs border-border/50"
-                          >
-                            {subject}
-                          </Badge>
+                        {exam.subjects.slice(0, 3).map((s: string, j: number) => (
+                          <span key={j} className="text-[10px] px-1.5 py-0.5 rounded-md bg-border/40 text-muted-foreground">{s}</span>
                         ))}
-                        {exam.subjects.length > 3 && (
-                          <Badge variant="outline" className="text-xs border-border/50">
-                            +{exam.subjects.length - 3}
-                          </Badge>
-                        )}
+                        {exam.subjects.length > 3 && <span className="text-[10px] text-muted-foreground/60">+{exam.subjects.length - 3}</span>}
                       </div>
-                      
-                      {/* CTA Button */}
-                      <Button 
-                        size="sm"
-                        onClick={() => handleViewResources(exam)}
-                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
-                      >
-                        Start Now
-                      </Button>
+                      <button onClick={() => handleViewResources(exam)}
+                        className="relative w-full py-2.5 rounded-xl text-xs font-semibold text-white overflow-hidden group/btn transition-all hover:shadow-[0_0_12px_rgba(124,58,237,0.25)]"
+                        style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                        <span className="relative z-10">Start Now</span>
+                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-12" />
+                      </button>
                     </div>
                   </div>
                 );
@@ -1158,33 +1104,28 @@ const Courses = () => {
   
       {/* Success Dialog */}
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-md border-border/50">
+        <DialogContent className="sm:max-w-md rounded-2xl" style={{ background: 'hsl(230,25%,7%)', border: '1px solid hsl(230,20%,14%)' }}>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-primary" />
-              Successfully Enrolled!
+            <DialogTitle className="flex flex-col items-center gap-3 text-center">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center">
+                <CheckCircle className="w-7 h-7 text-emerald-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Sora, sans-serif' }}>Enrolled Successfully!</h2>
+                <p className="text-sm text-muted-foreground mt-1">You now have full access to course materials</p>
+              </div>
             </DialogTitle>
           </DialogHeader>
-          <div className="py-4">
-            <p className="text-center text-muted-foreground mb-5">
-              You have successfully enrolled in the course. You can now access your course materials.
-            </p>
-            <div className="flex gap-3">
-              <Button 
-                onClick={handleViewDashboard}
-                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Go to Dashboard
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setShowSuccessDialog(false)}
-                className="flex-1 border-border/50"
-              >
-                Continue Browsing
-              </Button>
-            </div>
+          <div className="space-y-3 pt-2">
+            <button onClick={handleViewDashboard}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+              <Play className="w-4 h-4" /> Go to Dashboard
+            </button>
+            <button onClick={() => setShowSuccessDialog(false)}
+              className="w-full py-3 rounded-xl text-sm font-medium text-muted-foreground border border-border/50 hover:text-foreground hover:border-border transition-all">
+              Continue Browsing
+            </button>
           </div>
         </DialogContent>
       </Dialog>
@@ -1377,20 +1318,6 @@ const Courses = () => {
           courseDuration={selectedCourse.duration}
         />
       )}
-      
-      {/* CSS Animation */}
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
       
     </PageLayout>
   );

@@ -48,6 +48,15 @@ const courseSchema = new mongoose.Schema({
   price: { type: Number, default: 0 },
   isPremium: { type: Boolean, default: false },
   duration: String,
+  
+  // Credits awarded on completion
+  credits: { 
+    type: Number, 
+    default: 10,
+    min: [0, 'Credits cannot be negative'],
+    max: [100, 'Credits cannot exceed 100']
+  },
+  
   syllabus: [{
     title: String,
     description: String,

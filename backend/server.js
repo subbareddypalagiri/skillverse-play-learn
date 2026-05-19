@@ -29,7 +29,7 @@ app.set('trust proxy', 1);
 // Security middleware
 app.use(helmet({ crossOriginResourcePolicy: false }));
 // CORS — whitelist origins from env, fallback to localhost in dev
-const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:3000,http://localhost:5173')
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:3000,http://localhost:5173,http://localhost:8080,http://localhost:8081,http://localhost:8082,http://localhost:8083,http://localhost:8084,http://localhost:8085,http://localhost:8086')
   .split(',')
   .map(o => o.trim());
 
@@ -118,6 +118,7 @@ import opportunityRoutes from './routes/opportunities.routes.js';
 import reelRoutes from './routes/reelRoutes.js';
 import showcaseRoutes from './routes/showcaseRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import syncRoutes from './routes/syncRoutes.js';
 import startScheduler from './workers/jobFetcher.worker.js';
 
 const uploadsDirectory = path.resolve(process.cwd(), 'uploads');
@@ -133,6 +134,7 @@ app.use('/api/v1/opportunities', opportunityRoutes);
 app.use('/api/v1/reels', reelRoutes);
 app.use('/api/v1/showcase', showcaseRoutes);
 app.use('/api/v1/posts', postRoutes);
+app.use('/api/v1/sync', syncRoutes);
 app.use('/uploads', express.static(uploadsDirectory));
 
 app.get('/api/v1', (req, res) => {

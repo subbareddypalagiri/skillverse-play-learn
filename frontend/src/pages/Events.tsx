@@ -1,18 +1,21 @@
 import PageLayout from "@/components/PageLayout";
 import ClubsSection from "@/components/ClubsSection";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Filter } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar, MapPin, Users, Clock, CheckCircle, Globe, Monitor } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, CheckCircle, Globe, Monitor, Sparkles, ArrowRight, Filter } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiClient } from "@/lib/apiClient";
+
+const typeColors: Record<string, string> = {
+  Competition: "bg-violet-500/10 text-violet-400 border-violet-500/20",
+  Adventure:   "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  Learning:    "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+  Workshop:    "bg-amber-500/10 text-amber-400 border-amber-500/20",
+  Social:      "bg-pink-500/10 text-pink-400 border-pink-500/20",
+  default:     "bg-primary/10 text-primary border-primary/20",
+};
 
 const Events = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [showEventDetails, setShowEventDetails] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -21,317 +24,279 @@ const Events = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch events from API
   const fetchEvents = async () => {
     try {
       setLoading(true);
       setError(null);
-
       const params = new URLSearchParams();
       if (selectedCategory !== "all") params.append("category", selectedCategory);
       if (selectedLocation !== "all") params.append("location", selectedLocation);
-
       const response = await apiClient.get(`/events?${params}`);
       const result = response.data;
-
-      if (result.status === "success") {
-        setEvents(result.data.events);
-      } else {
-        setError("Failed to load events");
-      }
+      if (result.status === "success") setEvents(result.data.events);
+      else setError("Failed to load events");
     } catch (err: any) {
-      console.error('Error fetching events:', err);
-      setError(err.message || 'Failed to load events from server');
+      setError(err.message || "Failed to load events");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchEvents();
-  }, [selectedCategory, selectedLocation]);
-
-  const getBadgeVariant = (type: string) => {
-    switch (type) {
-      case "Competition": return "default";
-      case "Adventure": return "secondary";
-      case "Learning": return "outline";
-      case "Workshop": return "secondary";
-      case "Social": return "outline";
-      default: return "outline";
-    }
-  };
-
-  const getModeIcon = (mode: string) => {
-    return mode === "online" ? <Globe className="w-4 h-4" /> : <Monitor className="w-4 h-4" />;
-  };
-
-  const getModeColor = (mode: string) => {
-    return mode === "online" ? "text-blue-500" : "text-green-500";
-  };
+  useEffect(() => { fetchEvents(); }, [selectedCategory, selectedLocation]);
 
   const handleRegister = (event: any) => {
     setSelectedEvent(event);
     setRegisteredEvents(prev => [...prev, event]);
-    setShowSuccessDialog(true); // Show success dialog
+    setShowSuccessDialog(true);
   };
 
-  const isRegistered = (event: any) => {
-    return registeredEvents.some(registered => registered.title === event.title);
-  };
+  const isRegistered = (event: any) =>
+    registeredEvents.some(r => r.title === event.title);
 
-  // Filter events based on selected category and location
   const filteredEvents = events.filter(event => {
-    const categoryMatch = selectedCategory === "all" || event.category === selectedCategory;
-    const locationMatch = selectedLocation === "all" || event.location === selectedLocation;
-    return categoryMatch && locationMatch;
+    const catMatch = selectedCategory === "all" || event.category === selectedCategory;
+    const locMatch = selectedLocation === "all" || event.location === selectedLocation;
+    return catMatch && locMatch;
   });
+
+  const categories = [
+    { value: 'all', label: 'All' },
+    { value: 'cultural', label: 'Cultural' },
+    { value: 'technical', label: 'Technical' },
+    { value: 'non-technical', label: 'Non-Technical' },
+    { value: 'fun-tours', label: 'Fun Tours' },
+    { value: 'industrial-tours', label: 'Industrial Tours' },
+    { value: 'hackathons', label: 'Hackathons' },
+  ];
+
+  const locations = [
+    { value: 'all', label: 'All Locations' },
+    { value: 'In Campus', label: 'In Campus' },
+    { value: 'Out of Campus', label: 'Out of Campus' },
+  ];
 
   return (
     <PageLayout>
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-          {/* Header */}
-          <div className="mb-8" style={{ opacity: 0, animation: 'fadeInUp 0.5s ease-out forwards' }}>
-            <h1 className="text-3xl font-semibold tracking-tight mb-1">Events</h1>
-            <p className="text-muted-foreground">
-              Discover and join exciting events, hackathons, and learning experiences
-            </p>
-          </div>
+      {/* Header */}
+      <div className="mb-8 animate-reveal-up">
+        <div className="badge-gradient inline-flex mb-4">
+          <Sparkles className="w-3 h-3" />
+          Discover & Join
+        </div>
+        <h1 className="text-3xl font-bold text-foreground mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
+          Events
+        </h1>
+        <p className="text-muted-foreground">
+          Hackathons, workshops, tours, and more — your next big experience awaits
+        </p>
+      </div>
 
-          {/* Filter Section */}
-          <div className="mb-6 space-y-4" style={{ opacity: 0, animation: 'fadeInUp 0.5s ease-out 50ms forwards' }}>
-            {/* Category Filter */}
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: 'all', label: 'All' },
-                { value: 'cultural', label: 'Cultural' },
-                { value: 'technical', label: 'Technical' },
-                { value: 'non-technical', label: 'Non-Technical' },
-                { value: 'fun-tours', label: 'Fun Tours' },
-                { value: 'industrial-tours', label: 'Industrial Tours' },
-                { value: 'hackathons', label: 'Hackathons' },
-              ].map((category) => (
-                <button
-                  key={category.value}
-                  onClick={() => setSelectedCategory(category.value)}
-                  className={`px-3 py-1.5 text-sm rounded-full transition-all duration-300 ${
-                    selectedCategory === category.value
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary'
-                  }`}
-                >
-                  {category.label}
-                </button>
-              ))}
-            </div>
+      {/* Filters */}
+      <div className="rounded-2xl border border-border/50 p-4 mb-6 animate-reveal-up delay-100"
+        style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="flex items-center gap-2 mb-3">
+          <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Filter Events</span>
+        </div>
+        <div className="flex flex-wrap gap-2 mb-3">
+          {categories.map(({ value, label }) => (
+            <button key={value} onClick={() => setSelectedCategory(value)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-xl border transition-all duration-200 ${
+                selectedCategory === value
+                  ? 'bg-primary text-white border-primary shadow-[0_0_12px_rgba(124,58,237,0.3)]'
+                  : 'border-border/50 text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5'
+              }`}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 pt-3 border-t border-border/30">
+          <span className="text-xs text-muted-foreground mr-1">Location:</span>
+          {locations.map(({ value, label }) => (
+            <button key={value} onClick={() => setSelectedLocation(value)}
+              className={`px-3 py-1 text-xs font-medium rounded-lg border transition-all duration-200 ${
+                selectedLocation === value
+                  ? 'bg-primary/20 text-primary border-primary/40'
+                  : 'border-border/40 text-muted-foreground hover:border-primary/30 hover:text-primary'
+              }`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-            {/* Location Filter */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">Location:</span>
-              <div className="flex gap-2">
-                {[
-                  { value: 'all', label: 'All' },
-                  { value: 'In Campus', label: 'In Campus' },
-                  { value: 'Out of Campus', label: 'Out of Campus' },
-                ].map((location) => (
-                  <button
-                    key={location.value}
-                    onClick={() => setSelectedLocation(location.value)}
-                    className={`px-3 py-1 text-sm rounded-full transition-all duration-300 ${
-                      selectedLocation === location.value
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary'
-                    }`}
-                  >
-                    {location.label}
-                  </button>
+      {/* Count */}
+      <p className="text-xs text-muted-foreground mb-5 animate-reveal-fade delay-200">
+        {loading ? 'Loading...' : `${filteredEvents.length} event${filteredEvents.length !== 1 ? 's' : ''} found`}
+      </p>
+
+      {/* Loading state */}
+      {loading && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="rounded-2xl border border-border/30 p-5 animate-pulse"
+              style={{ background: 'rgba(255,255,255,0.015)' }}>
+              <div className="h-4 w-24 bg-border/40 rounded-lg mb-3" />
+              <div className="h-5 w-3/4 bg-border/40 rounded-lg mb-2" />
+              <div className="h-3 w-full bg-border/30 rounded mb-4" />
+              <div className="space-y-2">
+                {[...Array(3)].map((_, j) => (
+                  <div key={j} className="h-3 w-2/3 bg-border/20 rounded" />
                 ))}
               </div>
             </div>
-          </div>
+          ))}
+        </div>
+      )}
 
-          {/* Events Count */}
-          <div className="mb-4" style={{ opacity: 0, animation: 'fadeInUp 0.5s ease-out 100ms forwards' }}>
-            <p className="text-sm text-muted-foreground">
-              {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''} found
-            </p>
-          </div>
+      {/* Error state */}
+      {error && !loading && (
+        <div className="text-center py-12">
+          <p className="text-red-400 text-sm mb-3">{error}</p>
+          <button onClick={fetchEvents}
+            className="px-5 py-2.5 rounded-xl text-sm font-medium text-white"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+            Try again
+          </button>
+        </div>
+      )}
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredEvents.map((event, index) => (
-              <Card 
-                key={index} 
-                className="overflow-hidden bg-card rounded-xl border border-border/50 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
-                style={{ opacity: 0, animation: `fadeInUp 0.5s ease-out ${150 + index * 40}ms forwards` }}
-              >
-                <div className="p-4">
-                  {/* Header Row */}
+      {/* Events grid */}
+      {!loading && !error && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+          {filteredEvents.map((event, i) => {
+            const typeColor = typeColors[event.type] || typeColors.default;
+            const registered = isRegistered(event);
+            return (
+              <div key={i}
+                className="group relative rounded-2xl border border-border/50 hover:border-primary/30 overflow-hidden card-lift transition-all duration-300 animate-reveal-up"
+                style={{ background: 'rgba(255,255,255,0.02)', animationDelay: `${i * 0.05}s` }}>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: 'radial-gradient(ellipse at top, rgba(124,58,237,0.05) 0%, transparent 60%)' }} />
+
+                <div className="relative z-10 p-5">
+                  {/* Badges row */}
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-primary/10 text-primary">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${typeColor}`}>
                         {event.type}
                       </span>
-                      <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                        event.mode === 'online' 
-                          ? 'bg-primary/5 text-primary' 
-                          : 'bg-primary/5 text-primary'
-                      }`}>
-                        {event.mode === 'online' ? 'Online' : 'Offline'}
+                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-border/50 text-muted-foreground flex items-center gap-1">
+                        {event.mode === 'online'
+                          ? <><Globe className="w-2.5 h-2.5 text-blue-400" /> Online</>
+                          : <><Monitor className="w-2.5 h-2.5 text-emerald-400" /> Offline</>
+                        }
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                       <Users className="w-3 h-3" />
                       <span>{event.attendees}/{event.maxAttendees}</span>
                     </div>
                   </div>
-                  
-                  {/* Title & Description */}
-                  <h3 className="text-base font-semibold mb-1.5 text-foreground group-hover:text-primary transition-colors duration-300 line-clamp-1">
+
+                  {/* Title */}
+                  <h3 className="font-bold text-foreground mb-1.5 leading-snug group-hover:text-primary transition-colors duration-200 line-clamp-1"
+                    style={{ fontFamily: 'Sora, sans-serif' }}>
                     {event.title}
                   </h3>
-                  <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{event.description}</p>
-                  
-                  {/* Event Details */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <div className="p-1.5 rounded-md bg-primary/10">
-                        <Calendar className="w-3 h-3 text-primary" />
+                  <p className="text-xs text-muted-foreground mb-4 line-clamp-2 leading-relaxed">{event.description}</p>
+
+                  {/* Details */}
+                  <div className="space-y-1.5 mb-4">
+                    {[
+                      { icon: Calendar, text: `${event.date} · ${event.time}` },
+                      { icon: MapPin, text: event.venue },
+                      { icon: Clock, text: event.duration },
+                    ].map(({ icon: Icon, text }, j) => (
+                      <div key={j} className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <div className="w-6 h-6 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-3 h-3 text-primary/70" />
+                        </div>
+                        <span className="truncate">{text}</span>
                       </div>
-                      <span>{event.date} · {event.time}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <div className="p-1.5 rounded-md bg-primary/10">
-                        <MapPin className="w-3 h-3 text-primary" />
-                      </div>
-                      <span className="line-clamp-1">{event.venue}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <div className="p-1.5 rounded-md bg-primary/10">
-                        <Clock className="w-3 h-3 text-primary" />
-                      </div>
-                      <span>{event.duration}</span>
-                    </div>
+                    ))}
                   </div>
-                  
-                  {/* Registration Button */}
-                  {isRegistered(event) ? (
-                    <div className="flex items-center justify-center gap-2 py-2 bg-primary/10 rounded-lg text-primary">
-                      <CheckCircle className="w-3.5 h-3.5" />
-                      <span className="text-xs font-medium">Registered</span>
+
+                  {/* CTA */}
+                  {registered ? (
+                    <div className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                      <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-xs font-semibold text-emerald-400">Registered!</span>
                     </div>
                   ) : (
-                    <Button 
-                      onClick={() => handleRegister(event)}
-                      size="sm"
-                      className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 text-xs h-8"
-                    >
-                      Register Now
-                    </Button>
+                    <button onClick={() => handleRegister(event)}
+                      className="relative w-full py-2.5 rounded-xl text-xs font-semibold text-white overflow-hidden group/btn transition-all duration-300 hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]"
+                      style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                      <span className="relative z-10 flex items-center justify-center gap-1.5">
+                        Register Now
+                        <ArrowRight className="w-3 h-3 group-hover/btn:translate-x-0.5 transition-transform" />
+                      </span>
+                      <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-12" />
+                    </button>
                   )}
                 </div>
-              </Card>
-            ))}
-          </div>
-          <ClubsSection />
+              </div>
+            );
+          })}
 
-      {/* Success Registration Dialog */}
+          {filteredEvents.length === 0 && (
+            <div className="col-span-full text-center py-16">
+              <div className="w-14 h-14 rounded-2xl bg-primary/8 border border-primary/15 flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-6 h-6 text-primary/60" />
+              </div>
+              <h3 className="font-bold text-foreground mb-1.5" style={{ fontFamily: 'Sora, sans-serif' }}>No events found</h3>
+              <p className="text-sm text-muted-foreground">Try adjusting the filters above</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <ClubsSection />
+
+      {/* Success Dialog */}
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md rounded-2xl border border-border/60"
+          style={{ background: 'hsl(230,25%,7%)' }}>
           <DialogHeader>
             <DialogTitle className="flex flex-col items-center gap-3 text-center">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-primary" />
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center">
+                <CheckCircle className="w-7 h-7 text-emerald-400" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold">Registration Successful</h2>
+                <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Sora, sans-serif' }}>Registration Successful!</h2>
                 <p className="text-sm text-muted-foreground mt-1">You're all set for this event</p>
               </div>
             </DialogTitle>
           </DialogHeader>
-          
-          <div className="py-4">
-            {selectedEvent && (
-              <div className="space-y-4">
-                {/* Event Summary */}
-                <Card className="p-4 bg-primary/5 border-primary/20">
-                  <h3 className="font-semibold text-sm mb-3">{selectedEvent.title}</h3>
-                  <div className="space-y-2 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-primary" />
-                      <span>{selectedEvent.date} · {selectedEvent.time}</span>
+          {selectedEvent && (
+            <div className="space-y-4 pt-2">
+              <div className="p-4 rounded-xl border border-primary/20 bg-primary/5">
+                <h3 className="font-semibold text-sm text-foreground mb-3">{selectedEvent.title}</h3>
+                <div className="space-y-1.5 text-xs text-muted-foreground">
+                  {[
+                    { icon: Calendar, text: `${selectedEvent.date} · ${selectedEvent.time}` },
+                    { icon: MapPin, text: selectedEvent.venue },
+                    { icon: Clock, text: selectedEvent.duration },
+                  ].map(({ icon: Icon, text }, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <Icon className="w-3.5 h-3.5 text-primary" />
+                      <span>{text}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-3.5 h-3.5 text-primary" />
-                      <span>{selectedEvent.venue}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5 text-primary" />
-                      <span>{selectedEvent.duration}</span>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Quick Info */}
-                <div className="grid grid-cols-2 gap-3">
-                  <Card className="p-3 border-border/50">
-                    <p className="text-xs text-muted-foreground mb-1">Organizer</p>
-                    <p className="text-xs font-medium">{selectedEvent.organizer}</p>
-                  </Card>
-                  <Card className="p-3 border-border/50">
-                    <p className="text-xs text-muted-foreground mb-1">Mode</p>
-                    <p className="text-xs font-medium">{selectedEvent.mode === 'online' ? 'Online' : 'Offline'}</p>
-                  </Card>
-                </div>
-
-                {/* What's Next */}
-                <div className="text-xs text-muted-foreground space-y-1.5">
-                  <p className="font-medium text-foreground">What happens next:</p>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                    <span>Confirmation email sent to your inbox</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-                    <span>Reminder 24 hours before the event</span>
-                  </div>
+                  ))}
                 </div>
               </div>
-            )}
-            
-            {/* Action Buttons */}
-            <div className="flex gap-2 mt-4">
-              <Button 
-                onClick={() => setShowSuccessDialog(false)}
-                variant="outline"
-                size="sm"
-                className="flex-1 border-border/50 hover:border-primary/30 transition-all duration-300"
-              >
-                Close
-              </Button>
-              <Button 
-                onClick={() => setShowSuccessDialog(false)}
-                size="sm"
-                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300"
-              >
-                <Calendar className="w-3.5 h-3.5 mr-1.5" />
-                Add to Calendar
-              </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                A confirmation will be sent to your email. Check your dashboard for updates.
+              </p>
+              <button onClick={() => setShowSuccessDialog(false)}
+                className="w-full py-3 rounded-xl text-sm font-semibold text-white"
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                Done
+              </button>
             </div>
-          </div>
+          )}
         </DialogContent>
       </Dialog>
-      
     </PageLayout>
   );
 };

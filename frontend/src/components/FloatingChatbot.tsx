@@ -1,33 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
-  Bot, 
-  Send, 
-  Loader2, 
-  Settings, 
-  Sparkles, 
-  User,
-  Edit2,
-  Check,
-  X,
-  MessageCircle,
-  Minimize2,
-  Paperclip,
-  File,
-  Image as ImageIcon,
-  Sun,
-  Moon
-} from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Bot, Send, Loader2, Settings, Sparkles, User, Edit2, Check, X, MessageCircle, Minimize2, Paperclip, File, Image as ImageIcon, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface Message {
   id: string;
@@ -41,514 +14,266 @@ const FloatingChatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [botName, setBotName] = useState("Risee AI Assistant");
+  const [botName, setBotName] = useState("Risee AI");
   const [tempBotName, setTempBotName] = useState(botName);
   const [isEditingName, setIsEditingName] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [lastRequestTime, setLastRequestTime] = useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-  // Load bot name, theme, and messages from localStorage
   useEffect(() => {
-    const savedBotName = localStorage.getItem('botName');
-    if (savedBotName) {
-      setBotName(savedBotName);
-      setTempBotName(savedBotName);
-    }
-
-    const savedTheme = localStorage.getItem('chatbotTheme') as 'light' | 'dark';
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-
-    const savedMessages = localStorage.getItem('chatMessages');
-    if (savedMessages) {
-      const parsed = JSON.parse(savedMessages);
-      setMessages(parsed.map((msg: any) => ({
-        ...msg,
-        timestamp: new Date(msg.timestamp)
-      })));
+    const saved = localStorage.getItem('botName');
+    if (saved) { setBotName(saved); setTempBotName(saved); }
+    const savedMsgs = localStorage.getItem('chatMessages');
+    if (savedMsgs) {
+      const parsed = JSON.parse(savedMsgs);
+      setMessages(parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) })));
     }
   }, []);
 
-  // Save messages to localStorage
+  useEffect(() => { if (messages.length > 0) localStorage.setItem('chatMessages', JSON.stringify(messages)); }, [messages]);
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
   useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('chatMessages', JSON.stringify(messages));
-    }
+    if (!isOpen && messages.length > 0 && messages[messages.length - 1].role === 'assistant')
+      setUnreadCount(p => p + 1);
   }, [messages]);
+  useEffect(() => { if (isOpen) setUnreadCount(0); }, [isOpen]);
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Update unread count
-  useEffect(() => {
-    if (!isOpen && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.role === 'assistant') {
-        setUnreadCount(prev => prev + 1);
-      }
-    }
-  }, [messages, isOpen]);
-
-  // Reset unread count when opened
-  useEffect(() => {
-    if (isOpen) {
-      setUnreadCount(0);
-    }
-  }, [isOpen]);
-
-  // Send message to Gemini API
   const sendMessage = async () => {
     if (!inputMessage.trim()) return;
-
-    // Rate limiting: wait at least 1 second between requests
     const now = Date.now();
-    const timeSinceLastRequest = now - lastRequestTime;
-    if (timeSinceLastRequest < 1000) {
-      const waitTime = 1000 - timeSinceLastRequest;
-      await new Promise(resolve => setTimeout(resolve, waitTime));
-    }
+    if (now - lastRequestTime < 1000) await new Promise(r => setTimeout(r, 1000 - (now - lastRequestTime)));
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputMessage,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
+    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: inputMessage, timestamp: new Date() };
+    setMessages(p => [...p, userMsg]);
     const currentInput = inputMessage;
-    setInputMessage("");
-    setLoading(true);
-    setLastRequestTime(Date.now());
+    setInputMessage(""); setLoading(true); setLastRequestTime(Date.now());
 
     try {
-      if (!GEMINI_API_KEY) {
-        throw new Error('Gemini API key is not configured. Please add your key to the .env file as VITE_GEMINI_API_KEY.');
-      }
-
-      const systemPrompt =
-        "You are Risee AI Assistant, a helpful learning companion. Be specific and avoid repeating the same answer. If the user asks the same question again, respond with a different explanation, new examples, or a new angle.";
-
-      const recentMessages = [...messages, userMessage].slice(-10);
-
-      const response = await fetch(
+      if (!GEMINI_API_KEY) throw new Error('Gemini API key not configured.');
+      const systemPrompt = "You are Risee AI, a helpful learning companion. Be specific, concise, and avoid repeating yourself.";
+      const recent = [...messages, userMsg].slice(-10);
+      const resp = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`,
         {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `${systemPrompt}\n\nConversation history:\n${recentMessages.map(m => `${m.role}: ${m.content}`).join('\n')}\n\nRespond naturally and helpfully.`
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.9,
-              maxOutputTokens: 1024,
-            }
+            contents: [{ parts: [{ text: `${systemPrompt}\n\n${recent.map(m => `${m.role}: ${m.content}`).join('\n')}\n\nRespond helpfully.` }] }],
+            generationConfig: { temperature: 0.9, maxOutputTokens: 1024 }
           })
         }
       );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Gemini API Error:', errorData);
-
-        if (response.status === 401 || response.status === 403) {
-          throw new Error('Gemini API key invalid or unauthorized. Check your key and project settings.');
-        } else if (response.status === 429) {
-          throw new Error('Rate limit exceeded by Gemini. Free tier allows 60 requests/minute. Please wait 30-60 seconds before trying again.');
-        } else {
-          throw new Error(`Gemini API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
-        }
+      if (!resp.ok) {
+        const e = await resp.json();
+        if (resp.status === 429) throw new Error('Rate limit exceeded. Please wait 30 seconds and try again.');
+        throw new Error(`API Error: ${e.error?.message || resp.status}`);
       }
-
-      const data = await response.json();
-      console.log('Gemini API Response:', data);
-
-      const aiResponse =
-        data.candidates?.[0]?.content?.parts?.[0]?.text ||
-        "Sorry, I couldn't generate a response.";
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: aiResponse,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (error: any) {
-      console.error('Error calling Gemini API:', error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: `Error: ${error.message || 'Failed to connect to AI. Please check your internet connection and try again.'}`,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setLoading(false);
-    }
+      const data = await resp.json();
+      const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, no response generated.";
+      setMessages(p => [...p, { id: (Date.now()+1).toString(), role: 'assistant', content: aiText, timestamp: new Date() }]);
+    } catch (err: any) {
+      setMessages(p => [...p, { id: (Date.now()+1).toString(), role: 'assistant', content: `Error: ${err.message}`, timestamp: new Date() }]);
+    } finally { setLoading(false); }
   };
 
-  // Handle Enter key press
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
+  const handleKeyPress = (e: React.KeyboardEvent) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
+  const saveBotName = () => { if (tempBotName.trim()) { setBotName(tempBotName.trim()); localStorage.setItem('botName', tempBotName.trim()); setIsEditingName(false); } };
+  const clearChat = () => { setMessages([]); localStorage.removeItem('chatMessages'); setSettingsOpen(false); };
 
-  // Save bot name
-  const saveBotName = () => {
-    if (tempBotName.trim()) {
-      setBotName(tempBotName.trim());
-      localStorage.setItem('botName', tempBotName.trim());
-      setIsEditingName(false);
-    }
-  };
-
-  // Cancel name edit
-  const cancelNameEdit = () => {
-    setTempBotName(botName);
-    setIsEditingName(false);
-  };
-
-  // Clear chat
-  const clearChat = () => {
-    setMessages([]);
-    localStorage.removeItem('chatMessages');
-    setSettingsOpen(false);
-  };
-
-  // Toggle theme
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('chatbotTheme', newTheme);
-  };
-
-  // Handle file selection
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-    }
-  };
-
-  // Remove selected file
-  const removeFile = () => {
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
+  const formatTime = (d: Date) => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
     <>
-      {/* Floating Chat Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        {!isOpen && (
-          <Button
-            onClick={() => setIsOpen(true)}
-            className="w-16 h-16 rounded-full bg-gradient-primary text-primary-foreground shadow-elevated hover:opacity-90 relative"
-            size="icon"
-          >
-            <MessageCircle className="w-7 h-7" />
+      {/* FAB trigger */}
+      {!isOpen && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <button onClick={() => setIsOpen(true)}
+            className="relative w-14 h-14 rounded-2xl text-white shadow-[0_8px_32px_rgba(124,58,237,0.5)] hover:shadow-[0_12px_40px_rgba(124,58,237,0.7)] transition-all duration-300 hover:scale-105 group"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+            <div className="absolute inset-0 rounded-2xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <MessageCircle className="w-6 h-6 mx-auto" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                {unreadCount}
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-background">
+                {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
-          </Button>
-        )}
-      </div>
+          </button>
+        </div>
+      )}
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-[400px] h-[600px] max-w-[calc(100vw-3rem)] max-h-[calc(100vh-3rem)]">
-          <Card className={`h-full flex flex-col shadow-2xl ${theme === 'dark' ? 'bg-gray-900 text-white border-gray-700' : 'bg-white'}`}>
-            {/* Header */}
-            <div className="bg-gradient-primary text-primary-foreground p-4 rounded-t-lg flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                  <Bot className="w-5 h-5" />
+        <div className="fixed bottom-6 right-6 z-50 w-[380px] h-[580px] rounded-2xl border border-border/60 overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.05)] flex flex-col animate-scale-in"
+          style={{ background: 'hsl(230,25%,7%)' }}>
+
+          {/* Orb bg */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+            <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full opacity-20"
+              style={{ background: 'radial-gradient(circle, #7c3aed 0%, transparent 60%)', filter: 'blur(50px)' }} />
+          </div>
+
+          {/* Header */}
+          <div className="relative flex items-center justify-between p-4 border-b border-border/40 flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <div className="flex items-center gap-3">
+              <div className="relative w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                <Sparkles className="w-4.5 h-4.5 text-white" style={{width:'18px',height:'18px'}} />
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-background" />
+              </div>
+              <div>
+                {isEditingName ? (
+                  <div className="flex items-center gap-1.5">
+                    <input value={tempBotName} onChange={e => setTempBotName(e.target.value)}
+                      className="text-sm font-semibold text-foreground bg-white/5 border border-border/50 rounded-lg px-2 py-0.5 w-28 outline-none focus:border-primary/50"
+                      onKeyDown={e => e.key === 'Enter' && saveBotName()} autoFocus />
+                    <button onClick={saveBotName} className="text-emerald-400 hover:text-emerald-300"><Check className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => setIsEditingName(false)} className="text-muted-foreground hover:text-foreground"><X className="w-3.5 h-3.5" /></button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-semibold text-foreground" style={{fontFamily:'Sora,sans-serif'}}>{botName}</span>
+                    <button onClick={() => setIsEditingName(true)} className="text-muted-foreground/50 hover:text-muted-foreground transition-colors">
+                      <Edit2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+                <p className="text-[10px] text-muted-foreground">Powered by Gemini AI</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1">
+              <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+                <DialogTrigger asChild>
+                  <button className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+                    <Settings className="w-4 h-4" />
+                  </button>
+                </DialogTrigger>
+                <DialogContent style={{ background: 'hsl(230,25%,8%)', border: '1px solid hsl(230,20%,14%)' }} className="rounded-2xl max-w-xs">
+                  <DialogHeader>
+                    <DialogTitle className="text-foreground" style={{fontFamily:'Sora,sans-serif'}}>Chat Settings</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3 pt-2">
+                    <button onClick={clearChat}
+                      className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-sm text-red-400 border border-red-500/20 hover:bg-red-500/10 transition-all">
+                      <Trash2 className="w-4 h-4" /> Clear conversation
+                    </button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <button onClick={() => setIsOpen(false)}
+                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+                <Minimize2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-8">
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                  style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.2),rgba(6,182,212,0.15))' }}>
+                  <Sparkles className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-bold">{botName}</h3>
-                  <p className="text-xs opacity-90">Online</p>
+                  <p className="font-semibold text-foreground text-sm mb-1" style={{fontFamily:'Sora,sans-serif'}}>Ask me anything!</p>
+                  <p className="text-xs text-muted-foreground max-w-[200px] leading-relaxed">
+                    I'm your AI learning companion. Ask about courses, career advice, or anything you want to learn.
+                  </p>
                 </div>
               </div>
-              <div className="flex gap-2">
-                {/* Settings Dialog */}
-                <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-white/20">
-                      <Settings className="w-4 h-4" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Chatbot Settings</DialogTitle>
-                      <DialogDescription>
-                        Customize your AI assistant
-                      </DialogDescription>
-                    </DialogHeader>
-                    
-                    <div className="space-y-4 py-4">
-                      {/* Theme Toggle */}
-                      <div>
-                        <label className="text-sm font-semibold mb-2 block">
-                          Appearance
-                        </label>
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-2">
-                            {theme === 'light' ? (
-                              <Sun className="w-4 h-4 text-yellow-500" />
-                            ) : (
-                              <Moon className="w-4 h-4 text-blue-400" />
-                            )}
-                            <span className="font-medium">
-                              {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
-                            </span>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={toggleTheme}
-                            className="gap-2"
-                          >
-                            {theme === 'light' ? (
-                              <>
-                                <Moon className="w-4 h-4" />
-                                Dark
-                              </>
-                            ) : (
-                              <>
-                                <Sun className="w-4 h-4" />
-                                Light
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
+            )}
 
-                      <div>
-                        <label className="text-sm font-semibold mb-2 block">
-                          Bot Name
-                        </label>
-                        {isEditingName ? (
-                          <div className="flex gap-2">
-                            <Input
-                              value={tempBotName}
-                              onChange={(e) => setTempBotName(e.target.value)}
-                              placeholder="Enter bot name"
-                              className="flex-1"
-                            />
-                            <Button size="sm" onClick={saveBotName}>
-                              <Check className="w-4 h-4" />
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={cancelNameEdit}>
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-between p-3 border rounded-lg">
-                            <span className="font-medium">{botName}</span>
-                            <Button 
-                              size="sm" 
-                              variant="ghost"
-                              onClick={() => setIsEditingName(true)}
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="pt-4 border-t space-y-2">
-                        <Button 
-                          variant="outline" 
-                          className="w-full"
-                          onClick={clearChat}
-                        >
-                          Clear Chat History
-                        </Button>
-                        <p className="text-xs text-muted-foreground text-center">
-                          Powered by Google Gemini AI
-                        </p>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setIsOpen(false)}
-                  className="text-primary-foreground hover:bg-white/20"
-                >
-                  <Minimize2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Messages Area */}
-            <div className={`flex-1 overflow-y-auto p-4 space-y-3 ${theme === 'dark' ? 'bg-gray-800' : 'bg-muted/30'}`}>
-              {messages.length === 0 ? (
-                <div className="h-full flex items-center justify-center">
-                  <div className="text-center max-w-xs">
-                    <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-primary flex items-center justify-center">
-                      <Sparkles className="w-8 h-8 text-primary-foreground" />
-                    </div>
-                    <h4 className="text-lg font-bold mb-2">Hi! I'm {botName}</h4>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Ask me anything about courses, learning, or career advice!
-                    </p>
-                    <div className="space-y-2 text-xs">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="w-full justify-start text-left"
-                        onClick={() => setInputMessage("What courses do you recommend?")}
-                      >
-                        📚 Recommend courses
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="w-full justify-start text-left"
-                        onClick={() => setInputMessage("Help me with interview prep")}
-                      >
-                        🎯 Interview tips
-                      </Button>
-                    </div>
+            {messages.map(msg => (
+              <div key={msg.id} className={`flex gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                {msg.role === 'assistant' && (
+                  <div className="w-7 h-7 rounded-xl flex-shrink-0 flex items-center justify-center mt-0.5"
+                    style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                    <Bot className="w-3.5 h-3.5 text-white" />
                   </div>
+                )}
+                <div className={`max-w-[75%] ${msg.role === 'user' ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+                  <div className={`px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed ${
+                    msg.role === 'user'
+                      ? 'text-white rounded-br-sm'
+                      : 'text-foreground/90 border border-border/40 rounded-bl-sm'
+                  }`}
+                    style={msg.role === 'user'
+                      ? { background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }
+                      : { background: 'rgba(255,255,255,0.04)' }
+                    }>
+                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground/50 px-1">{formatTime(msg.timestamp)}</span>
                 </div>
-              ) : (
-                <>
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex gap-2 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      {message.role === 'assistant' && (
-                        <div className="w-7 h-7 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
-                          <Bot className="w-4 h-4 text-primary-foreground" />
-                        </div>
-                      )}
-                      
-                      <div
-                        className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${
-                          message.role === 'user'
-                            ? 'bg-gradient-primary text-primary-foreground'
-                            : theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-background border'
-                        }`}
-                      >
-                        <p className="whitespace-pre-wrap break-words">{message.content}</p>
-                        <span className="text-xs opacity-70 mt-1 block">
-                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-
-                      {message.role === 'user' && (
-                        <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                          <User className="w-4 h-4 text-primary" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  
-                  {loading && (
-                    <div className="flex gap-2 justify-start">
-                      <div className="w-7 h-7 rounded-full bg-gradient-primary flex items-center justify-center flex-shrink-0">
-                        <Bot className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                      <div className={`rounded-2xl px-3 py-2 ${theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-background border'}`}>
-                        <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div ref={messagesEndRef} />
-                </>
-              )}
-            </div>
-
-            {/* Input Area */}
-            <div className={`border-t p-3 ${theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-background'}`}>
-              {/* Selected File Display */}
-              {selectedFile && (
-                <div className={`mb-2 flex items-center gap-2 p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-muted'}`}>
-                  <File className="w-4 h-4 text-primary" />
-                  <span className="text-xs flex-1 truncate">{selectedFile.name}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6"
-                    onClick={removeFile}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </div>
-              )}
-              
-              <div className="flex gap-2">
-                {/* Hidden File Input */}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileSelect}
-                  accept="image/*,.pdf,.doc,.docx,.txt"
-                />
-                
-                {/* File Upload Button */}
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={loading}
-                  className="flex-shrink-0"
-                >
-                  <Paperclip className="w-4 h-4" />
-                </Button>
-                
-                <Input
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type a message..."
-                  disabled={loading}
-                  className="flex-1 text-sm"
-                />
-                <Button
-                  onClick={sendMessage}
-                  disabled={loading || !inputMessage.trim()}
-                  className="bg-gradient-primary text-primary-foreground hover:opacity-90"
-                  size="icon"
-                >
-                  {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
-                </Button>
+                {msg.role === 'user' && (
+                  <div className="w-7 h-7 rounded-xl flex-shrink-0 flex items-center justify-center mt-0.5 text-xs font-bold text-white"
+                    style={{ background: 'linear-gradient(135deg,#06b6d4,#7c3aed)' }}>
+                    <User className="w-3.5 h-3.5" />
+                  </div>
+                )}
               </div>
+            ))}
+
+            {loading && (
+              <div className="flex gap-2.5 justify-start">
+                <div className="w-7 h-7 rounded-xl flex-shrink-0 flex items-center justify-center"
+                  style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                  <Bot className="w-3.5 h-3.5 text-white" />
+                </div>
+                <div className="px-4 py-3 rounded-2xl rounded-bl-sm border border-border/40 flex items-center gap-1.5"
+                  style={{ background: 'rgba(255,255,255,0.04)' }}>
+                  {[0,1,2].map(i => (
+                    <div key={i} className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce"
+                      style={{ animationDelay: `${i * 0.15}s` }} />
+                  ))}
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* File indicator */}
+          {selectedFile && (
+            <div className="flex items-center gap-2 px-4 py-2 border-t border-border/30 bg-primary/5">
+              <File className="w-3.5 h-3.5 text-primary" />
+              <span className="text-xs text-muted-foreground flex-1 truncate">{selectedFile.name}</span>
+              <button onClick={() => { setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+                className="text-muted-foreground hover:text-foreground">
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
-          </Card>
+          )}
+
+          {/* Input */}
+          <div className="flex items-end gap-2 p-3 border-t border-border/40 flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <input type="file" ref={fileInputRef} onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="hidden" accept="image/*,.pdf,.txt" />
+            <button onClick={() => fileInputRef.current?.click()}
+              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all flex-shrink-0">
+              <Paperclip className="w-4 h-4" />
+            </button>
+            <div className="flex-1 relative">
+              <textarea
+                value={inputMessage}
+                onChange={e => setInputMessage(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="Ask anything..."
+                rows={1}
+                className="w-full bg-white/4 border border-border/40 rounded-xl px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground/50 outline-none resize-none transition-all focus:border-primary/50 focus:shadow-[0_0_0_2px_rgba(124,58,237,0.12)]"
+                style={{ maxHeight: '80px', fontFamily: 'DM Sans, sans-serif' }}
+              />
+            </div>
+            <button onClick={sendMessage} disabled={loading || !inputMessage.trim()}
+              className="p-2.5 rounded-xl text-white transition-all disabled:opacity-40 flex-shrink-0 hover:shadow-[0_0_15px_rgba(124,58,237,0.4)]"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
       )}
     </>

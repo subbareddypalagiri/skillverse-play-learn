@@ -1,436 +1,209 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Heart, MessageCircle, Share2, Play } from "lucide-react";
+import { ArrowRight, Sparkles, Play, BookOpen, Trophy, Users, Zap, Star } from "lucide-react";
 
-export default function PremiumHero() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+const FloatingCard = ({ children, className }: { children: React.ReactNode; className: string }) => (
+  <div className={`absolute glass rounded-2xl px-4 py-3 border border-white/10 shadow-2xl pointer-events-none ${className}`}>
+    {children}
+  </div>
+);
+
+const TypewriterText = ({ phrases }: { phrases: string[] }) => {
+  const [idx, setIdx] = useState(0);
+  const [text, setText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [pause, setPause] = useState(false);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: e.clientX / window.innerWidth,
-        y: e.clientY / window.innerHeight,
-      });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+    if (pause) { const t = setTimeout(() => setPause(false), 1200); return () => clearTimeout(t); }
+    const current = phrases[idx];
+    const timeout = deleting ? 40 : 80;
+    const t = setTimeout(() => {
+      if (!deleting) {
+        setText(current.slice(0, text.length + 1));
+        if (text.length + 1 === current.length) { setPause(true); setDeleting(true); }
+      } else {
+        setText(current.slice(0, text.length - 1));
+        if (text.length - 1 === 0) { setDeleting(false); setIdx((i) => (i + 1) % phrases.length); }
+      }
+    }, timeout);
+    return () => clearTimeout(t);
+  }, [text, deleting, pause, idx, phrases]);
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-black pt-20 pb-20">
-      <style>{`
-        /* SPACE-DEVOTIONAL HERO - EXACT REFERENCE MATCH */
-        .hero-bg {
-          background: linear-gradient(180deg, #050510 0%, #0a0515 25%, #150820 50%, #0f051a 75%, #050510 100%);
-          position: relative;
-          overflow: hidden;
-        }
+    <span className="text-gradient">
+      {text}<span className="cursor-blink text-violet-400">|</span>
+    </span>
+  );
+};
 
-        /* STRONG AURORA GRADIENTS - Devotional Space Feel */
-        .aurora-glow-main {
-          position: absolute;
-          inset: 0;
-          z-index: 1;
-          background: 
-            /* Primary purple-pink aurora - center-left, STRONG */
-            radial-gradient(ellipse 1200px 900px at 35% 35%, rgba(168, 85, 247, 0.4) 0%, rgba(236, 72, 153, 0.2) 30%, transparent 60%),
-            /* Secondary blue aurora - right side, STRONG */
-            radial-gradient(ellipse 1100px 800px at 75% 25%, rgba(59, 130, 246, 0.35) 0%, rgba(34, 211, 238, 0.15) 35%, transparent 65%);
-          filter: blur(150px);
-          animation: auroraBreathing 8s ease-in-out infinite;
-          pointer-events: none;
-        }
+export default function PremiumHero() {
+  const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
+  const heroRef = useRef<HTMLElement>(null);
 
-        .aurora-glow-accent {
-          position: absolute;
-          inset: 0;
-          z-index: 1;
-          background:
-            /* Pink accent glow */
-            radial-gradient(ellipse 900px 1000px at 45% 50%, rgba(236, 72, 153, 0.25) 0%, transparent 50%),
-            /* Cyan accent - bottom right */
-            radial-gradient(ellipse 800px 700px at 85% 75%, rgba(34, 211, 238, 0.2) 0%, transparent 55%);
-          filter: blur(140px);
-          animation: auroraFloat 12s ease-in-out infinite;
-          pointer-events: none;
-        }
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const handleMove = (e: MouseEvent) => {
+      const rect = el.getBoundingClientRect();
+      setMouse({ x: (e.clientX - rect.left) / rect.width, y: (e.clientY - rect.top) / rect.height });
+    };
+    el.addEventListener('mousemove', handleMove);
+    return () => el.removeEventListener('mousemove', handleMove);
+  }, []);
 
-        @keyframes auroraBreathing {
-          0%, 100% {
-            opacity: 0.7;
-            filter: blur(150px);
-          }
-          50% {
-            opacity: 0.85;
-            filter: blur(160px);
-          }
-        }
+  const stats = [
+    { icon: Users, value: "10K+", label: "Learners" },
+    { icon: BookOpen, value: "500+", label: "Courses" },
+    { icon: Trophy, value: "95%", label: "Success" },
+    { icon: Zap, value: "50+", label: "Partners" },
+  ];
 
-        @keyframes auroraFloat {
-          0%, 100% {
-            transform: translate(0, 0);
-          }
-          50% {
-            transform: translate(20px, 30px);
-          }
-        }
+  return (
+    <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-20 pb-16">
+      {/* Multi-layer background */}
+      <div className="absolute inset-0 bg-background" />
+      <div className="absolute inset-0 bg-grid opacity-100" />
 
-        /* Premium smooth easing curve */
-        @keyframes smoothPulse {
-          0%, 100% {
-            opacity: 0.6;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.75;
-            transform: scale(1.02);
-          }
-        }
+      {/* Dynamic orbs that track mouse */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute w-[800px] h-[800px] rounded-full opacity-25 transition-all duration-1000 ease-out"
+          style={{
+            background: 'radial-gradient(circle, rgba(124,58,237,0.6) 0%, rgba(99,102,241,0.2) 40%, transparent 70%)',
+            filter: 'blur(80px)',
+            left: `${mouse.x * 60 - 20}%`,
+            top: `${mouse.y * 60 - 10}%`,
+            transform: 'translate(-50%,-50%)',
+          }}
+        />
+        <div
+          className="absolute w-[600px] h-[600px] rounded-full opacity-20 transition-all duration-1500 ease-out"
+          style={{
+            background: 'radial-gradient(circle, rgba(6,182,212,0.5) 0%, transparent 60%)',
+            filter: 'blur(80px)',
+            right: `${mouse.x * 40}%`,
+            bottom: `${mouse.y * 40}%`,
+          }}
+        />
+        {/* Static deep glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[600px] rounded-full opacity-30 animate-aurora"
+          style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.25) 0%, transparent 60%)', filter: 'blur(100px)' }} />
+      </div>
 
-        @keyframes smoothFloat {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-15px);
-          }
-        }
+      {/* Animated ring */}
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
+        <div className="w-[700px] h-[700px] rounded-full border border-primary/5 animate-spin-slow" />
+        <div className="absolute w-[900px] h-[900px] rounded-full border border-primary/3 animate-spin-slow" style={{ animationDuration: '20s', animationDirection: 'reverse' }} />
+      </div>
 
-        @keyframes softGlow {
-          0%, 100% {
-            box-shadow: 
-              0 0 60px rgba(139, 92, 246, 0.25),
-              0 0 100px rgba(34, 211, 238, 0.15),
-              inset 0 0 40px rgba(139, 92, 246, 0.05);
-          }
-          50% {
-            box-shadow: 
-              0 0 90px rgba(139, 92, 246, 0.35),
-              0 0 140px rgba(34, 211, 238, 0.25),
-              inset 0 0 60px rgba(139, 92, 246, 0.1);
-          }
-        }
+      {/* Floating decoration cards */}
+      <FloatingCard className="top-[22%] left-[6%] animate-float-slow hidden xl:flex items-center gap-2.5">
+        <div className="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+          <Trophy className="w-4 h-4 text-emerald-400" />
+        </div>
+        <div>
+          <div className="text-xs font-bold text-foreground">Achievement Unlocked!</div>
+          <div className="text-[10px] text-muted-foreground">React Mastery Certificate</div>
+        </div>
+      </FloatingCard>
 
-        @keyframes cardFloatPremium {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-12px);
-          }
-        }
+      <FloatingCard className="top-[30%] right-[6%] animate-float-fast hidden xl:flex items-center gap-2.5" style={{animationDelay:'1.2s'}}>
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">P</div>
+        <div>
+          <div className="text-xs font-bold text-foreground">Priya just enrolled</div>
+          <div className="text-[10px] text-muted-foreground">Advanced Python Course</div>
+        </div>
+        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1" />
+      </FloatingCard>
 
-        /* Particle effect - ultra subtle */
-        .particle {
-          position: absolute;
-          pointer-events: none;
-        }
+      <FloatingCard className="bottom-[25%] left-[8%] animate-float-slow hidden xl:block" style={{animationDelay:'2s'}}>
+        <div className="flex items-center gap-2 mb-1">
+          <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+          <span className="text-xs font-bold text-foreground">4.9 / 5 Rating</span>
+        </div>
+        <div className="flex gap-0.5">
+          {[...Array(5)].map((_,i) => <Star key={i} className="w-3 h-3 text-yellow-400 fill-yellow-400" />)}
+        </div>
+      </FloatingCard>
 
-        .particle-small {
-          width: 2px;
-          height: 2px;
-          background: rgba(139, 92, 246, 0.4);
-          border-radius: 50%;
-          opacity: 0.15;
-          box-shadow: 0 0 6px rgba(139, 92, 246, 0.2);
-        }
+      <FloatingCard className="bottom-[28%] right-[8%] animate-float-fast hidden xl:block" style={{animationDelay:'0.8s'}}>
+        <div className="text-[10px] text-muted-foreground mb-1">Learning Streak 🔥</div>
+        <div className="flex items-end gap-1 h-8">
+          {[3,5,4,7,6,8,9].map((h,i) => (
+            <div key={i} className="w-3 rounded-t-sm transition-all"
+              style={{ height: `${h*10}%`, background: i === 6 ? 'linear-gradient(#7c3aed,#06b6d4)' : 'rgba(124,58,237,0.3)' }} />
+          ))}
+        </div>
+        <div className="text-xs font-bold text-foreground mt-1">7-day streak!</div>
+      </FloatingCard>
 
-        .particle-medium {
-          width: 4px;
-          height: 4px;
-          background: rgba(34, 211, 238, 0.3);
-          border-radius: 50%;
-          opacity: 0.1;
-          box-shadow: 0 0 8px rgba(34, 211, 238, 0.15);
-        }
+      {/* Main content */}
+      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass border-glow mb-8 animate-reveal-up">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <Sparkles className="w-3.5 h-3.5 text-primary" />
+          <span className="text-sm font-medium text-foreground/90">The Future of Learning is Here</span>
+          <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+        </div>
 
-        .particle-large {
-          width: 5px;
-          height: 5px;
-          background: rgba(236, 72, 153, 0.25);
-          border-radius: 50%;
-          opacity: 0.08;
-          box-shadow: 0 0 10px rgba(236, 72, 153, 0.12);
-        }
+        {/* Headline */}
+        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-[1.0] mb-6 animate-reveal-up delay-200" style={{fontFamily:'Sora,sans-serif'}}>
+          <span className="text-foreground block">Master Any</span>
+          <span className="block mt-1">
+            <TypewriterText phrases={["New Skill Fast", "Career You Want", "Tech Stack Now", "Future Together"]} />
+          </span>
+        </h1>
 
-        /* Soft neon glow - NOT harsh */
-        .premium-neon-border {
-          border: 1.5px solid;
-          border-image: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(34, 211, 238, 0.3)) 1;
-          box-shadow: 
-            0 0 40px rgba(139, 92, 246, 0.15),
-            0 0 80px rgba(34, 211, 238, 0.1),
-            inset 0 0 30px rgba(139, 92, 246, 0.03);
-        }
+        {/* Sub */}
+        <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-10 animate-reveal-up delay-300">
+          Risee gives you structured courses, real-world projects, community support, and AI-powered insights — everything you need to land your dream job.
+        </p>
 
-        /* Glassmorphism - premium quality */
-        .glass-card-premium {
-          backdrop-filter: blur(20px);
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
-          border: 1px solid rgba(139, 92, 246, 0.2);
-          box-shadow: 
-            0 8px 32px rgba(139, 92, 246, 0.08),
-            inset 0 0 20px rgba(139, 92, 246, 0.02);
-        }
-
-        /* Gradient buttons - soft premium */
-        .btn-gradient-premium {
-          background: linear-gradient(135deg, #8b5cf6 0%, #22d3ee 100%);
-          box-shadow: 
-            0 0 40px rgba(139, 92, 246, 0.25),
-            0 0 80px rgba(34, 211, 238, 0.15);
-          transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .btn-gradient-premium:hover {
-          box-shadow: 
-            0 0 60px rgba(139, 92, 246, 0.4),
-            0 0 120px rgba(34, 211, 238, 0.25);
-          transform: translateY(-3px);
-        }
-
-        .btn-gradient-secondary-premium {
-          border: 1.5px solid;
-          border-image: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(34, 211, 238, 0.3)) 1;
-          background: rgba(139, 92, 246, 0.05);
-          color: #cbd5ff;
-          box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
-          transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .btn-gradient-secondary-premium:hover {
-          box-shadow: 0 0 50px rgba(139, 92, 246, 0.25);
-          background: rgba(139, 92, 246, 0.1);
-          transform: translateY(-3px);
-        }
-
-        /* Gradient text */
-        .gradient-text-premium {
-          background: linear-gradient(135deg, #8b5cf6 0%, #22d3ee 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.3));
-        }
-
-        /* Soft reel glow */
-        .reel-glow-premium {
-          position: absolute;
-          width: 130%;
-          height: 130%;
-          left: -15%;
-          top: -15%;
-          z-index: 0;
-          background: 
-            radial-gradient(ellipse 600px 600px at 50% 50%, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
-            radial-gradient(ellipse 500px 700px at 45% 55%, rgba(34, 211, 238, 0.08) 0%, transparent 45%);
-          filter: blur(100px);
-          pointer-events: none;
-          animation: smoothPulse 5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-        }
-
-        /* Smooth text animations */
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .fade-in-premium {
-          animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        .delay-100 { animation-delay: 0.1s; }
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-300 { animation-delay: 0.3s; }
-        .delay-400 { animation-delay: 0.4s; }
-        .delay-500 { animation-delay: 0.5s; }
-      `}</style>
-
-      {/* Background - deep space */}
-      <div className="hero-bg absolute inset-0 -z-20" />
-      
-      {/* STRONG Aurora Glows - Devotional Space Feel */}
-      <div className="aurora-glow-main absolute inset-0 -z-20" />
-      <div className="aurora-glow-accent absolute inset-0 -z-20" />
-
-      {/* Main container */}
-      <div className="container mx-auto relative z-10 px-4">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-[calc(100vh-200px)]">
-          {/* Left Section - Text Content */}
-          <div className="space-y-8">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card-premium w-fit fade-in-premium delay-100">
-              <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-              <span className="text-sm text-cyan-300 font-medium">Join 10K+ Learners</span>
+        {/* CTA Buttons */}
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-16 animate-reveal-up delay-400">
+          <Link to="/signup"
+            className="relative group inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl text-base font-semibold text-white overflow-hidden shadow-[0_0_30px_rgba(124,58,237,0.4)] hover:shadow-[0_0_50px_rgba(124,58,237,0.6)] transition-all duration-500"
+            style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #6366f1 60%, #06b6d4 100%)' }}>
+            <Sparkles className="w-4 h-4 relative z-10" />
+            <span className="relative z-10">Start Learning Free</span>
+            <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform duration-300" />
+            <div className="absolute inset-0 bg-white/15 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+          </Link>
+          <Link to="/courses"
+            className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl text-base font-semibold text-foreground glass hover:border-primary/30 transition-all duration-300 hover:bg-white/5">
+            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
+              <Play className="w-3 h-3 text-primary ml-0.5" />
             </div>
+            Watch Demo
+          </Link>
+        </div>
 
-            {/* Heading */}
-            <div className="space-y-4">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight fade-in-premium delay-200">
-                Rise like a
-              </h1>
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight gradient-text-premium fade-in-premium delay-300">
-                Star
-              </h1>
-            </div>
-
-            {/* Subheading */}
-            <p className="text-lg md:text-xl text-cyan-100/70 max-w-lg leading-relaxed fade-in-premium delay-300">
-              Experience premium learning with cinematic storytelling, expert guidance, and a community designed for your success.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6 fade-in-premium delay-400">
-              <Link to="/login">
-                <Button
-                  size="lg"
-                  className="btn-gradient-premium text-white border-0 px-8 py-6 text-base font-semibold rounded-xl group"
-                >
-                  Start Journey
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link to="/vibe">
-                <Button
-                  size="lg"
-                  className="btn-gradient-secondary-premium px-8 py-6 text-base font-semibold rounded-xl"
-                >
-                  Explore Vibe
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
-            </div>
-
-            {/* Trust indicators */}
-            <div className="flex flex-wrap gap-6 pt-8 fade-in-premium delay-500">
-              <div className="flex items-center gap-2 text-sm text-cyan-200/80">
-                <div className="w-2 h-2 rounded-full bg-purple-400" />
-                Expert Instruction
+        {/* Stats row */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto animate-reveal-up delay-500">
+          {stats.map(({ icon: Icon, value, label }, i) => (
+            <div key={i} className="group glass rounded-2xl px-4 py-4 border-glow text-center transition-all duration-300 hover:bg-white/5">
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <Icon className="w-3.5 h-3.5 text-primary" />
+                <span className="text-xl font-bold text-foreground" style={{fontFamily:'Sora,sans-serif'}}>{value}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-cyan-200/80">
-                <div className="w-2 h-2 rounded-full bg-cyan-400" />
-                Live Projects
-              </div>
-              <div className="flex items-center gap-2 text-sm text-cyan-200/80">
-                <div className="w-2 h-2 rounded-full bg-purple-400" />
-                Career Support
-              </div>
+              <div className="text-xs text-muted-foreground">{label}</div>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Right Section - Reel Mockup */}
-          <div className="relative hidden lg:flex justify-center items-center h-full">
-            {/* Ultra-soft premium glow background */}
-            <div className="reel-glow-premium" />
-            
-            {/* Layered soft lighting */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/15 via-pink-500/10 to-cyan-500/15 rounded-3xl filter blur-3xl -z-10" />
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/12 via-purple-500/8 to-cyan-600/12 rounded-3xl filter blur-2xl -z-10" />
-
-            {/* Phone/Reel container - premium soft glow */}
-            <div className="relative w-64 h-[500px] smoothPulse" style={{animation: 'smoothPulse 5s cubic-bezier(0.22, 1, 0.36, 1) infinite'}}>
-              {/* Outer soft glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/15 rounded-3xl filter blur-3xl -z-10" />
-
-              {/* Phone frame - soft premium neon */}
-              <div className="relative w-full h-full premium-neon-border rounded-3xl overflow-hidden">
-                {/* Screen content */}
-                <div className="w-full h-full bg-gradient-to-b from-slate-900 via-slate-950 to-black relative">
-                  {/* Video placeholder */}
-                  <div className="w-full h-full relative group cursor-pointer overflow-hidden">
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 z-10" />
-
-                    {/* Play button */}
-                    <div className="absolute inset-0 flex items-center justify-center z-20 group-hover:scale-110 transition-transform duration-500 cubic-bezier(0.22, 1, 0.36, 1)">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-cyan-400 flex items-center justify-center shadow-lg" style={{animation: 'softGlow 5s cubic-bezier(0.22, 1, 0.36, 1) infinite'}}>
-                        <Play className="w-8 h-8 text-white fill-white" />
-                      </div>
-                    </div>
-
-                    {/* Video background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-slate-900/40 to-cyan-900/40" />
-                  </div>
-
-                  {/* Bottom engagement bar */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-20">
-                    <div className="flex items-center justify-between text-white">
-                      <div className="flex gap-4">
-                        <button className="flex items-center gap-1 hover:text-cyan-400 transition-colors group">
-                          <Heart className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                          <span className="text-xs">234</span>
-                        </button>
-                        <button className="flex items-center gap-1 hover:text-cyan-400 transition-colors group">
-                          <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                          <span className="text-xs">45</span>
-                        </button>
-                        <button className="flex items-center gap-1 hover:text-cyan-400 transition-colors group">
-                          <Share2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                          <span className="text-xs">12</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Notch simulator */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-30" />
-                </div>
-              </div>
-            </div>
-
-            {/* Floating cards */}
-            <div className="absolute top-12 -left-20" style={{animation: 'cardFloatPremium 5s cubic-bezier(0.22, 1, 0.36, 1) infinite'}}>
-              <div className="glass-card-premium p-4 rounded-xl w-48 group transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm">
-                    10K
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">Active Learners</p>
-                    <p className="text-xs text-cyan-300">Growing daily</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute top-1/2 -right-20" style={{animation: 'cardFloatPremium 5s cubic-bezier(0.22, 1, 0.36, 1) infinite', animationDelay: '1s'}}>
-              <div className="glass-card-premium p-4 rounded-xl w-48 group transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-400 flex items-center justify-center text-white font-bold text-sm">
-                    500+
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">Expert Courses</p>
-                    <p className="text-xs text-cyan-300">Industry-curated</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute bottom-20 -left-16" style={{animation: 'cardFloatPremium 5s cubic-bezier(0.22, 1, 0.36, 1) infinite', animationDelay: '2s'}}>
-              <div className="glass-card-premium p-4 rounded-xl w-48 group transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-400 flex items-center justify-center text-white font-bold text-sm">
-                    95%
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">Success Rate</p>
-                    <p className="text-xs text-cyan-300">Proven results</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Trust strip */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-5 text-xs text-muted-foreground/60 animate-reveal-fade delay-700">
+          {['✓ Free to start', '✓ No credit card', '✓ Cancel anytime', '✓ Trusted by 10K+ learners'].map((item,i) => (
+            <span key={i} className="flex items-center gap-1 hover:text-muted-foreground transition-colors">{item}</span>
+          ))}
         </div>
       </div>
+
+      {/* Bottom gradient fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, transparent, hsl(230,25%,5%))' }} />
     </section>
   );
 }

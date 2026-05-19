@@ -1,5 +1,6 @@
 import Course from '../models/Course.js';
 import Enrollment from '../models/Enrollment.js';
+import Certificate from '../models/Certificate.js';
 import User from '../models/User.js';
 import { 
   successResponse, 
@@ -216,12 +217,208 @@ export const getMyEnrollments = async (req, res, next) => {
     const enrollments = await Enrollment.find({ userId: req.userId })
       .populate({
         path: 'courseId',
-        select: 'title description thumbnail ownerId level category',
+        select: 'title description thumbnail ownerId level category credits',
         populate: { path: 'ownerId', select: 'name' }
       })
       .sort('-enrolledAt');
 
     return successResponse(res, 200, 'Enrollments fetched successfully', { enrollments });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Mark course as completed and award credits + certificate
+ * @route   POST /api/v1/courses/:id/complete
+ * @access  Private
+ */
+export const completeCourse = async (req, res, next) => {
+  try {
+    const { verificationData } = req.body; // Anti-cheating verification from frontend
+    
+    // Find enrollment
+    const enrollment = await Enrollment.findOne({
+      userId: req.userId,
+      courseId: req.params.id
+    });
+
+    if (!enrollment) {
+      throw new NotFoundError('You are not enrolled in this course');
+    }
+
+    if (enrollment.status === 'completed') {
+      throw new ConflictError('Course already completed');
+    }
+
+    // Get course for credits
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      throw new NotFoundError('Course not found');
+    }
+
+    // Validate completion (require at least 95% progress)
+    if (enrollment.progress < 95) {
+      throw new ValidationError(`Course progress must be at least 95% to complete. Current: ${enrollment.progress}%`);
+    }
+
+    // Calculate credits based on course level
+    let creditsToAward = course.credits || 10;
+    
+    // Bonus credits based on level
+    const levelBonus = {
+      'Beginner': 0,
+      'Intermediate': 5,
+      'Advanced': 10
+    };
+    creditsToAward += levelBonus[course.level] || 0;
+
+    // Generate certificate
+    const certificateNumber = `RISEE-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    
+    const certificate = await Certificate.create({
+      userId: req.userId,
+      courseId: req.params.id,
+      certificateNumber,
+      skillsVerified: [course.category, course.level],
+      issueBy: course.ownerId,
+      issueDate: new Date(),
+      isActive: true
+    });
+
+    // Update enrollment
+    enrollment.status = 'completed';
+    enrollment.progress = 100;
+    enrollment.completedAt = new Date();
+    enrollment.creditsEarned = creditsToAward;
+    enrollment.certificate = {
+      issued: true,
+      certificateId: certificate._id,
+      certificateUrl: `/certificates/${certificate._id}`,
+      issuedAt: new Date()
+    };
+    await enrollment.save();
+
+    // Update user stats - Add credits and increment completed courses
+    await User.findByIdAndUpdate(req.userId, {
+      $inc: { 
+        'stats.totalPoints': creditsToAward,
+        'stats.totalCoursesCompleted': 1
+      },
+      $set: {
+        'stats.lastActivityAt': new Date()
+      }
+    });
+
+    logger.info(`User ${req.userId} completed course ${course.title}. Awarded ${creditsToAward} credits.`);
+
+    return successResponse(res, 200, 'Course completed successfully! Certificate issued.', {
+      creditsEarned: creditsToAward,
+      certificate: {
+        id: certificate._id,
+        number: certificateNumber,
+        url: `/certificates/${certificate._id}`
+      },
+      enrollment
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Update course progress
+ * @route   PATCH /api/v1/courses/:id/progress
+ * @access  Private
+ */
+export const updateProgress = async (req, res, next) => {
+  try {
+    const { lessonId, progress, completedLessonsCount, totalLessons } = req.body;
+
+    const enrollment = await Enrollment.findOne({
+      userId: req.userId,
+      courseId: req.params.id
+    });
+
+    if (!enrollment) {
+      throw new NotFoundError('You are not enrolled in this course');
+    }
+
+    if (enrollment.status === 'completed') {
+      throw new ConflictError('Cannot update progress for completed course');
+    }
+
+    // Update progress
+    if (progress !== undefined) {
+      enrollment.progress = Math.min(100, Math.max(0, progress));
+    }
+    
+    if (completedLessonsCount !== undefined) {
+      enrollment.completedLessonsCount = completedLessonsCount;
+    }
+    
+    if (totalLessons !== undefined) {
+      enrollment.totalLessons = totalLessons;
+    }
+
+    // Add completed lesson if provided
+    if (lessonId) {
+      const alreadyCompleted = enrollment.completedLessons.some(l => l.lessonId === lessonId);
+      if (!alreadyCompleted) {
+        enrollment.completedLessons.push({
+          lessonId,
+          completedAt: new Date()
+        });
+      }
+    }
+
+    enrollment.lastActivityAt = new Date();
+    await enrollment.save();
+
+    // Update user last activity
+    await User.findByIdAndUpdate(req.userId, {
+      $set: { 'stats.lastActivityAt': new Date() }
+    });
+
+    return successResponse(res, 200, 'Progress updated', { enrollment });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Get user's total credits/points
+ * @route   GET /api/v1/courses/my-credits
+ * @access  Private
+ */
+export const getMyCredits = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId).select('stats name');
+    
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    // Get breakdown of credits earned per course
+    const completedEnrollments = await Enrollment.find({
+      userId: req.userId,
+      status: 'completed'
+    }).populate('courseId', 'title category level');
+
+    const creditHistory = completedEnrollments.map(e => ({
+      courseTitle: e.courseId?.title || 'Unknown Course',
+      category: e.courseId?.category,
+      level: e.courseId?.level,
+      creditsEarned: e.creditsEarned || 0,
+      completedAt: e.completedAt
+    }));
+
+    return successResponse(res, 200, 'Credits fetched successfully', {
+      totalCredits: user.stats?.totalPoints || 0,
+      totalCoursesCompleted: user.stats?.totalCoursesCompleted || 0,
+      estimatedLevel: user.stats?.estimatedLevel || 'Beginner',
+      creditHistory
+    });
   } catch (error) {
     next(error);
   }

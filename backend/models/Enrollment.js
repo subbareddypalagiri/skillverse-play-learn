@@ -36,6 +36,9 @@ const enrollmentSchema = new mongoose.Schema({
     issuedAt: Date
   },
   
+  // Credits earned on completion
+  creditsEarned: { type: Number, default: 0 },
+  
   // Activity
   lastActivityAt: Date,
   

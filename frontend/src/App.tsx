@@ -22,6 +22,10 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 import Sync from "./pages/Sync";
+import ApplyMentor from "./pages/ApplyMentor";
+import ApplyAlumniExpert from "./pages/ApplyAlumniExpert";
+import ApplyAlumni from "./pages/ApplyAlumni";
+import ClubPage from "./pages/ClubPage";
 import AITools from "./pages/AITools";
 import AIAssistant from "./pages/AIAssistant";
 import Settings from "./pages/Settings";
@@ -61,6 +65,10 @@ const App = () => (
                   <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
                   <Route path="/career" element={<ProtectedRoute><CareerHub /></ProtectedRoute>} />
                   <Route path="/sync" element={<ProtectedRoute><Sync /></ProtectedRoute>} />
+                  <Route path="/apply-mentor" element={<ProtectedRoute><ApplyMentor /></ProtectedRoute>} />
+                  <Route path="/apply-alumni-expert" element={<ProtectedRoute><ApplyAlumniExpert /></ProtectedRoute>} />
+                  <Route path="/apply-alumni" element={<ProtectedRoute><ApplyAlumni /></ProtectedRoute>} />
+                  <Route path="/clubs/:id" element={<ProtectedRoute><ClubPage /></ProtectedRoute>} />
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                   {/* Hobbies & Clubs are now within Events page */}
                   <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
