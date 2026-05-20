@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Award, User, Waves, Zap, Settings, UserCircle, LogOut, X, Menu, ChevronRight } from "lucide-react";
+import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Award, User, Waves, Zap, Settings, UserCircle, LogOut, X, Menu, ChevronRight, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -10,6 +10,9 @@ const navigation = [
   { name: "Vibe", path: "/vibe", icon: Zap },
   { name: "Events", path: "/events", icon: Calendar },
   { name: "Career", path: "/career", icon: Briefcase },
+];
+
+const moreNavigation = [
   { name: "Sync", path: "/sync", icon: Waves },
   { name: "Achievements", path: "/achievements", icon: Award },
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -17,11 +20,13 @@ const navigation = [
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [moreDropdown, setMoreDropdown] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const isLoggedIn = !!user;
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -30,6 +35,18 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setMoreDropdown(false);
+      }
+    };
+    if (moreDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [moreDropdown]);
 
   const handleLogout = async () => {
     setMobileOpen(false);
@@ -84,6 +101,54 @@ const Navbar = () => {
                   </Link>
                 );
               })}
+
+              {/* More Dropdown */}
+              <div ref={dropdownRef} className="relative">
+                <button
+                  onClick={() => setMoreDropdown(!moreDropdown)}
+                  className={cn(
+                    "relative flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 group",
+                    moreNavigation.some(item => location.pathname === item.path)
+                      ? "text-white"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {moreNavigation.some(item => location.pathname === item.path) && (
+                    <span className="absolute inset-0 rounded-xl bg-primary/90 shadow-[0_0_15px_rgba(124,58,237,0.4)]" />
+                  )}
+                  {!moreNavigation.some(item => location.pathname === item.path) && (
+                    <span className="absolute inset-0 rounded-xl bg-white/0 hover:bg-white/5 transition-colors duration-200" />
+                  )}
+                  <MoreHorizontal className={cn("w-3.5 h-3.5 relative z-10 transition-transform duration-300", !moreNavigation.some(item => location.pathname === item.path) && "group-hover:scale-110")} />
+                  <span className="relative z-10">More</span>
+                </button>
+
+                {/* Dropdown Menu */}
+                {moreDropdown && (
+                  <div className="absolute top-full mt-2 right-0 w-48 bg-background/95 backdrop-blur-2xl border border-border/60 rounded-xl shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto">
+                    {moreNavigation.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = location.pathname === item.path;
+                      return (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => setMoreDropdown(false)}
+                          className={cn(
+                            "flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all duration-200",
+                            isActive
+                              ? "bg-primary/20 text-primary border-l-2 border-primary"
+                              : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                          )}
+                        >
+                          <Icon className="w-4 h-4" />
+                          {item.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Desktop Auth */}
@@ -194,6 +259,53 @@ const Navbar = () => {
                 </Link>
               );
             })}
+
+            {/* Mobile More Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setMoreDropdown(!moreDropdown)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
+                  moreNavigation.some(item => location.pathname === item.path)
+                    ? "bg-primary/20 text-primary border border-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                )}
+              >
+                <MoreHorizontal className="w-4 h-4" />
+                More
+                {moreDropdown && <ChevronRight className="w-3.5 h-3.5 ml-auto text-primary rotate-90" />}
+              </button>
+
+              {/* Mobile More Dropdown Menu */}
+              {moreDropdown && (
+                <div className="mt-2 ml-4 space-y-1 border-l-2 border-primary/40 pl-2">
+                  {moreNavigation.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => {
+                          setMoreDropdown(false);
+                          setMobileOpen(false);
+                        }}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
+                          isActive
+                            ? "bg-primary/20 text-primary border border-primary/20"
+                            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                        )}
+                      >
+                        <Icon className="w-4 h-4" />
+                        {item.name}
+                        {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto text-primary" />}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border/40">
@@ -209,6 +321,16 @@ const Navbar = () => {
                     <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                   </div>
                 </div>
+                <Link to="/profile" onClick={() => setMobileOpen(false)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-foreground hover:bg-white/5 transition-all duration-200">
+                  <UserCircle className="w-4 h-4" />
+                  My Profile
+                </Link>
+                <Link to="/settings" onClick={() => setMobileOpen(false)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-foreground hover:bg-white/5 transition-all duration-200">
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </Link>
                 <button onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-all duration-200">
                   <LogOut className="w-4 h-4" />

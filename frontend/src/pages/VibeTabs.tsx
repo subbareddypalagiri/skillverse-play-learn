@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Zap, ArrowLeft } from 'lucide-react';
 import ReelsTab from '@/components/vibe/ReelsTab';
 import FeedTab from '@/components/vibe/FeedTab';
 import ShowcaseTab from '@/components/vibe/ShowcaseTab';
@@ -8,6 +9,7 @@ import MyReelsTab from '@/components/vibe/MyReelsTab';
 type TabType = 'reels' | 'feed' | 'showcase' | 'my-reels';
 
 export default function VibeTabs() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('reels');
 
   const tabs = [
@@ -24,6 +26,13 @@ export default function VibeTabs() {
         <div className="max-w-6xl mx-auto px-4">
           {/* Title */}
           <div className="py-4 flex items-center gap-3 border-b border-gray-800">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              title="Go back"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-400 hover:text-white" />
+            </button>
             <Zap className="w-6 h-6 text-yellow-400" />
             <h1 className="text-2xl font-bold">Vibe</h1>
           </div>

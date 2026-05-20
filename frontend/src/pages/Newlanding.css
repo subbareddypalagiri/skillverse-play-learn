@@ -1,0 +1,114 @@
+/* src/pages/NewLanding.css */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap');
+
+::selection { background: #c77b3f; color: #141414; }
+
+.grid-bg {
+  background-image: linear-gradient(to right, rgba(61, 61, 61, 0.45) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(61, 61, 61, 0.45) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── SPLIT FLAP (THE MAIN HAPPINESS BOXES) ── */
+.sf-char {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(4.5rem, 13vw, 11rem);
+  width: 0.65em; height: 1.05em;
+  background: #0a0a0a; overflow: hidden;
+  border-radius: 2px; transition: background 0.15s;
+}
+.sf-char.flipping { background: rgba(199, 123, 63, 0.15); }
+.sf-char .divider { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(0, 0, 0, 0.5); z-index: 10; }
+.sf-top, .sf-bot { position: absolute; left: 0; right: 0; display: flex; justify-content: center; overflow: hidden; }
+.sf-top { top: 0; bottom: 50%; align-items: flex-end; }
+.sf-bot { top: 50%; bottom: 0; align-items: flex-start; }
+.sf-top span { transform: translateY(0.52em); line-height: 1; transition: color 0.1s; }
+.sf-bot span { transform: translateY(-0.52em); line-height: 1; transition: color 0.1s; }
+.split-flap-space { width: 0.3em; }
+
+/* ── SIGNAL CARD ── */
+.signal-card { flex-shrink: 0; width: 290px; position: relative; }
+.signal-card-inner {
+  background: #1a1a1a; border: 1px solid rgba(61, 61, 61, 0.5);
+  padding: 2rem; position: relative; overflow: hidden;
+}
+.signal-card-inner::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(199, 123, 63, 0.3), transparent);
+}
+.signal-card:hover .sc-title { color: #c77b3f; }
+.signal-card:hover .sc-line { width: 100% !important; }
+.signal-card:hover { transform: translateY(-6px); }
+.signal-card { transition: transform 0.4s ease; }
+
+/* ── FEATURE CARD ── */
+.feat-card {
+  border: 1px solid rgba(61, 61, 61, 0.4); padding: 1.25rem;
+  display: flex; flex-direction: column; justify-content: space-between;
+  cursor: pointer; overflow: hidden; position: relative;
+  transition: border-color 0.4s;
+}
+.feat-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(199, 123, 63, 0.04);
+  opacity: 0; transition: opacity 0.4s;
+}
+.feat-card:hover::after { opacity: 1; }
+.feat-card:hover { border-color: rgba(199, 123, 63, 0.6); }
+.feat-card:hover .fc-title { color: #c77b3f; }
+.feat-card:hover .fc-desc { opacity: 1 !important; transform: translateY(0) !important; }
+.feat-card:hover .fc-corner { opacity: 1 !important; }
+.fc-title { transition: color 0.3s; }
+.fc-desc { opacity: 0; transform: translateY(0.5rem); transition: opacity 0.5s, transform 0.5s; }
+.fc-corner { position: absolute; top: 0; right: 0; width: 48px; height: 48px; opacity: 0; transition: opacity 0.4s; z-index: 1; }
+.fc-corner::before { content: ''; position: absolute; top: 0; right: 0; width: 100%; height: 1px; background: #c77b3f; }
+.fc-corner::after { content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%; background: #c77b3f; }
+
+/* ── NAV DOT ── */
+.nav-dot { display: flex; align-items: center; gap: 12px; text-decoration: none; position: relative; }
+.nav-dot .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(138, 138, 138, 0.3); flex-shrink: 0; transition: background 0.3s; }
+.nav-dot.active .dot { background: #c77b3f; }
+.nav-dot .dot-label {
+  position: absolute; left: 20px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+  letter-spacing: 0.3em; text-transform: uppercase; color: #6b6b6b;
+  white-space: nowrap; opacity: 0; transition: opacity 0.2s, left 0.2s;
+}
+.nav-dot:hover .dot-label { opacity: 1; left: 24px; }
+.nav-dot.active .dot-label { color: #c77b3f; }
+
+/* ── SCRAMBLE BTN ── */
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  border: 1px solid rgba(242, 242, 242, 0.2); padding: 0.75rem 1.5rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: #f2f2f2; text-decoration: none; cursor: pointer;
+  transition: border-color 0.2s, color 0.2s; background: transparent;
+}
+.cta-btn:hover { border-color: #c77b3f; color: #c77b3f; }
+.cta-link {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: #6b6b6b; text-decoration: none;
+  transition: color 0.2s; cursor: pointer;
+}
+.cta-link:hover { color: #f2f2f2; }
+
+/* ── ANIM & TYPOGRAPHY ── */
+.fade-up { opacity: 0; transform: translateY(2rem); transition: opacity 0.7s ease, transform 0.7s ease; }
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+.ver-tag { border: 1px solid rgba(61, 61, 61, 0.6); padding: 0.5rem 1rem; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #6b6b6b; }
+.sec-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: #c77b3f; display: block; margin-bottom: 1rem; }
+.sec-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 6vw, 5rem); letter-spacing: 0.02em; color: #f2f2f2; }
+.side-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: #6b6b6b; white-space: nowrap; }
+
+/* ── PRINCIPLES ── */
+.principle-highlight { position: relative; display: inline-block; }
+.ph-bg { position: absolute; left: -0.1em; right: -0.1em; top: 0.1em; bottom: 0.05em; background: #c77b3f; transform: scaleX(0); transform-origin: left center; transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.ph-txt { position: relative; z-index: 1; transition: color 0.4s 0.4s; }
+.principle-line { height: 1px; background: rgba(61, 61, 61, 0.8); width: 0; transition: width 0.8s ease 0.3s; }

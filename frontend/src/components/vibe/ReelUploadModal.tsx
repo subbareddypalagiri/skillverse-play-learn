@@ -81,7 +81,7 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
     try {
       const uploadResult = await uploadMutation.mutateAsync(file);
       await createPostMutation.mutateAsync({
-        mediaUrl: uploadResult.data.mediaUrl,
+        mediaUrl: uploadResult.mediaUrl,
         caption
       });
     } catch (error) {

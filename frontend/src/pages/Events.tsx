@@ -1,7 +1,7 @@
 import PageLayout from "@/components/PageLayout";
 import ClubsSection from "@/components/ClubsSection";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar, MapPin, Users, Clock, CheckCircle, Globe, Monitor, Sparkles, ArrowRight, Filter } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, CheckCircle, Globe, Monitor, Sparkles, ArrowRight, Filter, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { apiClient } from "@/lib/apiClient";
 
@@ -23,6 +23,22 @@ const Events = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createSuccess, setCreateSuccess] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    eventType: "workshop",
+    date: "",
+    time: "",
+    venue: "",
+    location: "In Campus",
+    duration: "",
+    mode: "offline",
+    category: "technical",
+    capacity: "100"
+  });
 
   const fetchEvents = async () => {
     try {
@@ -33,7 +49,7 @@ const Events = () => {
       if (selectedLocation !== "all") params.append("location", selectedLocation);
       const response = await apiClient.get(`/events?${params}`);
       const result = response.data;
-      if (result.status === "success") setEvents(result.data.events);
+      if (result.success) setEvents(result.data);
       else setError("Failed to load events");
     } catch (err: any) {
       setError(err.message || "Failed to load events");
@@ -48,6 +64,57 @@ const Events = () => {
     setSelectedEvent(event);
     setRegisteredEvents(prev => [...prev, event]);
     setShowSuccessDialog(true);
+  };
+
+  const handleCreateEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+    try {
+      await apiClient.post('/events', {
+        title: formData.title,
+        description: formData.description,
+        eventType: formData.eventType,
+        startDate: new Date(`${formData.date} ${formData.time}`),
+        endDate: new Date(new Date(`${formData.date} ${formData.time}`).getTime() + 2 * 60 * 60 * 1000),
+        location: formData.venue,
+        isOnline: formData.mode === 'online',
+        visibility: 'public',
+        capacity: parseInt(formData.capacity),
+        type: formData.eventType.charAt(0).toUpperCase() + formData.eventType.slice(1),
+        date: formData.date,
+        time: formData.time,
+        venue: formData.venue,
+        duration: formData.duration,
+        mode: formData.mode,
+        category: formData.category,
+        attendees: 0,
+        maxAttendees: parseInt(formData.capacity)
+      });
+      setCreateSuccess(true);
+      setTimeout(() => {
+        setShowCreateDialog(false);
+        setCreateSuccess(false);
+        setFormData({
+          title: "",
+          description: "",
+          eventType: "workshop",
+          date: "",
+          time: "",
+          venue: "",
+          location: "In Campus",
+          duration: "",
+          mode: "offline",
+          category: "technical",
+          capacity: "100"
+        });
+        fetchEvents();
+      }, 2000);
+    } catch (err: any) {
+      alert("Failed to create event. Please try again.");
+      console.error(err);
+    } finally {
+      setCreating(false);
+    }
   };
 
   const isRegistered = (event: any) =>
@@ -83,12 +150,23 @@ const Events = () => {
           <Sparkles className="w-3 h-3" />
           Discover & Join
         </div>
-        <h1 className="text-3xl font-bold text-foreground mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
-          Events
-        </h1>
-        <p className="text-muted-foreground">
-          Hackathons, workshops, tours, and more — your next big experience awaits
-        </p>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-foreground mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
+              Events
+            </h1>
+            <p className="text-muted-foreground">
+              Hackathons, workshops, tours, and more — your next big experience awaits
+            </p>
+          </div>
+          <button
+            onClick={() => setShowCreateDialog(true)}
+            className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white whitespace-nowrap transition-all duration-300 hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]"
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+            <Plus className="w-4 h-4" />
+            Create Event
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -294,6 +372,190 @@ const Events = () => {
                 Done
               </button>
             </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Event Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="sm:max-w-lg rounded-2xl border border-border/60 max-h-[90vh] overflow-y-auto"
+          style={{ background: 'hsl(230,25%,7%)' }}>
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-foreground" style={{ fontFamily: 'Sora, sans-serif' }}>
+              {createSuccess ? '✨ Event Created!' : 'Create Your Event'}
+            </DialogTitle>
+          </DialogHeader>
+
+          {createSuccess ? (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center">
+                <CheckCircle className="w-8 h-8 text-emerald-400" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">Your event is live!</h3>
+              <p className="text-sm text-muted-foreground text-center">
+                Users can now discover and register for your event
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleCreateEvent} className="space-y-4">
+              {/* Title */}
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-2 block">Event Title *</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="e.g., Web Dev Bootcamp"
+                  required
+                  className="w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-2 block">Description *</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Describe your event..."
+                  required
+                  rows={3}
+                  className="w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary resize-none"
+                />
+              </div>
+
+              {/* Event Type */}
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-2 block">Event Type *</label>
+                <select
+                  value={formData.eventType}
+                  onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground focus:outline-none focus:border-primary">
+                  <option value="workshop">Workshop</option>
+                  <option value="webinar">Webinar</option>
+                  <option value="hackathon">Hackathon</option>
+                  <option value="meetup">Meetup</option>
+                  <option value="conference">Conference</option>
+                  <option value="live_class">Live Class</option>
+                  <option value="tour">Tour/Trip</option>
+                  <option value="seminar">Seminar</option>
+                  <option value="networking">Networking Event</option>
+                </select>
+              </div>
+
+              {/* Grid: Date & Time */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-2 block">Date *</label>
+                  <input
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-2 block">Time *</label>
+                  <input
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Venue */}
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-2 block">Venue/Platform *</label>
+                <input
+                  type="text"
+                  value={formData.venue}
+                  onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                  placeholder="e.g., Zoom, Conference Hall A, Tech Park"
+                  required
+                  className="w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              {/* Grid: Duration & Capacity */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-2 block">Duration *</label>
+                  <input
+                    type="text"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    placeholder="e.g., 2 hours"
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-2 block">Capacity *</label>
+                  <input
+                    type="number"
+                    value={formData.capacity}
+                    onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                    placeholder="100"
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Grid: Mode & Category */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-2 block">Mode *</label>
+                  <select
+                    value={formData.mode}
+                    onChange={(e) => setFormData({ ...formData, mode: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground focus:outline-none focus:border-primary">
+                    <option value="offline">Offline</option>
+                    <option value="online">Online</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground mb-2 block">Category *</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground focus:outline-none focus:border-primary">
+                    <option value="technical">Technical</option>
+                    <option value="non-technical">Non-Technical</option>
+                    <option value="cultural">Cultural</option>
+                    <option value="hackathons">Hackathons</option>
+                    <option value="fun-tours">Fun Tours</option>
+                    <option value="industrial-tours">Industrial Tours</option>
+                    <option value="adventure">Adventure</option>
+                    <option value="sports">Sports</option>
+                    <option value="wellness">Wellness & Health</option>
+                    <option value="career">Career & Development</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateDialog(false)}
+                  disabled={creating}
+                  className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold border border-primary/20 text-muted-foreground hover:text-foreground hover:bg-primary/5 transition-colors disabled:opacity-50">
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition-all duration-300 hover:shadow-[0_0_15px_rgba(124,58,237,0.3)] disabled:opacity-50"
+                  style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                  {creating ? 'Creating...' : 'Create Event'}
+                </button>
+              </div>
+            </form>
           )}
         </DialogContent>
       </Dialog>

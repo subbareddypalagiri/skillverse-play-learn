@@ -10,7 +10,10 @@ import { ClubProvider } from "./contexts/ClubContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Home from "./pages/Home";
+
+// 👇 Patha Home badulu kotha NewLanding ni import chesthunnam
+import NewLanding from "./pages/NewLanding"; 
+
 import VibeTabs from "./pages/VibeTabs";
 import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
@@ -54,7 +57,9 @@ const App = () => (
                 <Sonner />
                 <BrowserRouter>
                 <Routes>
-                  <Route path="/" element={<Home />} />
+                  {/* 👇 Ikkada Home element theesesi NewLanding pettam */}
+                  <Route path="/" element={<NewLanding />} />
+                  
                   <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
                   <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -70,10 +75,8 @@ const App = () => (
                   <Route path="/apply-alumni" element={<ProtectedRoute><ApplyAlumni /></ProtectedRoute>} />
                   <Route path="/clubs/:id" element={<ProtectedRoute><ClubPage /></ProtectedRoute>} />
                   <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                  {/* Hobbies & Clubs are now within Events page */}
                   <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
                   <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 <FloatingChatbot />
