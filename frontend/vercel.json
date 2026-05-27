@@ -1,9 +1,5 @@
 {
   "version": 2,
-  "env": {
-    "VITE_API_URL": "@vite_api_url",
-    "VITE_GOOGLE_AI_KEY": "@vite_google_ai_key"
-  },
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
