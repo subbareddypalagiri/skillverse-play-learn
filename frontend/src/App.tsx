@@ -12,7 +12,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // 👇 Patha Home badulu kotha NewLanding ni import chesthunnam
-import NewLanding from "./pages/NewLanding"; 
+import Newlanding from "./pages/Newlanding"; 
 
 import VibeTabs from "./pages/VibeTabs";
 import Dashboard from "./pages/Dashboard";
@@ -58,7 +58,7 @@ const App = () => (
                 <BrowserRouter>
                 <Routes>
                   {/* 👇 Ikkada Home element theesesi NewLanding pettam */}
-                  <Route path="/" element={<NewLanding />} />
+                  <Route path="/" element={<Newlanding />} />
                   
                   <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
                   <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
