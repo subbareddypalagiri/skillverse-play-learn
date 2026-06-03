@@ -4,8 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import Navbar from '../components/Navbar'; 
 
-// 
-import './NewLanding.css'; 
+import './Newlanding.css';
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
