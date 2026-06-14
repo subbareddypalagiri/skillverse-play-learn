@@ -119,7 +119,9 @@ import reelRoutes from './routes/reelRoutes.js';
 import showcaseRoutes from './routes/showcaseRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import syncRoutes from './routes/syncRoutes.js';
+import aiToolsRoutes from './routes/aiToolsRoutes.js';
 import startScheduler from './workers/jobFetcher.worker.js';
+import startAIToolsScheduler from './workers/aiToolsSync.worker.js';
 
 const uploadsDirectory = path.resolve(process.cwd(), 'uploads');
 
@@ -135,6 +137,7 @@ app.use('/api/v1/reels', reelRoutes);
 app.use('/api/v1/showcase', showcaseRoutes);
 app.use('/api/v1/posts', postRoutes);
 app.use('/api/v1/sync', syncRoutes);
+app.use('/api/v1/ai-tools', aiToolsRoutes);
 app.use('/uploads', express.static(uploadsDirectory));
 
 app.get('/api/v1', (req, res) => {
@@ -162,8 +165,9 @@ const initializeApp = async () => {
     // Connect to MongoDB
     await connectDB();
 
-    // Start Daily Scheduler Worker
+    // Start Daily Scheduler Workers
     startScheduler();
+    startAIToolsScheduler();
 
     // Start Server
     const server = app.listen(PORT, () => {

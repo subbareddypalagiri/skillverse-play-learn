@@ -24,7 +24,7 @@
     "seed:courses": "node seeds/seedCourses.js",
     "seed:problems": "node seeds/seedProblems.js",
     "seed:jobs": "node seeds/seedJobs.js",
-    "seed:events": "node seeds/seedEvents.js",
+    "seed:ai-tools": "node seeds/seedAITools.js",
     "create:indexes": "node utils/createIndexes.js",
     "migrate": "node utils/migrations.js",
     "cache:clear": "node utils/clearCache.js"
