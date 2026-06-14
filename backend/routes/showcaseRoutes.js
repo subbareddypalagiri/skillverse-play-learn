@@ -1,35 +1,42 @@
 import express from 'express';
-const router = express.Router();
 import {
   getShowcase,
   connectGithub,
   connectLinkedIn,
   connectLeetCode,
+  connectCodeforces,
+  connectHackerrank,
+  connectStackoverflow,
+  connectDevto,
+  connectPortfolio,
+  connectCodepen,
   disconnectPlatform,
   refreshPlatform,
-  updateVisibility
+  updateVisibility,
+  getShowcaseStats,
 } from '../controllers/showcaseController.js';
 import { authenticate } from '../middleware/auth.js';
 
-// All routes require authentication
+const router = express.Router();
+
 router.use(authenticate);
 
-// Get showcase profile
+router.get('/stats', getShowcaseStats);
 router.get('/', getShowcase);
 router.get('/:userId', getShowcase);
 
-// Connect platforms
 router.post('/connect/github', connectGithub);
 router.post('/connect/linkedin', connectLinkedIn);
 router.post('/connect/leetcode', connectLeetCode);
+router.post('/connect/codeforces', connectCodeforces);
+router.post('/connect/hackerrank', connectHackerrank);
+router.post('/connect/stackoverflow', connectStackoverflow);
+router.post('/connect/devto', connectDevto);
+router.post('/connect/portfolio', connectPortfolio);
+router.post('/connect/codepen', connectCodepen);
 
-// Disconnect platform
 router.delete('/disconnect/:platform', disconnectPlatform);
-
-// Refresh/sync platform data
 router.post('/refresh/:platform', refreshPlatform);
-
-// Update visibility settings
 router.patch('/visibility', updateVisibility);
 
 export default router;

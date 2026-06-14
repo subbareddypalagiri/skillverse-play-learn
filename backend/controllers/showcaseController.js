@@ -1,328 +1,212 @@
 import Showcase from '../models/Showcase.js';
-import axios from 'axios';
+import {
+  parsePlatformInput,
+  PLATFORM_FETCHERS,
+  ALL_PLATFORMS,
+  fetchGithubProfile,
+  fetchLeetCodeProfile,
+} from '../services/showcaseConnectService.js';
 
-// Get user's showcase profile
+const upsertShowcase = async (userId, platformData) => {
+  const setFields = {};
+  for (const [key, value] of Object.entries(platformData)) {
+    setFields[key] = value;
+  }
+  return Showcase.findOneAndUpdate(
+    { userId },
+    { $set: { userId, ...setFields } },
+    { upsert: true, new: true }
+  );
+};
+
 export const getShowcase = async (req, res) => {
   try {
     const userId = req.params.userId || req.user._id;
-    
     let showcase = await Showcase.findOne({ userId });
-    
-    if (!showcase) {
-      // Create default showcase if it doesn't exist
-      showcase = await Showcase.create({ userId });
+    if (!showcase) showcase = await Showcase.create({ userId });
+    res.status(200).json({ success: true, data: showcase });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to fetch showcase profile', error: error.message });
+  }
+};
+
+const connectWithFetcher = (platform) => async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const parsed = parsePlatformInput(platform, req.body.username || req.body.profileUrl || req.body.userId || req.body.websiteUrl, req.body);
+    if (!parsed) {
+      return res.status(400).json({ success: false, message: 'Invalid input — enter username or profile URL' });
     }
-    
+
+    const fetcher = PLATFORM_FETCHERS[platform];
+    const platformData = await fetcher(parsed);
+    const showcase = await upsertShowcase(userId, { [platform]: platformData });
+
     res.status(200).json({
       success: true,
-      data: showcase
+      message: `${platform} connected successfully`,
+      data: showcase,
     });
   } catch (error) {
-    console.error('Error fetching showcase:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch showcase profile',
-      error: error.message
+      message: error.message || `Failed to connect ${platform}`,
+      error: error.message,
     });
   }
 };
 
-// Connect and sync GitHub account
 export const connectGithub = async (req, res) => {
   try {
     const { username } = req.body;
-    const userId = req.user._id;
-    
-    if (!username) {
-      return res.status(400).json({
-        success: false,
-        message: 'GitHub username is required'
-      });
-    }
-    
-    // Fetch GitHub profile data using public API (no auth required)
-    const profileResponse = await axios.get(`https://api.github.com/users/${username}`);
-    const profileData = profileResponse.data;
-    
-    // Fetch repositories to calculate total stars
-    const reposResponse = await axios.get(`https://api.github.com/users/${username}/repos?per_page=100`);
-    const repos = reposResponse.data;
-    const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
-    
-    // Get top languages
-    const languages = [...new Set(repos.map(repo => repo.language).filter(Boolean))].slice(0, 5);
-    
-    // Update or create showcase
-    const showcase = await Showcase.findOneAndUpdate(
-      { userId },
-      {
-        userId,
-        github: {
-          connected: true,
-          username: profileData.login,
-          profileUrl: profileData.html_url,
-          avatarUrl: profileData.avatar_url,
-          bio: profileData.bio || '',
-          publicRepos: profileData.public_repos,
-          totalStars,
-          followers: profileData.followers,
-          following: profileData.following,
-          topLanguages: languages,
-          lastSynced: new Date()
-        }
-      },
-      { upsert: true, new: true }
-    );
-    
-    res.status(200).json({
-      success: true,
-      message: 'GitHub account connected successfully',
-      data: showcase
-    });
+    const parsed = parsePlatformInput('github', username);
+    if (!parsed?.username) return res.status(400).json({ success: false, message: 'GitHub username is required' });
+    const github = await fetchGithubProfile(parsed.username);
+    const showcase = await upsertShowcase(req.user._id, { github });
+    res.status(200).json({ success: true, message: 'GitHub connected', data: showcase });
   } catch (error) {
-    console.error('Error connecting GitHub:', error);
-    res.status(500).json({
-      success: false,
-      message: error.response?.data?.message || 'Failed to connect GitHub account',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: error.message || 'Failed to connect GitHub' });
   }
 };
 
-// Connect LinkedIn account
 export const connectLinkedIn = async (req, res) => {
   try {
-    const { profileUrl, headline } = req.body;
-    const userId = req.user._id;
-    
-    if (!profileUrl) {
-      return res.status(400).json({
-        success: false,
-        message: 'LinkedIn profile URL is required'
-      });
-    }
-    
-    // Update showcase with LinkedIn info
-    const showcase = await Showcase.findOneAndUpdate(
-      { userId },
-      {
-        userId,
-        linkedin: {
-          connected: true,
-          profileUrl,
-          headline: headline || '',
-          lastSynced: new Date()
-        }
-      },
-      { upsert: true, new: true }
-    );
-    
-    res.status(200).json({
-      success: true,
-      message: 'LinkedIn account connected successfully',
-      data: showcase
-    });
+    const parsed = parsePlatformInput('linkedin', req.body.profileUrl, { headline: req.body.headline });
+    if (!parsed?.profileUrl) return res.status(400).json({ success: false, message: 'LinkedIn profile URL is required' });
+    const linkedin = {
+      connected: true,
+      profileUrl: parsed.profileUrl,
+      headline: parsed.headline || req.body.headline || '',
+      lastSynced: new Date(),
+    };
+    const showcase = await upsertShowcase(req.user._id, { linkedin });
+    res.status(200).json({ success: true, message: 'LinkedIn connected', data: showcase });
   } catch (error) {
-    console.error('Error connecting LinkedIn:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to connect LinkedIn account',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to connect LinkedIn' });
   }
 };
 
-// Connect and sync LeetCode account
 export const connectLeetCode = async (req, res) => {
   try {
-    const { username } = req.body;
-    const userId = req.user._id;
-    
-    if (!username) {
-      return res.status(400).json({
-        success: false,
-        message: 'LeetCode username is required'
-      });
-    }
-    
-    // Fetch LeetCode data using public GraphQL API
-    const query = `
-      query getUserProfile($username: String!) {
-        matchedUser(username: $username) {
-          username
-          profile {
-            ranking
-          }
-          submitStats {
-            acSubmissionNum {
-              difficulty
-              count
-            }
-          }
-        }
-      }
-    `;
-    
-    const response = await axios.post('https://leetcode.com/graphql', {
-      query,
-      variables: { username }
-    });
-    
-    const userData = response.data.data.matchedUser;
-    
-    if (!userData) {
-      return res.status(404).json({
-        success: false,
-        message: 'LeetCode user not found'
-      });
-    }
-    
-    const submitStats = userData.submitStats.acSubmissionNum;
-    const totalSolved = submitStats.find(s => s.difficulty === 'All')?.count || 0;
-    const easySolved = submitStats.find(s => s.difficulty === 'Easy')?.count || 0;
-    const mediumSolved = submitStats.find(s => s.difficulty === 'Medium')?.count || 0;
-    const hardSolved = submitStats.find(s => s.difficulty === 'Hard')?.count || 0;
-    
-    // Update showcase
-    const showcase = await Showcase.findOneAndUpdate(
-      { userId },
-      {
-        userId,
-        leetcode: {
-          connected: true,
-          username: userData.username,
-          profileUrl: `https://leetcode.com/${userData.username}`,
-          ranking: userData.profile?.ranking || 0,
-          totalSolved,
-          easySolved,
-          mediumSolved,
-          hardSolved,
-          acceptanceRate: totalSolved > 0 ? ((totalSolved / 3000) * 100).toFixed(2) : 0,
-          lastSynced: new Date()
-        }
-      },
-      { upsert: true, new: true }
-    );
-    
-    res.status(200).json({
-      success: true,
-      message: 'LeetCode account connected successfully',
-      data: showcase
-    });
+    const parsed = parsePlatformInput('leetcode', req.body.username);
+    if (!parsed?.username) return res.status(400).json({ success: false, message: 'LeetCode username is required' });
+    const leetcode = await fetchLeetCodeProfile(parsed.username);
+    const showcase = await upsertShowcase(req.user._id, { leetcode });
+    res.status(200).json({ success: true, message: 'LeetCode connected', data: showcase });
   } catch (error) {
-    console.error('Error connecting LeetCode:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to connect LeetCode account. Make sure the username is correct.',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: error.message || 'Failed to connect LeetCode' });
   }
 };
 
-// Disconnect a platform
+export const connectCodeforces = connectWithFetcher('codeforces');
+export const connectHackerrank = connectWithFetcher('hackerrank');
+export const connectStackoverflow = connectWithFetcher('stackoverflow');
+export const connectDevto = connectWithFetcher('devto');
+export const connectCodepen = connectWithFetcher('codepen');
+
+export const connectPortfolio = async (req, res) => {
+  try {
+    const parsed = parsePlatformInput('portfolio', req.body.websiteUrl, {
+      title: req.body.title,
+      description: req.body.description,
+    });
+    if (!parsed?.websiteUrl) return res.status(400).json({ success: false, message: 'Website URL is required' });
+    const portfolio = {
+      connected: true,
+      websiteUrl: parsed.websiteUrl,
+      title: parsed.title || '',
+      description: parsed.description || '',
+    };
+    const showcase = await upsertShowcase(req.user._id, { portfolio });
+    res.status(200).json({ success: true, message: 'Portfolio connected', data: showcase });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to connect portfolio' });
+  }
+};
+
 export const disconnectPlatform = async (req, res) => {
   try {
     const { platform } = req.params;
-    const userId = req.user._id;
-    
-    if (!['github', 'linkedin', 'leetcode'].includes(platform)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid platform'
-      });
+    if (!ALL_PLATFORMS.includes(platform)) {
+      return res.status(400).json({ success: false, message: 'Invalid platform' });
     }
-    
-    const updateData = {};
-    updateData[`${platform}.connected`] = false;
-    
     const showcase = await Showcase.findOneAndUpdate(
-      { userId },
-      updateData,
+      { userId: req.user._id },
+      { $set: { [`${platform}.connected`]: false } },
       { new: true }
     );
-    
-    res.status(200).json({
-      success: true,
-      message: `${platform} disconnected successfully`,
-      data: showcase
-    });
+    res.status(200).json({ success: true, message: `${platform} disconnected`, data: showcase });
   } catch (error) {
-    console.error('Error disconnecting platform:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to disconnect platform',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to disconnect platform' });
   }
 };
 
-// Refresh/sync platform data
 export const refreshPlatform = async (req, res) => {
   try {
     const { platform } = req.params;
-    const userId = req.user._id;
-    
-    const showcase = await Showcase.findOne({ userId });
-    
-    if (!showcase) {
-      return res.status(404).json({
-        success: false,
-        message: 'Showcase not found'
-      });
+    const showcase = await Showcase.findOne({ userId: req.user._id });
+    if (!showcase?.[platform]?.connected) {
+      return res.status(400).json({ success: false, message: 'Platform not connected' });
     }
-    
-    // Re-sync based on platform
-    if (platform === 'github' && showcase.github.connected) {
-      const username = showcase.github.username;
-      return connectGithub({ body: { username }, user: req.user }, res);
-    } else if (platform === 'leetcode' && showcase.leetcode.connected) {
-      const username = showcase.leetcode.username;
-      return connectLeetCode({ body: { username }, user: req.user }, res);
+
+    if (platform === 'linkedin' || platform === 'portfolio') {
+      return res.status(200).json({ success: true, message: 'Profile link refreshed', data: showcase });
     }
-    
-    res.status(400).json({
-      success: false,
-      message: 'Platform not connected or invalid'
-    });
+
+    const data = showcase[platform];
+    let parsed;
+    if (platform === 'stackoverflow') parsed = { userId: data.userId };
+    else if (platform === 'linkedin') parsed = { profileUrl: data.profileUrl };
+    else parsed = { username: data.username };
+
+    const fetcher = PLATFORM_FETCHERS[platform];
+    if (!fetcher) {
+      return res.status(200).json({ success: true, message: 'Profile saved', data: showcase });
+    }
+
+    const refreshed = await fetcher(parsed);
+    const updated = await upsertShowcase(req.user._id, { [platform]: refreshed });
+    res.status(200).json({ success: true, message: `${platform} refreshed`, data: updated });
   } catch (error) {
-    console.error('Error refreshing platform:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to refresh platform data',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: error.message || 'Failed to refresh' });
   }
 };
 
-// Update visibility settings
 export const updateVisibility = async (req, res) => {
   try {
-    const { github, linkedin, leetcode } = req.body;
     const userId = req.user._id;
-    
+    const current = await Showcase.findOne({ userId });
+    const visibility = { ...(current?.visibility?.toObject?.() || current?.visibility || {}), ...req.body };
     const showcase = await Showcase.findOneAndUpdate(
       { userId },
-      {
-        visibility: {
-          github: github !== undefined ? github : true,
-          linkedin: linkedin !== undefined ? linkedin : true,
-          leetcode: leetcode !== undefined ? leetcode : true
-        }
-      },
+      { $set: { visibility } },
       { upsert: true, new: true }
     );
-    
+    res.status(200).json({ success: true, message: 'Visibility updated', data: showcase });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to update visibility' });
+  }
+};
+
+export const getShowcaseStats = async (req, res) => {
+  try {
+    const showcase = await Showcase.findOne({ userId: req.user._id });
+    if (!showcase) {
+      return res.status(200).json({ success: true, data: { connected: 0, total: ALL_PLATFORMS.length, score: 0 } });
+    }
+    const connected = ALL_PLATFORMS.filter((p) => showcase[p]?.connected).length;
+    let score = 0;
+    if (showcase.github?.connected) score += Math.min(30, showcase.github.totalStars + showcase.github.publicRepos);
+    if (showcase.leetcode?.connected) score += Math.min(25, showcase.leetcode.totalSolved);
+    if (showcase.codeforces?.connected) score += Math.min(20, Math.floor((showcase.codeforces.rating || 0) / 100));
+    if (showcase.hackerrank?.connected) score += Math.min(10, showcase.hackerrank.badges * 2);
+    if (showcase.stackoverflow?.connected) score += Math.min(15, Math.floor((showcase.stackoverflow.reputation || 0) / 100));
+
     res.status(200).json({
       success: true,
-      message: 'Visibility settings updated',
-      data: showcase
+      data: { connected, total: ALL_PLATFORMS.length, score, platforms: ALL_PLATFORMS.filter((p) => showcase[p]?.connected) },
     });
   } catch (error) {
-    console.error('Error updating visibility:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to update visibility settings',
-      error: error.message
-    });
+    res.status(500).json({ success: false, message: 'Failed to get stats' });
   }
 };

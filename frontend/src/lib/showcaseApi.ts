@@ -1,5 +1,9 @@
 import { apiClient } from './apiClient';
 
+export type PlatformId =
+  | 'github' | 'linkedin' | 'leetcode' | 'codeforces' | 'hackerrank'
+  | 'stackoverflow' | 'devto' | 'portfolio' | 'codepen';
+
 export interface ShowcaseData {
   _id: string;
   userId: string;
@@ -87,112 +91,108 @@ export interface ShowcaseData {
     profileUrl: string;
     pens: number;
     followers: number;
+    lastSynced?: Date;
   };
-  visibility: {
-    github: boolean;
-    linkedin: boolean;
-    leetcode: boolean;
-    codeforces: boolean;
-    hackerrank: boolean;
-    stackoverflow: boolean;
-    devto: boolean;
-    portfolio: boolean;
-    codepen: boolean;
-  };
+  visibility: Record<PlatformId, boolean>;
 }
 
-export interface ShowcaseResponse {
+export interface ShowcaseStats {
+  connected: number;
+  total: number;
+  score: number;
+  platforms: PlatformId[];
+}
+
+interface ShowcaseResponse {
   success: boolean;
   data: ShowcaseData;
   message?: string;
 }
 
-// Get user's showcase profile
 export const getShowcase = async (userId?: string): Promise<ShowcaseData> => {
   const url = userId ? `/showcase/${userId}` : '/showcase';
   const response = await apiClient.get<ShowcaseResponse>(url);
   return response.data.data;
 };
 
-// Connect GitHub account
-export const connectGithub = async (username: string): Promise<ShowcaseData> => {
+export const getShowcaseStats = async (): Promise<ShowcaseStats> => {
+  const response = await apiClient.get<{ success: boolean; data: ShowcaseStats }>('/showcase/stats');
+  return response.data.data;
+};
+
+export const connectGithub = async (username: string) => {
   const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/github', { username });
   return response.data.data;
 };
 
-// Connect LinkedIn account
-export const connectLinkedIn = async (profileUrl: string, headline?: string): Promise<ShowcaseData> => {
-  const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/linkedin', {
-    profileUrl,
-    headline
-  });
+export const connectLinkedIn = async (profileUrl: string, headline?: string) => {
+  const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/linkedin', { profileUrl, headline });
   return response.data.data;
 };
 
-// Connect LeetCode account
-export const connectLeetCode = async (username: string): Promise<ShowcaseData> => {
+export const connectLeetCode = async (username: string) => {
   const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/leetcode', { username });
   return response.data.data;
 };
 
-// Connect CodeForces account
-export const connectCodeforces = async (username: string): Promise<ShowcaseData> => {
+export const connectCodeforces = async (username: string) => {
   const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/codeforces', { username });
   return response.data.data;
 };
 
-// Connect HackerRank account
-export const connectHackerrank = async (username: string): Promise<ShowcaseData> => {
+export const connectHackerrank = async (username: string) => {
   const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/hackerrank', { username });
   return response.data.data;
 };
 
-// Connect Stack Overflow account
-export const connectStackoverflow = async (userId: string): Promise<ShowcaseData> => {
+export const connectStackoverflow = async (userId: string) => {
   const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/stackoverflow', { userId });
   return response.data.data;
 };
 
-// Connect Dev.to account
-export const connectDevto = async (username: string): Promise<ShowcaseData> => {
+export const connectDevto = async (username: string) => {
   const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/devto', { username });
   return response.data.data;
 };
 
-// Connect Portfolio website
-export const connectPortfolio = async (websiteUrl: string, title?: string, description?: string): Promise<ShowcaseData> => {
-  const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/portfolio', {
-    websiteUrl,
-    title,
-    description
-  });
+export const connectPortfolio = async (websiteUrl: string, title?: string, description?: string) => {
+  const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/portfolio', { websiteUrl, title, description });
   return response.data.data;
 };
 
-// Connect Codepen account
-export const connectCodepen = async (username: string): Promise<ShowcaseData> => {
+export const connectCodepen = async (username: string) => {
   const response = await apiClient.post<ShowcaseResponse>('/showcase/connect/codepen', { username });
   return response.data.data;
 };
 
-// Disconnect a platform
-export const disconnectPlatform = async (platform: 'github' | 'linkedin' | 'leetcode'): Promise<ShowcaseData> => {
+export const disconnectPlatform = async (platform: PlatformId) => {
   const response = await apiClient.delete<ShowcaseResponse>(`/showcase/disconnect/${platform}`);
   return response.data.data;
 };
 
-// Refresh platform data
-export const refreshPlatform = async (platform: 'github' | 'linkedin' | 'leetcode'): Promise<ShowcaseData> => {
+export const refreshPlatform = async (platform: PlatformId) => {
   const response = await apiClient.post<ShowcaseResponse>(`/showcase/refresh/${platform}`);
   return response.data.data;
 };
 
-// Update visibility settings
-export const updateVisibility = async (visibility: {
-  github?: boolean;
-  linkedin?: boolean;
-  leetcode?: boolean;
-}): Promise<ShowcaseData> => {
+export const updateVisibility = async (visibility: Partial<Record<PlatformId, boolean>>) => {
   const response = await apiClient.patch<ShowcaseResponse>('/showcase/visibility', visibility);
   return response.data.data;
+};
+
+/** Parse username or full profile URL on the client before sending */
+export const parseConnectInput = (platform: PlatformId, input: string): string => {
+  const trimmed = input.trim();
+  const patterns: Partial<Record<PlatformId, RegExp>> = {
+    github: /github\.com\/([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?)/i,
+    leetcode: /leetcode\.com\/(?:u\/)?([a-zA-Z0-9_-]+)/i,
+    codeforces: /codeforces\.com\/profile\/([a-zA-Z0-9_.-]+)/i,
+    hackerrank: /hackerrank\.com\/([a-zA-Z0-9_-]+)/i,
+    stackoverflow: /stackoverflow\.com\/users\/(\d+)/i,
+    devto: /dev\.to\/([a-zA-Z0-9_-]+)/i,
+    codepen: /codepen\.io\/([a-zA-Z0-9_-]+)/i,
+  };
+  const match = patterns[platform]?.exec(trimmed);
+  if (match) return match[1];
+  return trimmed.replace(/^@/, '');
 };
