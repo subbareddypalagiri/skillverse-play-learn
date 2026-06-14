@@ -1,7 +1,13 @@
 import { Link } from "react-router-dom";
 import { Twitter, Github, Instagram, Mail, ArrowRight, Sparkles } from "lucide-react";
 
-const Footer = () => {
+interface FooterProps {
+  premium?: boolean;
+  midnight?: boolean;
+  neat?: boolean;
+}
+
+const Footer = ({ premium = false, midnight = false, neat = false }: FooterProps) => {
   const productLinks = [
     { label: "Courses", to: "/courses" },
     { label: "Events", to: "/events" },
@@ -22,11 +28,15 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative border-t border-border/40 overflow-hidden">
+    <footer className={`relative border-t overflow-hidden ${
+      neat ? "border-border/60" : midnight ? "border-white/10" : "border-[#636FA4]/15"
+    }`}>
       {/* Background */}
-      <div className="absolute inset-0 bg-background" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full opacity-20 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.3) 0%, transparent 70%)', filter: 'blur(60px)' }} />
+      <div className={`absolute inset-0 ${
+        neat ? "bg-[#f6f5fa]/95 backdrop-blur-sm" : midnight ? "bg-black/70 backdrop-blur-xl" : premium ? "bg-white/45 backdrop-blur-xl" : "bg-background"
+      }`} />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] rounded-full opacity-30 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse, rgba(124,58,237,0.25) 0%, transparent 70%)', filter: 'blur(60px)' }} />
 
       <div className="relative z-10 container mx-auto px-4 lg:px-6">
         {/* Main footer */}

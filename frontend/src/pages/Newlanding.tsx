@@ -214,9 +214,7 @@ const NewLanding: React.FC = () => {
     <div ref={containerRef} className="bg-[#141414] text-[#f2f2f2] font-sans antialiased relative min-h-screen">
       
       {/* TOP NAVBAR */}
-      <div className="relative z-50">
-        <Navbar />
-      </div>
+      <Navbar />
 
       <div className="grid-bg fixed inset-0 opacity-25 pointer-events-none z-0"></div>
 

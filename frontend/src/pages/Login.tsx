@@ -3,6 +3,7 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { apiClient } from "@/lib/apiClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff, ArrowRight, Sparkles, BookOpen, Trophy, Zap, ChevronRight } from "lucide-react";
+import NeatGradientBackground from "@/components/NeatGradientBackground";
 
 const FloatingOrb = ({ className }: { className: string }) => (
   <div className={`absolute rounded-full pointer-events-none ${className}`} />
@@ -62,7 +63,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex overflow-hidden bg-background">
+    <div className="neat-gradient-layout min-h-screen flex overflow-hidden bg-[#E4E4E4] relative">
+      <NeatGradientBackground />
+      <div className="relative z-10 flex flex-1 w-full">
       {/* Left Panel — Branding */}
       <div className="hidden lg:flex lg:w-[54%] relative overflow-hidden flex-col justify-between p-14">
         {/* Animated background */}
@@ -179,6 +182,7 @@ const Login = () => {
                 <input
                   id="email"
                   type="email"
+                  autoComplete="email"
                   placeholder="you@email.com"
                   value={formData.email}
                   onChange={handleChange}
@@ -202,6 +206,7 @@ const Login = () => {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   placeholder="••••••••••"
                   value={formData.password}
                   onChange={handleChange}
@@ -264,6 +269,7 @@ const Login = () => {
             </Link>
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

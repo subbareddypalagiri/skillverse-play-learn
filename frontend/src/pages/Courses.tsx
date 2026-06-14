@@ -1174,7 +1174,11 @@ const Courses = () => {
   };
 
   if (showDashboard) {
-    return <CourseDashboard enrolledCourses={enrolledCourses} onBack={() => setShowDashboard(false)} />;
+    return (
+      <PageLayout>
+        <CourseDashboard enrolledCourses={enrolledCourses} onBack={() => setShowDashboard(false)} embedded />
+      </PageLayout>
+    );
   }
 
   return (
@@ -1220,7 +1224,7 @@ const Courses = () => {
           {loading ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="rounded-2xl border border-border/30 p-5 animate-pulse" style={{ background: 'rgba(255,255,255,0.015)' }}>
+                <div key={i} className="rounded-2xl border border-border/30 p-5 animate-pulse bg-card">
                   <div className="h-4 w-20 bg-border/40 rounded-lg mb-3" />
                   <div className="h-5 w-3/4 bg-border/40 rounded-lg mb-2" />
                   <div className="h-3 w-1/2 bg-border/30 rounded mb-3" />
@@ -1249,8 +1253,8 @@ const Courses = () => {
               return (
                 <div
                   key={course._id || index}
-                  className="group relative rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 card-lift transition-all duration-300 animate-reveal-up"
-                  style={{ background: 'rgba(255,255,255,0.02)', animationDelay: `${index * 0.04}s` }}
+                  className="group relative rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 card-lift bg-card shadow-sm transition-all duration-300 animate-reveal-up"
+                  style={{ animationDelay: `${index * 0.04}s` }}
                 >
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                     style={{ background: 'radial-gradient(ellipse at top, rgba(124,58,237,0.05) 0%, transparent 60%)' }} />
@@ -1326,8 +1330,8 @@ const Courses = () => {
                 const Icon = exam.icon;
                 return (
                   <div key={index}
-                    className="group relative rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 card-lift transition-all duration-300 animate-reveal-up"
-                    style={{ background: 'rgba(255,255,255,0.02)', animationDelay: `${index * 0.04}s` }}>
+                    className="group relative rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 card-lift bg-card shadow-sm transition-all duration-300 animate-reveal-up"
+                    style={{ animationDelay: `${index * 0.04}s` }}>
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
                       style={{ background: 'radial-gradient(ellipse at top, rgba(124,58,237,0.05) 0%, transparent 60%)' }} />
                     <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

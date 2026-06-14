@@ -56,7 +56,7 @@ const App = () => (
               <ClubProvider>
                 <Toaster />
                 <Sonner />
-                <BrowserRouter>
+                <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                 <Routes>
                   {/* 👇 Ikkada Home element theesesi NewLanding pettam */}
                   <Route path="/" element={<Newlanding />} />

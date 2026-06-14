@@ -19,9 +19,10 @@ import {
 interface CourseDashboardProps {
   enrolledCourses: any[];
   onBack: () => void;
+  embedded?: boolean;
 }
 
-const CourseDashboard = ({ enrolledCourses, onBack }: CourseDashboardProps) => {
+const CourseDashboard = ({ enrolledCourses, onBack, embedded = false }: CourseDashboardProps) => {
   // Sample course content data
   const getCourseContent = (courseTitle: string) => {
     return {
@@ -55,11 +56,11 @@ const CourseDashboard = ({ enrolledCourses, onBack }: CourseDashboardProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <div className={embedded ? "" : "min-h-screen bg-background"}>
+      {!embedded && <Navbar />}
       
-      <div className="pt-24 pb-12 px-4">
-        <div className="container mx-auto">
+      <div className={embedded ? "" : "pt-24 pb-12 px-4"}>
+        <div className={embedded ? "" : "container mx-auto"}>
           {/* Header */}
           <div className="mb-8">
             <Button 
@@ -265,7 +266,7 @@ const CourseDashboard = ({ enrolledCourses, onBack }: CourseDashboardProps) => {
         </div>
       </div>
       
-      <Footer />
+      {!embedded && <Footer />}
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { apiClient } from "@/lib/apiClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff, ArrowRight, Sparkles, Check, X, ChevronRight, User, Mail, Lock } from "lucide-react";
+import NeatGradientBackground from "@/components/NeatGradientBackground";
 
 const PASSWORD_RULES = {
   minLength: 8,
@@ -107,7 +108,9 @@ const Signup = () => {
   ];
 
   return (
-    <div className="min-h-screen flex overflow-hidden bg-background">
+    <div className="neat-gradient-layout min-h-screen flex overflow-hidden bg-[#E4E4E4] relative">
+      <NeatGradientBackground />
+      <div className="relative z-10 flex flex-1 w-full">
       {/* Left Panel */}
       <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden flex-col justify-between p-14">
         <div className="absolute inset-0 bg-grid opacity-100" />
@@ -288,6 +291,7 @@ const Signup = () => {
             </Link>
           </p>
         </div>
+      </div>
       </div>
     </div>
   );
