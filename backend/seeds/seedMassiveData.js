@@ -46,7 +46,7 @@ const seedMassiveData = async () => {
     }
 
     // =====================================================
-    // ALL 18 COURSES WITH FULL MEDIA RESOURCES
+    // ALL 30 COURSES WITH FULL MEDIA RESOURCES
     // =====================================================
     const coursesToSeed = [
       // 1. Full Stack Web Development Bootcamp
@@ -706,6 +706,438 @@ const seedMassiveData = async () => {
             { title: "LangChain Hub", url: "https://python.langchain.com/" },
             { title: "AutoGPT GitHub", url: "https://github.com/Significant-Gravitas/AutoGPT" },
             { title: "LangGraph Documentation", url: "https://langchain-ai.github.io/langgraph/" }
+          ]
+        }
+      },
+
+      // 19. Data Structures & Algorithms Masterclass
+      {
+        title: "Data Structures & Algorithms Masterclass",
+        instructor: "NeetCode",
+        category: "Programming",
+        level: "Intermediate",
+        duration: "16 weeks",
+        description: "Arrays, Trees, Graphs, DP — crack FAANG interviews",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 8920,
+        rating: 4.9,
+        ratingCount: 2100,
+        resources: {
+          videos: [
+            { title: "DSA Full Course - freeCodeCamp", url: "https://www.youtube.com/watch?v=8hly31xKli0", platform: "YouTube", videoId: "8hly31xKli0" },
+            { title: "NeetCode DSA Roadmap", url: "https://www.youtube.com/watch?v=otvLdDbzP5Y", platform: "YouTube", videoId: "otvLdDbzP5Y" },
+            { title: "Graph Algorithms Explained", url: "https://www.youtube.com/watch?v=09_LlHjoEiY", platform: "YouTube", videoId: "09_LlHjoEiY" },
+            { title: "Dynamic Programming Patterns", url: "https://www.youtube.com/watch?v=aPQY__2H3tE", platform: "YouTube", videoId: "aPQY__2H3tE" }
+          ],
+          pdfs: [
+            { title: "CLRS Introduction to Algorithms", url: "https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/" },
+            { title: "Grokking Algorithms (Free Chapters)", url: "https://www.manning.com/books/grokking-algorithms" },
+            { title: "Competitive Programmer's Handbook", url: "https://cses.fi/book/book.pdf" }
+          ],
+          links: [
+            { title: "LeetCode", url: "https://leetcode.com/" },
+            { title: "NeetCode.io", url: "https://neetcode.io/" },
+            { title: "AlgoExpert", url: "https://www.algoexpert.io/" },
+            { title: "Codeforces", url: "https://codeforces.com/" }
+          ]
+        }
+      },
+
+      // 20. System Design for Software Engineers
+      {
+        title: "System Design for Software Engineers",
+        instructor: "Gaurav Sen",
+        category: "Web Development",
+        level: "Advanced",
+        duration: "10 weeks",
+        description: "Scalability, microservices, load balancing, caching, databases at scale",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 5670,
+        rating: 4.9,
+        ratingCount: 1580,
+        resources: {
+          videos: [
+            { title: "System Design Interview Course", url: "https://www.youtube.com/watch?v=UzLMhqg3_Wc", platform: "YouTube", videoId: "UzLMhqg3_Wc" },
+            { title: "System Design Basics", url: "https://www.youtube.com/watch?v=xpDnVSmNnr0", platform: "YouTube", videoId: "xpDnVSmNnr0" },
+            { title: "Microservices Architecture", url: "https://www.youtube.com/watch?v=rv4LlmLmVWk", platform: "YouTube", videoId: "rv4LlmLmVWk" },
+            { title: "Designing Data-Intensive Applications", url: "https://www.youtube.com/watch?v=PdtlMd-6-p0", platform: "YouTube", videoId: "PdtlMd-6-p0" }
+          ],
+          pdfs: [
+            { title: "System Design Primer", url: "https://github.com/donnemartin/system-design-primer" },
+            { title: "Designing Data-Intensive Applications", url: "https://dataintensive.net/" },
+            { title: "Google SRE Book", url: "https://sre.google/sre-book/table-of-contents/" }
+          ],
+          links: [
+            { title: "ByteByteGo", url: "https://bytebytego.com/" },
+            { title: "System Design Interview", url: "https://www.educative.io/courses/grokking-the-system-design-interview" },
+            { title: "High Scalability Blog", url: "http://highscalability.com/" },
+            { title: "AWS Architecture Center", url: "https://aws.amazon.com/architecture/" }
+          ]
+        }
+      },
+
+      // 21. Next.js Full Stack Development
+      {
+        title: "Next.js Full Stack Development",
+        instructor: "Josh Comeau",
+        category: "Web Development",
+        level: "Intermediate",
+        duration: "12 weeks",
+        description: "Next.js 14, App Router, Server Components, API routes, deployment",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 4120,
+        rating: 4.9,
+        ratingCount: 1120,
+        resources: {
+          videos: [
+            { title: "Next.js 14 Full Course", url: "https://www.youtube.com/watch?v=wm5gMKuwSYk", platform: "YouTube", videoId: "wm5gMKuwSYk" },
+            { title: "Next.js App Router Tutorial", url: "https://www.youtube.com/watch?v=gSSs-Qa3i48", platform: "YouTube", videoId: "gSSs-Qa3i48" },
+            { title: "Next.js + TypeScript", url: "https://www.youtube.com/watch?v=d8M4q7vSP5w", platform: "YouTube", videoId: "d8M4q7vSP5w" },
+            { title: "Deploy Next.js to Vercel", url: "https://www.youtube.com/watch?v=2HBIzEx6IZA", platform: "YouTube", videoId: "2HBIzEx6IZA" }
+          ],
+          pdfs: [
+            { title: "Next.js Official Docs", url: "https://nextjs.org/docs" },
+            { title: "React Server Components RFC", url: "https://github.com/reactjs/rfcs/blob/main/text/0188-server-components.md" },
+            { title: "Vercel Deployment Guide", url: "https://vercel.com/docs" }
+          ],
+          links: [
+            { title: "Next.js Learn", url: "https://nextjs.org/learn" },
+            { title: "Vercel Platform", url: "https://vercel.com/" },
+            { title: "shadcn/ui", url: "https://ui.shadcn.com/" },
+            { title: "Next.js Examples", url: "https://github.com/vercel/next.js/tree/canary/examples" }
+          ]
+        }
+      },
+
+      // 22. TypeScript Complete Developer Guide
+      {
+        title: "TypeScript Complete Developer Guide",
+        instructor: "Matt Pocock",
+        category: "Programming",
+        level: "Intermediate",
+        duration: "8 weeks",
+        description: "Types, generics, utility types, React + TypeScript patterns",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 6340,
+        rating: 4.9,
+        ratingCount: 1750,
+        resources: {
+          videos: [
+            { title: "TypeScript Full Course", url: "https://www.youtube.com/watch?v=30LW083Z9pk", platform: "YouTube", videoId: "30LW083Z9pk" },
+            { title: "TypeScript for Beginners", url: "https://www.youtube.com/watch?v=BwuLxPH8IDs", platform: "YouTube", videoId: "BwuLxPH8IDs" },
+            { title: "Advanced TypeScript", url: "https://www.youtube.com/watch?v=HG6AyZtY5fY", platform: "YouTube", videoId: "HG6AyZtY5fY" },
+            { title: "React + TypeScript", url: "https://www.youtube.com/watch?v=FJDVKeh7RJI", platform: "YouTube", videoId: "FJDVKeh7RJI" }
+          ],
+          pdfs: [
+            { title: "TypeScript Handbook", url: "https://www.typescriptlang.org/docs/handbook/intro.html" },
+            { title: "TypeScript Deep Dive", url: "https://basarat.gitbook.io/typescript/" },
+            { title: "Total TypeScript Cheatsheet", url: "https://www.totaltypescript.com/typescript-cheat-sheet" }
+          ],
+          links: [
+            { title: "TypeScript Playground", url: "https://www.typescriptlang.org/play" },
+            { title: "Total TypeScript", url: "https://www.totaltypescript.com/" },
+            { title: "Type Challenges", url: "https://github.com/type-challenges/type-challenges" },
+            { title: "DefinitelyTyped", url: "https://github.com/DefinitelyTyped/DefinitelyTyped" }
+          ]
+        }
+      },
+
+      // 23. React Native Mobile App Development
+      {
+        title: "React Native Mobile App Development",
+        instructor: "Simcoder",
+        category: "Mobile Development",
+        level: "Intermediate",
+        duration: "14 weeks",
+        description: "Build iOS & Android apps with React Native, Expo, navigation",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 3780,
+        rating: 4.8,
+        ratingCount: 940,
+        resources: {
+          videos: [
+            { title: "React Native Full Course 2024", url: "https://www.youtube.com/watch?v=0-S5a0eXPoc", platform: "YouTube", videoId: "0-S5a0eXPoc" },
+            { title: "Expo Router Tutorial", url: "https://www.youtube.com/watch?v=Z20nUd9IsCQ", platform: "YouTube", videoId: "Z20nUd9IsCQ" },
+            { title: "React Native Navigation", url: "https://www.youtube.com/watch?v=nQWFzMv_0ho", platform: "YouTube", videoId: "nQWFzMv_0ho" },
+            { title: "Build & Publish to App Store", url: "https://www.youtube.com/watch?v=3bKZd0d5h1Y", platform: "YouTube", videoId: "3bKZd0d5h1Y" }
+          ],
+          pdfs: [
+            { title: "React Native Docs", url: "https://reactnative.dev/docs/getting-started" },
+            { title: "Expo Documentation", url: "https://docs.expo.dev/" },
+            { title: "React Navigation Guide", url: "https://reactnavigation.org/docs/getting-started" }
+          ],
+          links: [
+            { title: "Expo Platform", url: "https://expo.dev/" },
+            { title: "React Native Directory", url: "https://reactnative.directory/" },
+            { title: "App Store Connect", url: "https://developer.apple.com/app-store-connect/" },
+            { title: "Google Play Console", url: "https://play.google.com/console/" }
+          ]
+        }
+      },
+
+      // 24. Flutter & Dart Complete Course
+      {
+        title: "Flutter & Dart Complete Course",
+        instructor: "Maximilian Schwarzmüller",
+        category: "Mobile Development",
+        level: "Beginner",
+        duration: "12 weeks",
+        description: "Cross-platform mobile apps with Flutter, Dart, Firebase integration",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 4450,
+        rating: 4.8,
+        ratingCount: 1180,
+        resources: {
+          videos: [
+            { title: "Flutter Full Course", url: "https://www.youtube.com/watch?v=VPvVDiRtE7c", platform: "YouTube", videoId: "VPvVDiRtE7c" },
+            { title: "Dart Programming Tutorial", url: "https://www.youtube.com/watch?v=5xlVP049Itw", platform: "YouTube", videoId: "5xlVP049Itw" },
+            { title: "Flutter State Management", url: "https://www.youtube.com/watch?v=ShnX5fF5T8c", platform: "YouTube", videoId: "ShnX5fF5T8c" },
+            { title: "Flutter + Firebase", url: "https://www.youtube.com/watch?v=sz4slPFwEvs", platform: "YouTube", videoId: "sz4slPFwEvs" }
+          ],
+          pdfs: [
+            { title: "Flutter Documentation", url: "https://docs.flutter.dev/" },
+            { title: "Dart Language Tour", url: "https://dart.dev/language" },
+            { title: "Flutter Cookbook", url: "https://docs.flutter.dev/cookbook" }
+          ],
+          links: [
+            { title: "Flutter Dev", url: "https://flutter.dev/" },
+            { title: "Pub.dev Packages", url: "https://pub.dev/" },
+            { title: "FlutterFire", url: "https://firebase.flutter.dev/" },
+            { title: "Flutter Samples", url: "https://flutter.github.io/samples/" }
+          ]
+        }
+      },
+
+      // 25. UI/UX Design with Figma
+      {
+        title: "UI/UX Design with Figma",
+        instructor: "Mizko",
+        category: "Design",
+        level: "Beginner",
+        duration: "10 weeks",
+        description: "User research, wireframing, prototyping, design systems in Figma",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 5120,
+        rating: 4.9,
+        ratingCount: 1320,
+        resources: {
+          videos: [
+            { title: "Figma UI/UX Design Tutorial", url: "https://www.youtube.com/watch?v=jwCmIBjm8NM", platform: "YouTube", videoId: "jwCmIBjm8NM" },
+            { title: "UX Design Full Course", url: "https://www.youtube.com/watch?v=9B0mtpd0hXc", platform: "YouTube", videoId: "9B0mtpd0hXc" },
+            { title: "Figma Auto Layout", url: "https://www.youtube.com/watch?v=HZuk6Wkx_Eg", platform: "YouTube", videoId: "HZuk6Wkx_Eg" },
+            { title: "Design System in Figma", url: "https://www.youtube.com/watch?v=RYDiDpW2VkM", platform: "YouTube", videoId: "RYDiDpW2VkM" }
+          ],
+          pdfs: [
+            { title: "Figma Learn Resources", url: "https://help.figma.com/hc/en-us" },
+            { title: "Laws of UX", url: "https://lawsofux.com/" },
+            { title: "Material Design Guidelines", url: "https://m3.material.io/" }
+          ],
+          links: [
+            { title: "Figma Community", url: "https://www.figma.com/community" },
+            { title: "Dribbble Inspiration", url: "https://dribbble.com/" },
+            { title: "Behance Portfolio", url: "https://www.behance.net/" },
+            { title: "Google UX Design Certificate", url: "https://grow.google/uxdesign/" }
+          ]
+        }
+      },
+
+      // 26. SQL & PostgreSQL Mastery
+      {
+        title: "SQL & PostgreSQL Mastery",
+        instructor: "Amigoscode",
+        category: "Data Science",
+        level: "Beginner",
+        duration: "8 weeks",
+        description: "SQL queries, joins, indexes, PostgreSQL, database design",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 5890,
+        rating: 4.9,
+        ratingCount: 1480,
+        resources: {
+          videos: [
+            { title: "SQL Full Course", url: "https://www.youtube.com/watch?v=HXV3zeQKqGY", platform: "YouTube", videoId: "HXV3zeQKqGY" },
+            { title: "PostgreSQL Tutorial", url: "https://www.youtube.com/watch?v=qw--VYLpxG4", platform: "YouTube", videoId: "qw--VYLpxG4" },
+            { title: "Advanced SQL Queries", url: "https://www.youtube.com/watch?v=R3g4T3b4O3M", platform: "YouTube", videoId: "R3g4T3b4O3M" },
+            { title: "Database Design Tutorial", url: "https://www.youtube.com/watch?v=ztHopE5Wnpc", platform: "YouTube", videoId: "ztHopE5Wnpc" }
+          ],
+          pdfs: [
+            { title: "PostgreSQL Documentation", url: "https://www.postgresql.org/docs/" },
+            { title: "SQL Style Guide", url: "https://www.sqlstyle.guide/" },
+            { title: "Use The Index, Luke", url: "https://use-the-index-luke.com/" }
+          ],
+          links: [
+            { title: "SQLBolt Interactive", url: "https://sqlbolt.com/" },
+            { title: "LeetCode Database", url: "https://leetcode.com/problemset/database/" },
+            { title: "Mode SQL Tutorial", url: "https://mode.com/sql-tutorial/" },
+            { title: "DB Fiddle", url: "https://www.db-fiddle.com/" }
+          ]
+        }
+      },
+
+      // 27. Java Spring Boot Microservices
+      {
+        title: "Java Spring Boot Microservices",
+        instructor: "Amigoscode",
+        category: "Programming",
+        level: "Intermediate",
+        duration: "14 weeks",
+        description: "Spring Boot, REST APIs, JPA, microservices, Docker deployment",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 3670,
+        rating: 4.8,
+        ratingCount: 890,
+        resources: {
+          videos: [
+            { title: "Spring Boot Full Course", url: "https://www.youtube.com/watch?v=9SGDpanrc8U", platform: "YouTube", videoId: "9SGDpanrc8U" },
+            { title: "Java Full Course", url: "https://www.youtube.com/watch?v=eIrMbAQSU34", platform: "YouTube", videoId: "eIrMbAQSU34" },
+            { title: "Spring Boot Microservices", url: "https://www.youtube.com/watch?v=mPPhcU7odQM", platform: "YouTube", videoId: "mPPhcU7odQM" },
+            { title: "Spring Security Tutorial", url: "https://www.youtube.com/watch?v=Gj5o4HqSTyA", platform: "YouTube", videoId: "Gj5o4HqSTyA" }
+          ],
+          pdfs: [
+            { title: "Spring Boot Reference", url: "https://docs.spring.io/spring-boot/docs/current/reference/html/" },
+            { title: "Effective Java (Guide)", url: "https://www.oracle.com/java/technologies/javase/codeconventions-contents.html" },
+            { title: "Microservices Patterns", url: "https://microservices.io/patterns/index.html" }
+          ],
+          links: [
+            { title: "Spring Initializr", url: "https://start.spring.io/" },
+            { title: "Spring Guides", url: "https://spring.io/guides" },
+            { title: "Baeldung Tutorials", url: "https://www.baeldung.com/" },
+            { title: "Java Documentation", url: "https://docs.oracle.com/en/java/" }
+          ]
+        }
+      },
+
+      // 28. AWS Solutions Architect Certification Prep
+      {
+        title: "AWS Solutions Architect Certification Prep",
+        instructor: "Stephane Maarek",
+        category: "Cloud & DevOps",
+        level: "Intermediate",
+        duration: "10 weeks",
+        description: "EC2, S3, RDS, Lambda, VPC — pass the AWS SAA-C03 exam",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 4230,
+        rating: 4.9,
+        ratingCount: 1150,
+        resources: {
+          videos: [
+            { title: "AWS Solutions Architect Course", url: "https://www.youtube.com/watch?v=Ia-UEzM3DuI", platform: "YouTube", videoId: "Ia-UEzM3DuI" },
+            { title: "AWS EC2 Deep Dive", url: "https://www.youtube.com/watch?v=7m_q1ldzw0U", platform: "YouTube", videoId: "7m_q1ldzw0U" },
+            { title: "AWS S3 Complete Guide", url: "https://www.youtube.com/watch?v=77lMCiiMilo", platform: "YouTube", videoId: "77lMCiiMilo" },
+            { title: "AWS Lambda Tutorial", url: "https://www.youtube.com/watch?v=eOBq__bYWQo", platform: "YouTube", videoId: "eOBq__bYWQo" }
+          ],
+          pdfs: [
+            { title: "AWS SAA Exam Guide", url: "https://d1.awsstatic.com/training-and-certification/docs-sa-assoc/AWS-Certified-Solutions-Architect-Associate_Exam-Guide.pdf" },
+            { title: "AWS Well-Architected Framework", url: "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html" },
+            { title: "AWS Whitepapers", url: "https://aws.amazon.com/whitepapers/" }
+          ],
+          links: [
+            { title: "AWS Skill Builder", url: "https://skillbuilder.aws/" },
+            { title: "AWS Free Tier", url: "https://aws.amazon.com/free/" },
+            { title: "Tutorials Dojo Practice", url: "https://tutorialsdojo.com/" },
+            { title: "AWS Architecture Icons", url: "https://aws.amazon.com/architecture/icons/" }
+          ]
+        }
+      },
+
+      // 29. Competitive Programming Bootcamp
+      {
+        title: "Competitive Programming Bootcamp",
+        instructor: "William Lin",
+        category: "Programming",
+        level: "Advanced",
+        duration: "20 weeks",
+        description: "Codeforces, AtCoder, ICPC prep — advanced algorithms & math",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 2890,
+        rating: 4.9,
+        ratingCount: 720,
+        resources: {
+          videos: [
+            { title: "Competitive Programming Course", url: "https://www.youtube.com/watch?v=8hly31xKli0", platform: "YouTube", videoId: "8hly31xKli0" },
+            { title: "CP Algorithms Explained", url: "https://www.youtube.com/watch?v=09_LlHjoEiY", platform: "YouTube", videoId: "09_LlHjoEiY" },
+            { title: "Number Theory for CP", url: "https://www.youtube.com/watch?v=ugFnF67t6PI", platform: "YouTube", videoId: "ugFnF67t6PI" },
+            { title: "Segment Trees Tutorial", url: "https://www.youtube.com/watch?v=O26YVNm0xA0", platform: "YouTube", videoId: "O26YVNm0xA0" }
+          ],
+          pdfs: [
+            { title: "Competitive Programmer's Handbook", url: "https://cses.fi/book/book.pdf" },
+            { title: "CP-Algorithms", url: "https://cp-algorithms.com/" },
+            { title: "USACO Guide", url: "https://usaco.guide/" }
+          ],
+          links: [
+            { title: "Codeforces", url: "https://codeforces.com/" },
+            { title: "AtCoder", url: "https://atcoder.jp/" },
+            { title: "CSES Problem Set", url: "https://cses.fi/problemset/" },
+            { title: "CodeChef", url: "https://www.codechef.com/" }
+          ]
+        }
+      },
+
+      // 30. Digital Marketing & SEO Fundamentals
+      {
+        title: "Digital Marketing & SEO Fundamentals",
+        instructor: "Neil Patel",
+        category: "Business",
+        level: "Beginner",
+        duration: "8 weeks",
+        description: "SEO, Google Analytics, social media marketing, content strategy",
+        ownerId: instructorUser._id,
+        isPublished: true,
+        isActive: true,
+        price: 0,
+        enrollmentCount: 3560,
+        rating: 4.7,
+        ratingCount: 810,
+        resources: {
+          videos: [
+            { title: "Digital Marketing Full Course", url: "https://www.youtube.com/watch?v=ZVuToMilP0A", platform: "YouTube", videoId: "ZVuToMilP0A" },
+            { title: "SEO Tutorial for Beginners", url: "https://www.youtube.com/watch?v=xsVTqzratPs", platform: "YouTube", videoId: "xsVTqzratPs" },
+            { title: "Google Analytics 4 Tutorial", url: "https://www.youtube.com/watch?v=G6X1o8eX5Hk", platform: "YouTube", videoId: "G6X1o8eX5Hk" },
+            { title: "Social Media Marketing", url: "https://www.youtube.com/watch?v=9UdYB2Og4HE", platform: "YouTube", videoId: "9UdYB2Og4HE" }
+          ],
+          pdfs: [
+            { title: "Google SEO Starter Guide", url: "https://developers.google.com/search/docs/fundamentals/seo-starter-guide" },
+            { title: "HubSpot Marketing Guide", url: "https://www.hubspot.com/marketing" },
+            { title: "Content Marketing Institute", url: "https://contentmarketinginstitute.com/" }
+          ],
+          links: [
+            { title: "Google Search Console", url: "https://search.google.com/search-console" },
+            { title: "Google Analytics", url: "https://analytics.google.com/" },
+            { title: "Ahrefs Blog", url: "https://ahrefs.com/blog/" },
+            { title: "Moz SEO Learning", url: "https://moz.com/learn/seo" }
           ]
         }
       }

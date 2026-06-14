@@ -6,7 +6,7 @@ import { Loader2, Video, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { fetchMyReels } from '@/lib/reelsApi';
 
-const API_ORIGIN = (import.meta.env.VITE_API_URL || 'http://localhost:5002/api/v1').replace(/\/api\/v1\/?$/, '');
+const API_ORIGIN = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1').replace(/\/api\/v1\/?$/, '');
 
 const resolveMediaUrl = (url: string) => {
   if (!url) return '';

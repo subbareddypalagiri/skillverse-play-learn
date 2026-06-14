@@ -55,7 +55,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 
-const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5002/api/v1").replace(/\/api\/v1\/?$/, "");
+const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1").replace(/\/api\/v1\/?$/, "");
 
 const FEED_MODES: Array<{ key: FeedMode; label: string }> = [
   { key: "latest", label: "Latest" },

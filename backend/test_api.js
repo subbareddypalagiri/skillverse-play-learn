@@ -1,6 +1,6 @@
 import http from 'http';
 
-http.get('http://localhost:5002/api/v1/courses', (res) => {
+http.get('http://localhost:5000/api/v1/courses', (res) => {
   let data = '';
   res.on('data', (chunk) => data += chunk);
   res.on('end', () => {

@@ -18,6 +18,7 @@
     "seed:all": "node seeds/seedAll.js",
     "seed:reels": "node seeds/seedReels.js --force",
     "seed:complete": "node runSeeds.js",
+    "seed:massive": "node seeds/seedMassiveData.js",
     "seed:users": "node seeds/seedUsers.js",
     "seed:courses": "node seeds/seedCourses.js",
     "seed:problems": "node seeds/seedProblems.js",

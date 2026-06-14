@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5002/api/v1").replace(/\/api\/v1\/?$/, "");
+const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1").replace(/\/api\/v1\/?$/, "");
 
 const resolveMediaUrl = (url: string) => {
   if (!url) return "";

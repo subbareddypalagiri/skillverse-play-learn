@@ -19,15 +19,13 @@ import {
   Play,
   Loader2,
   ChevronUp,
-  ChevronDown,
-  Plus
+  ChevronDown
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ReelUploadModal } from "./ReelUploadModal";
 
-const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5002/api/v1").replace(/\/api\/v1\/?$/, "");
+const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1").replace(/\/api\/v1\/?$/, "");
 
 const resolveMediaUrl = (url: string) => {
   if (!url) return "";
@@ -214,7 +212,6 @@ export default function ReelsTab() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
-  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [activeCommentReelId, setActiveCommentReelId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
 
@@ -402,14 +399,6 @@ export default function ReelsTab() {
         </button>
       </div>
 
-      <button
-        onClick={() => setUploadModalOpen(true)}
-        className="fixed right-6 top-24 z-40 w-14 h-14 rounded-full bg-yellow-400 hover:bg-yellow-500 flex items-center justify-center shadow-lg transition-transform hover:scale-110"
-        title="Upload reel"
-      >
-        <Plus className="w-6 h-6 text-black" />
-      </button>
-
       <Dialog open={commentDialogOpen} onOpenChange={setCommentDialogOpen}>
         <DialogContent className="bg-zinc-900 border-zinc-700 text-white">
           <DialogHeader>
@@ -438,8 +427,6 @@ export default function ReelsTab() {
           </div>
         </DialogContent>
       </Dialog>
-
-      <ReelUploadModal isOpen={uploadModalOpen} onClose={() => setUploadModalOpen(false)} />
     </>
   );
 }

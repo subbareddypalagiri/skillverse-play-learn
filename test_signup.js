@@ -4,11 +4,11 @@ const testSignup = async () => {
 
   // 1. Health check
   try {
-    const healthRes = await fetch('http://localhost:5002/health');
+    const healthRes = await fetch('http://localhost:5000/health');
     const health = await healthRes.json();
     console.log('✅ Backend is running:', health.message);
   } catch (e) {
-    console.error('❌ Backend NOT reachable at http://localhost:5002');
+    console.error('❌ Backend NOT reachable at http://localhost:5000');
     console.error('   Error:', e.message);
     console.error('\n   👉 Start the backend: cd backend && node server.js');
     return;
@@ -17,7 +17,7 @@ const testSignup = async () => {
   // 2. Test signup
   console.log('\n=== Testing Signup ===\n');
   try {
-    const res = await fetch('http://localhost:5002/api/v1/auth/register', {
+    const res = await fetch('http://localhost:5000/api/v1/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -42,7 +42,7 @@ const testSignup = async () => {
   // 3. Test login
   console.log('\n=== Testing Login ===\n');
   try {
-    const res = await fetch('http://localhost:5002/api/v1/auth/login', {
+    const res = await fetch('http://localhost:5000/api/v1/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

@@ -3,7 +3,7 @@
  * Centralized API calls for the application
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
 interface ApiResponse<T> {
   status: string;

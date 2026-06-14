@@ -1,7 +1,7 @@
-import Clubs from "./Clubs";
+import ClubDetailPage from "./ClubDetailPage";
 
 const ClubPage = () => {
-  return <Clubs />;
+  return <ClubDetailPage />;
 };
 
 export default ClubPage;

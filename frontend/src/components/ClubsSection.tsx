@@ -1,33 +1,24 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Plus, Palette, Music, Dumbbell, Code, Camera, BookOpen, Gamepad2, Coffee, Heart, MessageCircle, Crown, UserPlus, Send, Sparkles, ArrowRight } from "lucide-react";
+import { Users, Plus, Coffee, MessageCircle, Crown, UserPlus } from "lucide-react";
 import { useClubs } from "@/contexts/ClubContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { clubTypes, getClubTypeConfig } from "@/lib/clubTypes";
 
 const ClubsSection = () => {
-  const { clubs, createClub, joinClub, addPost, likePost, addComment, isUserMember, isUserAdmin } = useClubs();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { clubs, createClub, joinClub, isUserMember, isUserAdmin } = useClubs();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [selectedClub, setSelectedClub] = useState<string | null>(null);
-  const [newPost, setNewPost] = useState({ content: '', mediaUrl: '' });
-  const [newComment, setNewComment] = useState('');
-  const currentUser = { id: 'user123', name: 'John Student' };
+  const currentUser = { id: user?._id || 'guest', name: user?.name || 'Guest User' };
 
   const [newClub, setNewClub] = useState({
     name: '', category: 'hobby' as 'hobby' | 'club', type: 'art',
     description: '', coverImage: '', isActive: true,
   });
-
-  const clubTypes = [
-    { type: 'art', icon: Palette, label: 'Art & Design' },
-    { type: 'music', icon: Music, label: 'Music' },
-    { type: 'sports', icon: Dumbbell, label: 'Sports' },
-    { type: 'tech', icon: Code, label: 'Technology' },
-    { type: 'photography', icon: Camera, label: 'Photography' },
-    { type: 'reading', icon: BookOpen, label: 'Reading' },
-    { type: 'gaming', icon: Gamepad2, label: 'Gaming' },
-    { type: 'other', icon: Coffee, label: 'Other' },
-  ];
 
   const handleCreateClub = () => {
     createClub({ ...newClub, adminId: currentUser.id, adminName: currentUser.name });
@@ -35,22 +26,13 @@ const ClubsSection = () => {
     setNewClub({ name: '', category: 'hobby', type: 'art', description: '', coverImage: '', isActive: true });
   };
 
-  const handleJoinClub = (clubId: string) => joinClub(clubId, currentUser.id, currentUser.name);
-  const handleAddPost = (clubId: string) => {
-    if (!newPost.content.trim()) return;
-    addPost(clubId, { clubId, userId: currentUser.id, userName: currentUser.name, content: newPost.content, mediaUrl: newPost.mediaUrl });
-    setNewPost({ content: '', mediaUrl: '' });
-  };
-  const handleAddComment = (clubId: string, postId: string) => {
-    if (!newComment.trim()) return;
-    addComment(clubId, postId, { userId: currentUser.id, userName: currentUser.name, content: newComment });
-    setNewComment('');
+  const handleJoinClub = (clubId: string) => {
+    joinClub(clubId, currentUser.id, currentUser.name);
+    navigate(`/clubs/${clubId}`);
   };
 
-  const selectedClubData = clubs.find(c => c.id === selectedClub);
-
-  const ClubCard = ({ club, showMemberBadge = false }: { club: any; showMemberBadge?: boolean }) => {
-    const typeConfig = clubTypes.find(t => t.type === club.type);
+  const ClubCard = ({ club }: { club: any }) => {
+    const typeConfig = getClubTypeConfig(club.type);
     const Icon = typeConfig?.icon || Coffee;
     const isMember = isUserMember(club.id, currentUser.id);
     const isAdmin = isUserAdmin(club.id, currentUser.id);
@@ -87,7 +69,7 @@ const ClubsSection = () => {
             <span className="flex items-center gap-1"><MessageCircle className="w-3 h-3" />{club.posts.length}</span>
           </div>
           {isMember ? (
-            <button onClick={() => setSelectedClub(club.id)}
+            <button onClick={() => navigate(`/clubs/${club.id}`)}
               className="w-full py-2 rounded-xl text-xs font-semibold text-white transition-all hover:shadow-[0_0_12px_rgba(124,58,237,0.25)]"
               style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
               Open Club
@@ -141,7 +123,7 @@ const ClubsSection = () => {
         <TabsContent value="my-clubs">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {clubs.filter(c => isUserMember(c.id, currentUser.id)).map(club => (
-              <ClubCard key={club.id} club={club} showMemberBadge />
+              <ClubCard key={club.id} club={club} />
             ))}
             {clubs.filter(c => isUserMember(c.id, currentUser.id)).length === 0 && (
               <div className="col-span-full text-center py-14">
@@ -201,85 +183,6 @@ const ClubsSection = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Club View Dialog */}
-      {selectedClubData && (
-        <Dialog open={!!selectedClub} onOpenChange={() => setSelectedClub(null)}>
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl"
-            style={{ background: 'hsl(230,25%,7%)', border: '1px solid hsl(230,20%,14%)' }}>
-            <DialogHeader>
-              <DialogTitle className="text-foreground" style={{ fontFamily: 'Sora, sans-serif' }}>{selectedClubData.name}</DialogTitle>
-              <p className="text-sm text-muted-foreground">{selectedClubData.description}</p>
-            </DialogHeader>
-            <div className="space-y-5">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/15 text-primary">
-                  {selectedClubData.members.length} members
-                </span>
-                <span className="text-xs text-muted-foreground">{selectedClubData.posts.length} posts</span>
-              </div>
-
-              {/* Create Post */}
-              <div className="rounded-2xl border border-border/50 p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                <h4 className="font-semibold text-sm text-foreground mb-3">Share with the club</h4>
-                <Textarea value={newPost.content} onChange={e => setNewPost({ ...newPost, content: e.target.value })}
-                  placeholder="What's on your mind?" rows={2}
-                  className="premium-input resize-none mb-3" />
-                <button onClick={() => handleAddPost(selectedClubData.id)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold text-white transition-all"
-                  style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
-                  <Send className="w-3.5 h-3.5" /> Post
-                </button>
-              </div>
-
-              {/* Posts */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-sm text-foreground">Club Feed</h4>
-                {selectedClubData.posts.map((post: any) => (
-                  <div key={post.id} className="rounded-xl border border-border/40 p-4 hover:border-primary/25 transition-colors"
-                    style={{ background: 'rgba(255,255,255,0.015)' }}>
-                    <div className="flex items-center gap-2.5 mb-2.5">
-                      <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-primary text-xs font-bold flex-shrink-0">
-                        {post.userName[0]}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-xs text-foreground">{post.userName}</p>
-                        <p className="text-[10px] text-muted-foreground">{new Date(post.timestamp).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                    <p className="text-sm text-foreground/85 leading-relaxed mb-3">{post.content}</p>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground border-t border-border/30 pt-3">
-                      <button onClick={() => likePost(selectedClubData.id, post.id, currentUser.id)}
-                        className="flex items-center gap-1.5 hover:text-pink-400 transition-colors">
-                        <Heart className="w-3.5 h-3.5" />{post.likes.length}
-                      </button>
-                      <span className="flex items-center gap-1"><MessageCircle className="w-3.5 h-3.5" />{post.comments.length}</span>
-                    </div>
-                    {/* Comments */}
-                    {post.comments.map((c: any) => (
-                      <div key={c.id} className="mt-2 ml-4 text-xs text-muted-foreground flex gap-1.5">
-                        <span className="font-semibold text-foreground/70">{c.userName}:</span>
-                        <span>{c.content}</span>
-                      </div>
-                    ))}
-                    <div className="flex gap-2 mt-3">
-                      <input value={newComment} onChange={e => setNewComment(e.target.value)}
-                        placeholder="Comment..." onKeyDown={e => e.key === 'Enter' && handleAddComment(selectedClubData.id, post.id)}
-                        className="flex-1 bg-white/4 border border-border/40 rounded-xl px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/40 transition-colors" />
-                      <button onClick={() => handleAddComment(selectedClubData.id, post.id)}
-                        className="p-2 rounded-xl text-white" style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
-                        <Send className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                {selectedClubData.posts.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-6">No posts yet — be the first to share!</p>
-                )}
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };

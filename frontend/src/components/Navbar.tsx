@@ -1,52 +1,53 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Award, User, Waves, Zap, Settings, UserCircle, LogOut, X, Menu, ChevronRight, MoreHorizontal } from "lucide-react";
+import { Home, LayoutDashboard, BookOpen, Calendar, Briefcase, Award, User, Waves, Zap, Settings, UserCircle, LogOut, X, Menu, ChevronDown, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
-const navigation = [
-  { name: "Home", path: "/", icon: Home },
-  { name: "Courses", path: "/courses", icon: BookOpen },
-  { name: "Vibe", path: "/vibe", icon: Zap },
-  { name: "Events", path: "/events", icon: Calendar },
-  { name: "Career", path: "/career", icon: Briefcase },
+const primaryNavigation = [
+  { name: "Home", path: "/" },
+  { name: "Courses", path: "/courses" },
+  { name: "Vibe", path: "/vibe" },
+  { name: "Career", path: "/career" },
+  { name: "Dashboard", path: "/dashboard" },
 ];
 
-const moreNavigation = [
-  { name: "Sync", path: "/sync", icon: Waves },
-  { name: "Achievements", path: "/achievements", icon: Award },
-  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+const eventsDropdown = [
+  { name: "Sync", path: "/sync" },
+  { name: "Achievements", path: "/achievements" },
 ];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [moreDropdown, setMoreDropdown] = useState(false);
+  const [eventsDropdownOpen, setEventsDropdownOpen] = useState(false);
+  const [homeNavOpen, setHomeNavOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const isLoggedIn = !!user;
-  const dropdownRef = useRef(null);
+  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    setHomeNavOpen(false);
+  }, [isHomePage]);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setMoreDropdown(false);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setEventsDropdownOpen(false);
       }
     };
-    if (moreDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [moreDropdown]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
     setMobileOpen(false);
@@ -54,305 +55,303 @@ const Navbar = () => {
     navigate('/');
   };
 
+  const closeMobile = () => setMobileOpen(false);
+
   return (
     <>
-      <nav className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-        scrolled
-          ? "bg-background/85 backdrop-blur-2xl border-b border-border/60 shadow-[0_1px_30px_rgba(0,0,0,0.3)]"
-          : "bg-transparent"
-      )}>
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="flex items-center gap-4 h-[64px]">
+      {isHomePage && (
+        <div
+          onMouseEnter={() => setHomeNavOpen(true)}
+          className="fixed top-0 left-0 right-0 z-[60] h-6"
+        />
+      )}
 
+      <nav
+        onMouseLeave={() => isHomePage && setHomeNavOpen(false)}
+        className={cn(
+          "left-0 right-0 z-50 transition-all duration-700 ease-expo-out",
+          isHomePage
+            ? cn(
+                "absolute top-5 mx-auto max-w-6xl left-5 right-5 rounded-[20px]",
+                "bg-[#09090b]/80 backdrop-blur-2xl",
+                "border border-[#ffffff08]",
+                "shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_20px_50px_-12px_rgba(0,0,0,0.5)]",
+                homeNavOpen 
+                  ? "opacity-100 translate-y-0" 
+                  : "opacity-0 -translate-y-2 pointer-events-none"
+              )
+            : cn(
+                "fixed top-0",
+                scrolled 
+                  ? "bg-[#09090b]/95 backdrop-blur-2xl shadow-[0_1px_0_0_rgba(255,255,255,0.03),0_20px_40px_-15px_rgba(0,0,0,0.4)]" 
+                  : "bg-[#09090b]/60 backdrop-blur-xl",
+                "border-b border-[#ffffff05]"
+              )
+        )}
+      >
+        <div className="max-w-6xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
-              <div className="relative w-9 h-9 rounded-xl overflow-hidden ring-1 ring-white/10 group-hover:ring-primary/40 transition-all duration-300 shadow-lg">
-                <img src="/Risee.png" alt="Risee" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            <Link 
+              to="/" 
+              className="flex items-center gap-2.5 group" 
+              onClick={closeMobile}
+            >
+              <div className="relative w-9 h-9 rounded-xl overflow-hidden bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 p-[1px] shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+                <div className="w-full h-full rounded-[10px] overflow-hidden bg-[#09090b]">
+                  <img 
+                    src="/Risee.png" 
+                    alt="Risee" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
-              <span className="text-lg font-bold text-gradient hidden sm:block" style={{fontFamily:'Sora,sans-serif'}}>
+              <span className="text-[19px] font-bold tracking-[-0.03em] text-white">
                 Risee
               </span>
             </Link>
 
             {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-0.5 flex-1 justify-center">
-              {navigation.map((item) => {
-                const Icon = item.icon;
+            <div className="hidden lg:flex items-center gap-0.5">
+              {primaryNavigation.map((item) => {
                 const isActive = location.pathname === item.path;
                 return (
-                  <Link key={item.path} to={item.path}
+                  <Link
+                    key={item.path}
+                    to={item.path}
                     className={cn(
-                      "relative flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 group",
+                      "relative px-4 py-2 text-[14px] font-medium tracking-[-0.01em] rounded-lg transition-all duration-200",
                       isActive
                         ? "text-white"
-                        : "text-muted-foreground hover:text-foreground"
+                        : "text-[#a1a1aa] hover:text-white"
                     )}
                   >
+                    {item.name}
                     {isActive && (
-                      <span className="absolute inset-0 rounded-xl bg-primary/90 shadow-[0_0_15px_rgba(124,58,237,0.4)]" />
+                      <span className="absolute inset-0 rounded-lg bg-white/[0.06]" />
                     )}
-                    {!isActive && (
-                      <span className="absolute inset-0 rounded-xl bg-white/0 hover:bg-white/5 transition-colors duration-200" />
-                    )}
-                    <Icon className={cn("w-3.5 h-3.5 relative z-10 transition-transform duration-300", !isActive && "group-hover:scale-110")} />
-                    <span className="relative z-10">{item.name}</span>
                   </Link>
                 );
               })}
 
-              {/* More Dropdown */}
-              <div ref={dropdownRef} className="relative">
+              {/* Events Dropdown */}
+              <div className="relative" ref={dropdownRef}>
                 <button
-                  onClick={() => setMoreDropdown(!moreDropdown)}
+                  onClick={() => setEventsDropdownOpen(!eventsDropdownOpen)}
                   className={cn(
-                    "relative flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 group",
-                    moreNavigation.some(item => location.pathname === item.path)
-                      ? "text-white"
-                      : "text-muted-foreground hover:text-foreground"
+                    "flex items-center gap-1 px-4 py-2 text-[14px] font-medium tracking-[-0.01em] rounded-lg transition-all duration-200",
+                    (location.pathname === "/events" || eventsDropdown.some(item => location.pathname === item.path))
+                      ? "text-white bg-white/[0.06]"
+                      : "text-[#a1a1aa] hover:text-white"
                   )}
                 >
-                  {moreNavigation.some(item => location.pathname === item.path) && (
-                    <span className="absolute inset-0 rounded-xl bg-primary/90 shadow-[0_0_15px_rgba(124,58,237,0.4)]" />
-                  )}
-                  {!moreNavigation.some(item => location.pathname === item.path) && (
-                    <span className="absolute inset-0 rounded-xl bg-white/0 hover:bg-white/5 transition-colors duration-200" />
-                  )}
-                  <MoreHorizontal className={cn("w-3.5 h-3.5 relative z-10 transition-transform duration-300", !moreNavigation.some(item => location.pathname === item.path) && "group-hover:scale-110")} />
-                  <span className="relative z-10">More</span>
+                  Events
+                  <ChevronDown className={cn(
+                    "w-3.5 h-3.5 transition-transform duration-300",
+                    eventsDropdownOpen && "rotate-180"
+                  )} />
                 </button>
 
-                {/* Dropdown Menu */}
-                {moreDropdown && (
-                  <div className="absolute top-full mt-2 right-0 w-48 bg-background/95 backdrop-blur-2xl border border-border/60 rounded-xl shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto">
-                    {moreNavigation.map((item) => {
-                      const Icon = item.icon;
-                      const isActive = location.pathname === item.path;
-                      return (
-                        <Link
-                          key={item.path}
-                          to={item.path}
-                          onClick={() => setMoreDropdown(false)}
-                          className={cn(
-                            "flex items-center gap-3 px-4 py-3 text-sm font-medium transition-all duration-200",
-                            isActive
-                              ? "bg-primary/20 text-primary border-l-2 border-primary"
-                              : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                          )}
-                        >
-                          <Icon className="w-4 h-4" />
-                          {item.name}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
+                <div className={cn(
+                  "absolute top-full mt-2 right-0 w-48 py-1.5 rounded-xl",
+                  "bg-[#18181b] border border-[#ffffff08]",
+                  "shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_16px_40px_-8px_rgba(0,0,0,0.6)]",
+                  "transition-all duration-200 origin-top-right",
+                  eventsDropdownOpen 
+                    ? "opacity-100 scale-100 translate-y-0" 
+                    : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+                )}>
+                  <Link
+                    to="/events"
+                    onClick={() => setEventsDropdownOpen(false)}
+                    className={cn(
+                      "block px-3.5 py-2.5 text-[13px] font-medium tracking-[-0.01em] transition-colors",
+                      location.pathname === "/events"
+                        ? "text-white bg-white/[0.05]"
+                        : "text-[#a1a1aa] hover:text-white hover:bg-white/[0.03]"
+                    )}
+                  >
+                    All Events
+                  </Link>
+                  <div className="mx-3 my-1 h-px bg-[#ffffff08]" />
+                  {eventsDropdown.map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setEventsDropdownOpen(false)}
+                      className={cn(
+                        "block px-3.5 py-2.5 text-[13px] font-medium tracking-[-0.01em] transition-colors",
+                        location.pathname === item.path
+                          ? "text-white bg-white/[0.05]"
+                          : "text-[#a1a1aa] hover:text-white hover:bg-white/[0.03]"
+                      )}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Desktop Auth */}
-            <div className="hidden md:flex items-center gap-2 flex-shrink-0">
+            {/* Right Side */}
+            <div className="hidden lg:flex items-center gap-2">
               {isLoggedIn && user ? (
-                <div className="flex items-center gap-2">
-                  <Link to="/profile" className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-white/5 transition-all duration-200 group">
-                    <div className="relative w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-md"
-                      style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)' }}>
+                <>
+                  <div className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 rounded-full bg-[#ffffff06] border border-[#ffffff08] hover:border-[#ffffff12] transition-colors duration-200">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 flex items-center justify-center text-[12px] font-semibold text-white shadow-[0_0_12px_rgba(139,92,246,0.4)]">
                       {user.name?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
-                    <span className="text-sm font-medium text-foreground/80 hidden lg:block max-w-[100px] truncate">{user.name}</span>
-                  </Link>
-                  <Link to="/settings"
-                    className={cn("p-2 rounded-xl transition-all duration-200",
-                      location.pathname === '/settings' ? "bg-primary/20 text-primary" : "hover:bg-white/5 text-muted-foreground hover:text-foreground"
-                    )}>
-                    <Settings className="w-4 h-4" />
-                  </Link>
-                  <button onClick={handleLogout}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-all duration-200">
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span className="hidden xl:block">Out</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link to="/login"
-                    className="px-4 py-2 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all duration-200">
-                    Sign in
-                  </Link>
-                  <Link to="/signup"
-                    className="relative px-4 py-2 rounded-xl text-sm font-semibold text-white overflow-hidden group transition-all duration-300 hover:shadow-[0_0_20px_rgba(124,58,237,0.4)]"
-                    style={{ background: 'linear-gradient(135deg, #7c3aed, #6366f1)' }}>
-                    <span className="relative z-10 flex items-center gap-1">
-                      Get Started
-                      <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    <span className="text-[13px] font-medium text-[#e4e4e7] tracking-[-0.01em]">
+                      {user.name}
                     </span>
-                    <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12" />
+                  </div>
+                  <Link
+                    to="/settings"
+                    className={cn(
+                      "p-2 rounded-lg transition-all duration-200",
+                      location.pathname === "/settings"
+                        ? "bg-white/[0.08] text-white"
+                        : "text-[#71717a] hover:text-[#a1a1aa] hover:bg-white/[0.04]"
+                    )}
+                  >
+                    <Settings className="w-[18px] h-[18px]" strokeWidth={1.5} />
                   </Link>
-                </div>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  className="px-5 py-2 rounded-full text-[13px] font-semibold tracking-[-0.01em] bg-white text-[#09090b] hover:bg-[#f4f4f5] transition-all duration-200 shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_2px_8px_rgba(0,0,0,0.1)]"
+                >
+                  Sign in
+                </Link>
               )}
             </div>
 
-            {/* Mobile menu button */}
+            {/* Mobile Button */}
             <button
-              className="md:hidden ml-auto p-2.5 rounded-xl hover:bg-white/5 text-foreground transition-all duration-200"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              className="lg:hidden p-2 -mr-2 rounded-lg text-[#a1a1aa] hover:text-white hover:bg-white/[0.05] transition-all duration-200"
+              onClick={() => {
+                setHomeNavOpen(true);
+                setMobileOpen(!mobileOpen);
+              }}
             >
-              <div className="relative w-5 h-5">
-                <span className={cn("absolute inset-0 transition-all duration-300", mobileOpen ? "opacity-100 rotate-0" : "opacity-0 rotate-90")}>
-                  <X className="w-5 h-5" />
-                </span>
-                <span className={cn("absolute inset-0 transition-all duration-300", mobileOpen ? "opacity-0 -rotate-90" : "opacity-100 rotate-0")}>
-                  <Menu className="w-5 h-5" />
-                </span>
-              </div>
+              {mobileOpen ? <X className="w-5 h-5" strokeWidth={1.5} /> : <Menu className="w-5 h-5" strokeWidth={1.5} />}
             </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div className={cn(
+          "lg:hidden overflow-hidden transition-all duration-300 ease-out",
+          mobileOpen ? "max-h-[70vh] opacity-100" : "max-h-0 opacity-0"
+        )}>
+          <div className="px-4 pb-6 pt-2 border-t border-[#ffffff06]">
+            <div className="space-y-0.5">
+              {primaryNavigation.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={closeMobile}
+                  className={cn(
+                    "block px-3.5 py-3 rounded-xl text-[15px] font-medium tracking-[-0.01em] transition-colors",
+                    location.pathname === item.path
+                      ? "text-white bg-white/[0.06]"
+                      : "text-[#a1a1aa] hover:text-white"
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-[#ffffff06]">
+              <p className="px-3.5 py-2 text-[11px] font-semibold text-[#52525b] uppercase tracking-[0.08em]">
+                Events
+              </p>
+              <Link
+                to="/events"
+                onClick={closeMobile}
+                className={cn(
+                  "block px-3.5 py-3 rounded-xl text-[15px] font-medium tracking-[-0.01em] transition-colors",
+                  location.pathname === "/events"
+                    ? "text-white bg-white/[0.06]"
+                    : "text-[#a1a1aa] hover:text-white"
+                )}
+              >
+                All Events
+              </Link>
+              {eventsDropdown.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={closeMobile}
+                  className={cn(
+                    "block px-3.5 py-3 rounded-xl text-[15px] font-medium tracking-[-0.01em] transition-colors",
+                    location.pathname === item.path
+                      ? "text-white bg-white/[0.06]"
+                      : "text-[#a1a1aa] hover:text-white"
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-[#ffffff06]">
+              <p className="px-3.5 py-2 text-[11px] font-semibold text-[#52525b] uppercase tracking-[0.08em]">
+                Account
+              </p>
+              <Link
+                to="/profile"
+                onClick={closeMobile}
+                className={cn(
+                  "block px-3.5 py-3 rounded-xl text-[15px] font-medium tracking-[-0.01em] transition-colors",
+                  location.pathname === "/profile"
+                    ? "text-white bg-white/[0.06]"
+                    : "text-[#a1a1aa] hover:text-white"
+                )}
+              >
+                Profile
+              </Link>
+              <Link
+                to="/settings"
+                onClick={closeMobile}
+                className={cn(
+                  "block px-3.5 py-3 rounded-xl text-[15px] font-medium tracking-[-0.01em] transition-colors",
+                  location.pathname === "/settings"
+                    ? "text-white bg-white/[0.06]"
+                    : "text-[#a1a1aa] hover:text-white"
+                )}
+              >
+                Settings
+              </Link>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-[#ffffff06]">
+              {isLoggedIn && user ? (
+                <div className="flex items-center gap-3 px-3.5 py-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 flex items-center justify-center text-[14px] font-semibold text-white shadow-[0_0_16px_rgba(139,92,246,0.4)]">
+                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                  <div>
+                    <p className="text-[14px] font-semibold text-white tracking-[-0.01em]">{user.name}</p>
+                    <p className="text-[12px] text-[#71717a]">{user.email}</p>
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={closeMobile}
+                  className="block w-full py-3 rounded-full text-center text-[14px] font-semibold tracking-[-0.01em] bg-white text-[#09090b] hover:bg-[#f4f4f5] transition-colors"
+                >
+                  Sign in
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </nav>
-
-      {/* Mobile Drawer */}
-      <div className={cn(
-        "fixed inset-0 z-40 md:hidden transition-all duration-500",
-        mobileOpen ? "pointer-events-auto" : "pointer-events-none"
-      )}>
-        {/* Backdrop */}
-        <div
-          className={cn("absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-500", mobileOpen ? "opacity-100" : "opacity-0")}
-          onClick={() => setMobileOpen(false)}
-        />
-        {/* Drawer */}
-        <div className={cn(
-          "absolute top-0 right-0 h-full w-[280px] bg-background/95 backdrop-blur-2xl border-l border-border/60 shadow-2xl transition-transform duration-500",
-          mobileOpen ? "translate-x-0" : "translate-x-full"
-        )}>
-          <div className="flex items-center justify-between p-5 border-b border-border/40">
-            <Link to="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg overflow-hidden ring-1 ring-white/10">
-                <img src="/Risee.png" alt="Risee" className="w-full h-full object-cover" />
-              </div>
-              <span className="font-bold text-gradient" style={{fontFamily:'Sora,sans-serif'}}>Risee</span>
-            </Link>
-            <button onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-white/5 text-muted-foreground">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="p-4 space-y-1">
-            {navigation.map((item, i) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-              return (
-                <Link key={item.path} to={item.path} onClick={() => setMobileOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
-                    isActive
-                      ? "bg-primary/20 text-primary border border-primary/20"
-                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                  )}
-                  style={{ animationDelay: `${i * 40}ms` }}
-                >
-                  <Icon className="w-4 h-4" />
-                  {item.name}
-                  {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto text-primary" />}
-                </Link>
-              );
-            })}
-
-            {/* Mobile More Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setMoreDropdown(!moreDropdown)}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
-                  moreNavigation.some(item => location.pathname === item.path)
-                    ? "bg-primary/20 text-primary border border-primary/20"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                )}
-              >
-                <MoreHorizontal className="w-4 h-4" />
-                More
-                {moreDropdown && <ChevronRight className="w-3.5 h-3.5 ml-auto text-primary rotate-90" />}
-              </button>
-
-              {/* Mobile More Dropdown Menu */}
-              {moreDropdown && (
-                <div className="mt-2 ml-4 space-y-1 border-l-2 border-primary/40 pl-2">
-                  {moreNavigation.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = location.pathname === item.path;
-                    return (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        onClick={() => {
-                          setMoreDropdown(false);
-                          setMobileOpen(false);
-                        }}
-                        className={cn(
-                          "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
-                          isActive
-                            ? "bg-primary/20 text-primary border border-primary/20"
-                            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                        )}
-                      >
-                        <Icon className="w-4 h-4" />
-                        {item.name}
-                        {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto text-primary" />}
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border/40">
-            {isLoggedIn && user ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/3">
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                    style={{ background: 'linear-gradient(135deg,#7c3aed,#06b6d4)' }}>
-                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{user.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                  </div>
-                </div>
-                <Link to="/profile" onClick={() => setMobileOpen(false)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-foreground hover:bg-white/5 transition-all duration-200">
-                  <UserCircle className="w-4 h-4" />
-                  My Profile
-                </Link>
-                <Link to="/settings" onClick={() => setMobileOpen(false)}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-foreground hover:bg-white/5 transition-all duration-200">
-                  <Settings className="w-4 h-4" />
-                  Settings
-                </Link>
-                <button onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-all duration-200">
-                  <LogOut className="w-4 h-4" />
-                  Sign out
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Link to="/login" onClick={() => setMobileOpen(false)}
-                  className="block w-full text-center py-3 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
-                  Sign in
-                </Link>
-                <Link to="/signup" onClick={() => setMobileOpen(false)}
-                  className="block w-full text-center py-3 rounded-xl text-sm font-semibold text-white transition-all"
-                  style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
-                  Get Started Free
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
     </>
   );
 };
