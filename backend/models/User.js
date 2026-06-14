@@ -24,8 +24,13 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['student', 'instructor', 'teaching_assistant', 'moderator', 'admin', 'recruiter', 'company_admin'],
+    enum: ['student', 'instructor', 'teaching_assistant', 'moderator', 'admin', 'recruiter', 'company_admin', 'campus_ambassador'],
     default: 'student'
+  },
+  collegeName: {
+    type: String,
+    trim: true,
+    default: null
   },
   company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' },
   

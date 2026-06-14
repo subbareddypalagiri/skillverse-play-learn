@@ -1,91 +1,101 @@
 import mongoose from 'mongoose';
 
-const eventSchema = new mongoose.Schema({
-  // Basic Info
-  title: {
-    type: String,
-    required: true,
-    trim: true
+const tourDetailsSchema = new mongoose.Schema({
+  destinations: [{ name: String, description: String, arrivalTime: String }],
+  food: { meals: String, snacks: String, dietaryOptions: String },
+  planner: { name: String, organization: String, contact: String },
+  bus: {
+    busNumber: String,
+    pickupPoint: String,
+    departureTime: String,
+    returnTime: String,
+    driverName: String,
+    driverContact: String,
+    capacity: Number
   },
+  itinerary: String,
+  thingsToCarry: [String]
+}, { _id: false });
+
+const eventSchema = new mongoose.Schema({
+  title: { type: String, required: true, trim: true },
   description: String,
-  
-  // Event Type
+
   eventType: {
     type: String,
-    enum: ['webinar', 'workshop', 'hackathon', 'meetup', 'conference', 'live_class'],
+    enum: ['webinar', 'workshop', 'hackathon', 'meetup', 'conference', 'live_class', 'tour', 'seminar', 'networking', 'cultural', 'competition'],
     required: true
   },
-  
-  // Location & Online Info
+
+  category: {
+    type: String,
+    enum: ['cultural', 'technical', 'non-technical', 'fun-tours', 'industrial-tours', 'hackathons'],
+    default: 'technical'
+  },
+
+  campusLocation: {
+    type: String,
+    enum: ['In Campus', 'Out of Campus'],
+    default: 'In Campus'
+  },
+
+  mode: { type: String, enum: ['online', 'offline'], default: 'offline' },
+  type: { type: String, default: 'Event' },
+
+  venue: String,
+  duration: String,
+  displayDate: String,
+  displayTime: String,
+
   location: String,
   isOnline: { type: Boolean, default: false },
   eventLink: String,
-  
-  // Time
-  startDate: {
-    type: Date,
-    required: true
-  },
-  endDate: {
-    type: Date,
-    required: true
-  },
-  
-  // Course Association (Optional)
-  linkedCourse: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course'
-  },
-  
-  // Organizer
-  organizerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  
-  // Access Control
+
+  startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
+
+  linkedCourse: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+
+  organizerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  collegeName: String,
+
+  tourDetails: tourDetailsSchema,
+
   visibility: {
     type: String,
     enum: ['public', 'private', 'course_members_only'],
     default: 'public'
   },
   allowedRoles: [String],
-  
-  // Capacity
+
   capacity: { type: Number, default: null },
   registeredCount: { type: Number, default: 0 },
-  
-  // Recording
+
   hasRecording: { type: Boolean, default: false },
   recordingUrl: String,
-  
-  // Status
+
   isActive: { type: Boolean, default: true },
   isCancelled: { type: Boolean, default: false },
-  
-  // Soft Delete
+
   isDeleted: { type: Boolean, default: false, index: true },
   deletedAt: Date,
-  
-  // Audit
+
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   updatedAt: { type: Date, default: Date.now },
   version: { type: Number, default: 1 }
-}, {
-  timestamps: true
-});
+}, { timestamps: true });
 
-// Indexes
 eventSchema.index({ startDate: 1 });
 eventSchema.index({ eventType: 1 });
+eventSchema.index({ category: 1 });
+eventSchema.index({ campusLocation: 1 });
 eventSchema.index({ organizerId: 1 });
+eventSchema.index({ collegeName: 1 });
 eventSchema.index({ visibility: 1 });
 eventSchema.index({ title: 'text', description: 'text' });
 
-// Query middleware
 eventSchema.pre(['find', 'findOne'], function (next) {
   if (!this.getOptions().includeDeleted) {
     this.where({ isDeleted: false });

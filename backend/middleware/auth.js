@@ -26,6 +26,26 @@ export const authenticate = async (req, res, next) => {
   }
 };
 
+export const optionalAuthenticate = async (req, res, next) => {
+  try {
+    const authHeader = req.get('authorization');
+    if (!authHeader) return next();
+
+    const token = extractTokenFromHeader(authHeader);
+    const decoded = verifyToken(token);
+    const User = (await import('../models/User.js')).default;
+    const user = await User.findById(decoded.userId).lean();
+
+    if (user) {
+      req.user = user;
+      req.userId = user._id;
+    }
+    next();
+  } catch {
+    next();
+  }
+};
+
 export const authorize = (...allowedRoles) => {
   return (req, res, next) => {
     try {

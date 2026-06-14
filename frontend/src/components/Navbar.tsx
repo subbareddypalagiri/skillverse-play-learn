@@ -198,14 +198,30 @@ const Navbar = () => {
             <div className="hidden lg:flex items-center gap-2">
               {isLoggedIn && user ? (
                 <>
-                  <div className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 rounded-full bg-[#ffffff06] border border-[#ffffff08] hover:border-[#ffffff12] transition-colors duration-200">
+                  <Link
+                    to="/profile"
+                    className="flex items-center gap-2.5 pl-2.5 pr-4 py-1.5 rounded-full bg-[#ffffff06] border border-[#ffffff08] hover:border-[#ffffff12] hover:bg-white/[0.04] transition-colors duration-200"
+                    title="View profile"
+                  >
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 flex items-center justify-center text-[12px] font-semibold text-white shadow-[0_0_12px_rgba(139,92,246,0.4)]">
                       {user.name?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                     <span className="text-[13px] font-medium text-[#e4e4e7] tracking-[-0.01em]">
                       {user.name}
                     </span>
-                  </div>
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className={cn(
+                      "p-2 rounded-lg transition-all duration-200",
+                      location.pathname === "/profile"
+                        ? "bg-white/[0.08] text-white"
+                        : "text-[#71717a] hover:text-[#a1a1aa] hover:bg-white/[0.04]"
+                    )}
+                    title="Profile"
+                  >
+                    <UserCircle className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                  </Link>
                   <Link
                     to="/settings"
                     className={cn(
@@ -331,13 +347,15 @@ const Navbar = () => {
             <div className="mt-6 pt-4 border-t border-[#ffffff06]">
               {isLoggedIn && user ? (
                 <div className="flex items-center gap-3 px-3.5 py-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 flex items-center justify-center text-[14px] font-semibold text-white shadow-[0_0_16px_rgba(139,92,246,0.4)]">
-                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
-                  </div>
-                  <div>
-                    <p className="text-[14px] font-semibold text-white tracking-[-0.01em]">{user.name}</p>
-                    <p className="text-[12px] text-[#71717a]">{user.email}</p>
-                  </div>
+                  <Link to="/profile" onClick={closeMobile} className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 flex items-center justify-center text-[14px] font-semibold text-white shadow-[0_0_16px_rgba(139,92,246,0.4)] flex-shrink-0">
+                      {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[14px] font-semibold text-white tracking-[-0.01em] truncate">{user.name}</p>
+                      <p className="text-[12px] text-[#71717a] truncate">{user.email}</p>
+                    </div>
+                  </Link>
                 </div>
               ) : (
                 <Link

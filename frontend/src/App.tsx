@@ -18,6 +18,7 @@ import VibeTabs from "./pages/VibeTabs";
 import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
 import Events from "./pages/Events";
+import EventDetailPage from "./pages/EventDetailPage";
 import CareerHub from "./pages/CareerHub";
 import Achievements from "./pages/Achievements";
 import Profile from "./pages/Profile";
@@ -68,6 +69,7 @@ const App = () => (
                   <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />
                   <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
                   <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
+                  <Route path="/events/:id" element={<ProtectedRoute><EventDetailPage /></ProtectedRoute>} />
                   <Route path="/career" element={<ProtectedRoute><CareerHub /></ProtectedRoute>} />
                   <Route path="/sync" element={<ProtectedRoute><Sync /></ProtectedRoute>} />
                   <Route path="/apply-mentor" element={<ProtectedRoute><ApplyMentor /></ProtectedRoute>} />

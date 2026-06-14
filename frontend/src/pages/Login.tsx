@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { apiClient } from "@/lib/apiClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff, ArrowRight, Sparkles, BookOpen, Trophy, Zap, ChevronRight } from "lucide-react";
@@ -30,6 +30,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/dashboard';
   const { login } = useAuth();
 
   useEffect(() => { setMounted(true); }, []);
@@ -48,7 +50,7 @@ const Login = () => {
       if (response.data.success) {
         const { tokens, user } = response.data.data;
         login(tokens.accessToken, user, tokens.refreshToken);
-        navigate('/dashboard');
+        navigate(redirectTo.startsWith('/') ? redirectTo : '/dashboard');
       } else {
         setError(response.data.message || 'Login failed. Please try again.');
       }

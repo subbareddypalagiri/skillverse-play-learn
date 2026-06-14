@@ -1,31 +1,22 @@
 import express from 'express';
-import { 
-  getEvents, 
-  getEvent, 
-  createEvent, 
-  updateEvent, 
-  registerForEvent, 
-  getMyRegistrations 
+import {
+  getEvents,
+  getEvent,
+  createEvent,
+  updateEvent,
+  registerForEvent,
+  getMyRegistrations
 } from '../controllers/eventController.js';
-import { authenticate, authorize } from '../middleware/auth.js';
+import { authenticate, authorize, optionalAuthenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Public routes
 router.get('/', getEvents);
-
-// Private routes (named paths — must be before /:id to avoid being shadowed)
 router.get('/my-registrations', authenticate, getMyRegistrations);
+router.get('/:id', optionalAuthenticate, getEvent);
 
-// Public param route
-router.get('/:id', getEvent);
-
-// Private routes
-router.use(authenticate);
-router.post('/:id/register', registerForEvent);
-
-// Admin-only routes
-router.post('/', authorize('admin'), createEvent);
-router.patch('/:id', authorize('admin'), updateEvent);
+router.post('/:id/register', authenticate, registerForEvent);
+router.post('/', authenticate, authorize('admin', 'campus_ambassador'), createEvent);
+router.patch('/:id', authenticate, authorize('admin', 'campus_ambassador'), updateEvent);
 
 export default router;
