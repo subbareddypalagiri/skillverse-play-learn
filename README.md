@@ -2,7 +2,11 @@
 
 A comprehensive learning and career development platform combining skill-building, competitive programming, and career guidance.
 
-## Project Structure
+## 🚀 Deployment
+
+**Frontend on Vercel + Backend on Render (Recommended)**
+→ See the full guide: [RENDER_DEPLOYMENT.md](./RENDER_DEPLOYMENT.md)
+
 
 ```
 skillverse-play-learn/
