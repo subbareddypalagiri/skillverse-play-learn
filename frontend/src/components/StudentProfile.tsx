@@ -3,10 +3,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Trophy, Star, Zap, Award, BookOpen, Video, Heart, MessageCircle, Share2, CheckCircle, Code, Clock, Calendar, Flame, Crown, Sparkles, Rocket, Medal, Edit, Save, Github, Linkedin, ExternalLink, TrendingUp } from "lucide-react";
+import { Trophy, Star, Zap, Award, BookOpen, Video, Heart, MessageCircle, Share2, CheckCircle, Code, Clock, Calendar, Flame, Crown, Sparkles, Rocket, Medal, Edit, Save, Github, Linkedin, ExternalLink, TrendingUp, LogOut } from "lucide-react";
 import { useSocial } from "@/contexts/SocialContext";
 import { useVideoProgress } from "@/contexts/VideoProgressContext";
 import { useCourseContext } from "@/contexts/CourseContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import PlatformIntegrations from "@/components/PlatformIntegrations";
 
@@ -24,6 +26,13 @@ const StudentProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const { videoProgress } = useVideoProgress();
   const { enrolledCourses } = useCourseContext();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   const totalPosts = posts.length;
   const totalLikes = posts.reduce((s, p) => s + p.likes, 0);
@@ -96,10 +105,16 @@ const StudentProfile = () => {
                     </span>
                   </div>
                 </div>
-                <button onClick={handleOpenEdit}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-white/3 transition-all duration-200">
-                  <Edit className="w-3.5 h-3.5" /> Edit Profile
-                </button>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button onClick={handleOpenEdit}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-white/3 transition-all duration-200">
+                    <Edit className="w-3.5 h-3.5" /> Edit Profile
+                  </button>
+                  <button onClick={handleLogout}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border border-red-500/30 text-red-400 hover:text-red-300 hover:bg-red-500/10 hover:border-red-500/50 transition-all duration-200">
+                    <LogOut className="w-3.5 h-3.5" /> Logout
+                  </button>
+                </div>
               </div>
             </div>
           </div>
