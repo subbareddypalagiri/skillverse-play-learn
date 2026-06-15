@@ -836,12 +836,31 @@ const seedOpportunities = async () => {
     await connectDB();
     logger.info('[Seed] Connected to database');
 
+    // Drop the old TTL index on expiresAt if it still exists in Atlas
+    // This prevents MongoDB from auto-deleting opportunities
+    try {
+      const collection = mongoose.connection.collection('opportunities');
+      const indexes = await collection.indexes();
+      const ttlIndex = indexes.find(idx => idx.key && idx.key.expiresAt && idx.expireAfterSeconds !== undefined);
+      if (ttlIndex) {
+        await collection.dropIndex(ttlIndex.name);
+        logger.info(`[Seed] Dropped old TTL index: ${ttlIndex.name}`);
+      } else {
+        logger.info('[Seed] No TTL index found — skipping drop');
+      }
+    } catch (indexErr) {
+      logger.warn(`[Seed] Could not drop TTL index: ${indexErr.message}`);
+    }
+
+    // Strip expiresAt from all seed records so MongoDB never auto-deletes them
+    const cleanedData = sampleOpportunities.map(({ expiresAt, ...rest }) => rest);
+
     // Clear existing opportunities
     await Opportunity.deleteMany({});
     logger.info('[Seed] Cleared existing opportunities');
 
-    // Insert seed data
-    const inserted = await Opportunity.insertMany(sampleOpportunities, { ordered: false });
+    // Insert seed data (without expiresAt — opportunities live forever)
+    const inserted = await Opportunity.insertMany(cleanedData, { ordered: false });
     logger.info(`[Seed] Successfully seeded ${inserted.length} opportunities`);
 
     console.log('\n═══════════════════════════════════════════════════');
@@ -851,6 +870,8 @@ const seedOpportunities = async () => {
     console.log(`  Jobs         : ${inserted.filter(o => o.type === 'job').length}`);
     console.log(`  Internships  : ${inserted.filter(o => o.type === 'internship').length}`);
     console.log(`  Places       : ${inserted.filter(o => o.type === 'place').length}`);
+    console.log('  Note         : No expiry set — opportunities stay permanently');
+    console.log('  Live Jobs    : Run "node agents/fetchAllJobs.js" to pull real jobs');
     console.log('═══════════════════════════════════════════════════\n');
 
     await mongoose.connection.close();

@@ -76,7 +76,7 @@ const opportunitySchema = new mongoose.Schema({
   },
   expiresAt: {
     type: Date,
-    index: { expires: 0 }           // TTL index — MongoDB auto-deletes on expiry
+    index: { expires: 0 }  // TTL: auto-deletes jobs ONLY if expiresAt is set and has passed
   }
 }, {
   timestamps: true                    // Mongoose auto-manages createdAt & updatedAt
