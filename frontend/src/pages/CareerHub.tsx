@@ -18,7 +18,7 @@ const CareerHub = () => {
   const [allOpportunities, setAllOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const itemsPerPage = 6;
+  const itemsPerPage = 12;
 
   const fetchOpportunities = async (search = "", location = "all", type = "all") => {
     try {
@@ -232,16 +232,24 @@ const CareerHub = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-4">
+            <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
               <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}
                 className="p-2.5 rounded-xl border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all disabled:opacity-40">
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  const page = i + 1;
-                  return (
-                    <button key={page} onClick={() => handlePageChange(page)}
+              <div className="flex items-center gap-1 flex-wrap justify-center">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).filter(page => {
+                  // Always show first, last, current, and neighbors
+                  return page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1;
+                }).reduce((acc: (number | string)[], page, idx, arr) => {
+                  if (idx > 0 && (page as number) - (arr[idx - 1] as number) > 1) acc.push('...');
+                  acc.push(page);
+                  return acc;
+                }, []).map((page, idx) =>
+                  page === '...' ? (
+                    <span key={`ellipsis-${idx}`} className="w-9 h-9 flex items-center justify-center text-sm text-muted-foreground">…</span>
+                  ) : (
+                    <button key={page} onClick={() => handlePageChange(page as number)}
                       className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
                         currentPage === page
                           ? 'text-white shadow-[0_0_12px_rgba(124,58,237,0.25)]'
@@ -250,8 +258,8 @@ const CareerHub = () => {
                       style={currentPage === page ? { background: 'linear-gradient(135deg,#7c3aed,#6366f1)' } : {}}>
                       {page}
                     </button>
-                  );
-                })}
+                  )
+                )}
               </div>
               <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}
                 className="p-2.5 rounded-xl border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all disabled:opacity-40">
