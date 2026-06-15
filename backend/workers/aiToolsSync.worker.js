@@ -34,8 +34,11 @@ const startAIToolsScheduler = () => {
     try {
       await connectDB();
       if (await needsSync()) {
-        logger.info('[AIToolsScheduler] Stale data detected — running startup sync');
-        await executeAIToolsSync();
+        logger.info('[AIToolsScheduler] Stale data detected — triggering startup sync in background');
+        // Run sync asynchronously in background without blocking startup thread
+        executeAIToolsSync().catch(err => {
+          logger.error(`[AIToolsScheduler] Background startup sync failed: ${err.message}`);
+        });
       }
     } catch (err) {
       logger.warn(`[AIToolsScheduler] Startup sync skipped: ${err.message}`);
