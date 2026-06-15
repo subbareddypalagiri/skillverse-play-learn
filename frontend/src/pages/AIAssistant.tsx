@@ -71,51 +71,64 @@ const AIAssistant = () => {
     setInputMessage("");
     setLoading(true);
 
-    try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: inputMessage
-              }]
-            }],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 1024,
+    // Auto-fallback model chain: tries each model in order if one is busy/unavailable
+    const MODELS = [
+      'gemini-2.5-flash',
+      'gemini-2.0-flash',
+      'gemini-flash-latest',
+      'gemini-1.5-flash',
+    ];
+
+    const callWithFallback = async (prompt: string): Promise<string> => {
+      if (!GEMINI_API_KEY) throw new Error('Gemini API key not configured.');
+      let lastError = '';
+      for (const model of MODELS) {
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.7, maxOutputTokens: 1024 }
+              })
             }
-          })
+          );
+          if (response.ok) {
+            const data = await response.json();
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
+          }
+          const errorData = await response.json();
+          // If rate limited (429), model not found (404) or bad request (400), try next model
+          if (response.status === 429 || response.status === 404 || response.status === 400) {
+            lastError = errorData.error?.message || `Status ${response.status}`;
+            continue;
+          }
+          throw new Error(`API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+        } catch (err: any) {
+          lastError = err.message;
+          continue;
         }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('API Error:', errorData);
-        throw new Error(`API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
       }
+      throw new Error(`All models unavailable. Last error: ${lastError}`);
+    };
 
-      const data = await response.json();
-      const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
-
+    try {
+      const aiResponse = await callWithFallback(inputMessage);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: aiResponse,
         timestamp: new Date()
       };
-
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error calling Gemini API:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: "Sorry, I encountered an error. Please try again.",
+        content: "Sorry, all AI models are currently unavailable. Please try again in a moment.",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);

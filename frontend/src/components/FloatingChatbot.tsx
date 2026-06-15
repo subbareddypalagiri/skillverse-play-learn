@@ -53,27 +53,54 @@ const FloatingChatbot = () => {
     const currentInput = inputMessage;
     setInputMessage(""); setLoading(true); setLastRequestTime(Date.now());
 
-    try {
+    // Auto-fallback model chain: tries each model in order if one is busy/unavailable
+    const MODELS = [
+      'gemini-2.5-flash',
+      'gemini-2.0-flash',
+      'gemini-flash-latest',
+      'gemini-1.5-flash',
+    ];
+
+    const callWithFallback = async (prompt: string): Promise<string> => {
       if (!GEMINI_API_KEY) throw new Error('Gemini API key not configured.');
+      let lastError = '';
+      for (const model of MODELS) {
+        try {
+          const resp = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+            {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.9, maxOutputTokens: 1024 }
+              })
+            }
+          );
+          if (resp.ok) {
+            const data = await resp.json();
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, no response generated.';
+          }
+          const e = await resp.json();
+          // If rate limited (429) or model not found (404), try next model
+          if (resp.status === 429 || resp.status === 404 || resp.status === 400) {
+            lastError = e.error?.message || `Status ${resp.status}`;
+            continue;
+          }
+          throw new Error(`API Error: ${e.error?.message || resp.status}`);
+        } catch (err: any) {
+          lastError = err.message;
+          // If it's a network error or model error, try next model
+          continue;
+        }
+      }
+      throw new Error(`All models unavailable. Last error: ${lastError}`);
+    };
+
+    try {
       const systemPrompt = "You are Risee AI, a helpful learning companion. Be specific, concise, and avoid repeating yourself.";
       const recent = [...messages, userMsg].slice(-10);
-      const resp = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: `${systemPrompt}\n\n${recent.map(m => `${m.role}: ${m.content}`).join('\n')}\n\nRespond helpfully.` }] }],
-            generationConfig: { temperature: 0.9, maxOutputTokens: 1024 }
-          })
-        }
-      );
-      if (!resp.ok) {
-        const e = await resp.json();
-        if (resp.status === 429) throw new Error('Rate limit exceeded. Please wait 30 seconds and try again.');
-        throw new Error(`API Error: ${e.error?.message || resp.status}`);
-      }
-      const data = await resp.json();
-      const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, no response generated.";
+      const prompt = `${systemPrompt}\n\n${recent.map(m => `${m.role}: ${m.content}`).join('\n')}\n\nRespond helpfully.`;
+      const aiText = await callWithFallback(prompt);
       setMessages(p => [...p, { id: (Date.now()+1).toString(), role: 'assistant', content: aiText, timestamp: new Date() }]);
     } catch (err: any) {
       setMessages(p => [...p, { id: (Date.now()+1).toString(), role: 'assistant', content: `Error: ${err.message}`, timestamp: new Date() }]);
