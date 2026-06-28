@@ -4,7 +4,11 @@ import Reel from '../models/Reel.js';
 import User from '../models/User.js';
 import Course from '../models/Course.js';
 
-dotenv.config();
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 // Topic to video index and clip details mapping
 const TOPIC_MAPPINGS = [
@@ -21,9 +25,9 @@ const TOPIC_MAPPINGS = [
   },
   {
     topicKey: "css-fundamentals",
-    videoIndex: 1,
-    clipStartSeconds: 0,
-    clipEndSeconds: 60,
+    videoIndex: 0,
+    clipStartSeconds: 600,
+    clipEndSeconds: 660,
     title: "CSS Styling Fundamentals",
     caption: "Make your websites beautiful!",
     description: "Learn CSS selectors, properties, and values. Transform plain HTML into stunning designs.",
@@ -31,74 +35,8 @@ const TOPIC_MAPPINGS = [
     difficulty: "Easy"
   },
   {
-    topicKey: "css-flexbox",
-    videoIndex: 2,
-    clipStartSeconds: 30,
-    clipEndSeconds: 90,
-    title: "CSS Flexbox Magic",
-    caption: "Stop struggling with layouts!",
-    description: "Master Flexbox for modern responsive layouts. Align and distribute space like a pro.",
-    tags: ["css", "flexbox", "layout", "responsive"],
-    difficulty: "Easy"
-  },
-  {
-    topicKey: "css-grid",
-    videoIndex: 3,
-    clipStartSeconds: 0,
-    clipEndSeconds: 60,
-    title: "CSS Grid Layout",
-    caption: "Build complex layouts easily!",
-    description: "Learn CSS Grid for two-dimensional layouts. Create magazine-style designs effortlessly.",
-    tags: ["css", "grid", "layout", "responsive"],
-    difficulty: "Medium"
-  },
-  {
-    topicKey: "js-basics",
-    videoIndex: 4,
-    clipStartSeconds: 0,
-    clipEndSeconds: 60,
-    title: "JavaScript Basics",
-    caption: "Add interactivity to your sites!",
-    description: "Learn variables, functions, and basic JS syntax. The language that powers the web.",
-    tags: ["javascript", "basics", "programming", "frontend"],
-    difficulty: "Easy"
-  },
-  {
-    topicKey: "js-dom",
-    videoIndex: 5,
-    clipStartSeconds: 0,
-    clipEndSeconds: 60,
-    title: "DOM Manipulation",
-    caption: "Control the page dynamically!",
-    description: "Learn to select, modify, and create HTML elements with JavaScript DOM methods.",
-    tags: ["javascript", "dom", "frontend", "dynamic"],
-    difficulty: "Medium"
-  },
-  {
-    topicKey: "js-events",
-    videoIndex: 6,
-    clipStartSeconds: 0,
-    clipEndSeconds: 55,
-    title: "JavaScript Events",
-    caption: "React to user interactions!",
-    description: "Master click, submit, keyboard events. Make your apps respond to user actions.",
-    tags: ["javascript", "events", "interactive", "frontend"],
-    difficulty: "Medium"
-  },
-  {
-    topicKey: "js-fetch",
-    videoIndex: 7,
-    clipStartSeconds: 0,
-    clipEndSeconds: 60,
-    title: "Fetch API & Async JS",
-    caption: "Get data from APIs!",
-    description: "Learn fetch, promises, and async/await. Connect your frontend to any backend.",
-    tags: ["javascript", "fetch", "api", "async"],
-    difficulty: "Medium"
-  },
-  {
     topicKey: "react-basics",
-    videoIndex: 8,
+    videoIndex: 1,
     clipStartSeconds: 0,
     clipEndSeconds: 60,
     title: "React Components 101",
@@ -109,7 +47,7 @@ const TOPIC_MAPPINGS = [
   },
   {
     topicKey: "nodejs-express",
-    videoIndex: 9,
+    videoIndex: 2,
     clipStartSeconds: 0,
     clipEndSeconds: 60,
     title: "Node.js & Express Intro",
@@ -117,6 +55,28 @@ const TOPIC_MAPPINGS = [
     description: "Learn Node.js basics and Express.js routing. Create APIs and server-side apps.",
     tags: ["nodejs", "express", "backend", "api"],
     difficulty: "Medium"
+  },
+  {
+    topicKey: "mongodb-setup",
+    videoIndex: 3,
+    clipStartSeconds: 0,
+    clipEndSeconds: 60,
+    title: "MongoDB Databases",
+    caption: "Store your data securely!",
+    description: "Learn how to query, create documents, and connect database collections in MongoDB.",
+    tags: ["mongodb", "database", "backend", "nosql"],
+    difficulty: "Medium"
+  },
+  {
+    topicKey: "javascript-loops",
+    videoIndex: 4,
+    clipStartSeconds: 0,
+    clipEndSeconds: 60,
+    title: "JavaScript Programming",
+    caption: "Master JavaScript loops & arrays!",
+    description: "Understand variables, controls, and modern JS logic step by step.",
+    tags: ["javascript", "basics", "programming", "frontend"],
+    difficulty: "Easy"
   }
 ];
 

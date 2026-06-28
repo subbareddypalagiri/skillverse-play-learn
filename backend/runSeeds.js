@@ -44,9 +44,9 @@ async function main() {
     console.log('\n🚀 SkillVerse Database Seeding');
     console.log('═'.repeat(60));
 
-    // Step 1: Run seedAll.js
-    console.log('\n[Step 1/2] Creating courses with Web Development videos...');
-    await runScript(path.join(__dirname, 'seeds', 'seedAll.js'));
+    // Step 1: Run seedMassiveData.js
+    console.log('\n[Step 1/2] Creating courses with massive resources...');
+    await runScript(path.join(__dirname, 'seeds', 'seedMassiveData.js'));
 
     // Step 2: Run seedReels.js with --force
     console.log('\n[Step 2/2] Creating reels from Web Development course...');

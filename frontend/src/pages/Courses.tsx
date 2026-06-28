@@ -171,7 +171,7 @@ const Courses = () => {
       resources: {
         videos: [
           { title: "AI Full Course - Stanford", url: "https://www.youtube.com/watch?v=J8Eh7RqggsU", platform: "YouTube", videoId: "J8Eh7RqggsU" },
-          { title: "Machine Learning by Andrew Ng", url: "https://www.coursera.org/learn/machine-learning", platform: "Coursera" },
+          { title: "Machine Learning Lecture by Andrew Ng", url: "https://www.youtube.com/watch?v=UzxYlbK2c7E", platform: "YouTube", videoId: "UzxYlbK2c7E" },
           { title: "AI for Everyone", url: "https://www.youtube.com/watch?v=mJeNghZXtMo", platform: "YouTube", videoId: "mJeNghZXtMo" }
         ],
         pdfs: [
