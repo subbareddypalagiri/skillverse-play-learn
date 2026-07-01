@@ -13,25 +13,34 @@ const logFormat = winston.format.combine(
   })
 );
 
+// On Vercel serverless, filesystem is read-only — only use Console transport
+const isServerless = !!process.env.VERCEL;
+
+const transports = [
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.simple()
+    )
+  })
+];
+
+// Only add file transports in non-serverless environments
+if (!isServerless) {
+  const fs = await import('fs');
+  if (!fs.existsSync('logs')) fs.mkdirSync('logs', { recursive: true });
+
+  transports.push(
+    new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'logs/app.log' })
+  );
+}
+
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: logFormat,
   defaultMeta: { service: 'skillverse-backend' },
-  transports: [
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      )
-    }),
-    new winston.transports.File({
-      filename: 'logs/error.log',
-      level: 'error'
-    }),
-    new winston.transports.File({
-      filename: 'logs/app.log'
-    })
-  ]
+  transports
 });
 
 export default logger;
