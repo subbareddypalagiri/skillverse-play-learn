@@ -8,9 +8,12 @@
   }
 }
 
-/* World-class typography - Satoshi */
+/* Premium unified typography - Inter */
 * {
-  font-family: 'Satoshi', 'General Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
@@ -128,14 +131,16 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-medium;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     line-height: 1.6;
   }
 
-  /* Corporate Typography */
+  /* Clean typography — Inter for everything */
   h1, h2, h3, h4, h5, h6 {
     @apply text-foreground font-semibold;
-    line-height: 1.2;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
   }
 
   h1 { @apply text-3xl lg:text-4xl; }
@@ -145,7 +150,11 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  /* Corporate Cards */
+  /* Corporate & Premium Cards */
+  .premium-card {
+    @apply bg-card border border-border/60 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300;
+    background-color: hsl(var(--card)) !important;
+  }
   .corporate-card {
     @apply bg-card border border-border/40 rounded-xl shadow-sm;
     backdrop-filter: blur(10px);
