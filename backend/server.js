@@ -73,6 +73,16 @@ app.use(securityHeaders);
 // HEALTH CHECK & READY ENDPOINTS
 // ============================================================
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Skillverse Play Learn Backend API is running on Vercel',
+    docs: '/api/v1',
+    health: '/health',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
