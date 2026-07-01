@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risee - Perfect Scrolling Track</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111111; 
+            height: 10287px; /* Ee height must! Appude scroll varaku velthundi */
+            color: white;
+            font-family: sans-serif;
+            overflow-x: hidden;
+        }
+
+        .track-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10287px; 
+            pointer-events: none; 
+            z-index: 10;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            overflow: visible;
+        }
+
+        /* 4-Hands Character CSS */
+        .custom-character {
+            width: 60px;
+            height: 60px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 20;
+            visibility: hidden; /* JS load ayye varaku kanipinchadu */
+            
+            /* Ekkada zoom avvakunda fix chesam */
+            transform: scale(1) !important; 
+        }
+
+        .character-art {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            box-shadow: 0px 0px 20px rgba(255, 165, 0, 0.9);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="track-container">
+        <svg viewBox="0 0 3852 10287" preserveAspectRatio="xMidYMin meet">
+            <path id="riseeTrack" 
+                  d="M559.084 0V679C720.084 347.5 1090.48 -222.6 1284.08 149C1626.08 818.2 1662.25 1016.5 1637.58 1032C1820.25 654 2209.78 -23.9 2306.58 288.5C2427.58 679 2539.58 976 2511.58 957.5C2483.58 939 2864.58 307.5 3032.08 428C3166.08 524.4 3360.58 1720.17 3441.08 2306L3506.08 3012.5L2214.08 2575.5L1349.08 3719C955.084 5184.2 974.25 5581.5 1033.08 5597C1240.75 5271.5 1711.88 4704.2 1935.08 5039C2158.28 5373.8 2214.08 5668.17 2214.08 5773.5V6117.5C2406.25 5789 2816.58 5213.8 2920.58 5541C3050.58 5950 3646.08 5931 3655.08 5950C3662.28 5965.2 3788.08 5956.33 3850.08 5950L2920.58 6963.5L2009.08 6396.5L1098.08 6963.5L1.08362 6554.5L698.584 7828L1433.08 7242.5L2288.08 7828L3506.08 7242.5L3850.08 7912L3162.08 8693L1935.08 8088.5L1098.08 8693L1.08362 8200L642.584 9864.5L1293.58 9408.5L1935.08 8888C3054.28 9529.2 3448.75 10087.5 3506.08 10286.5" 
+                  fill="none" 
+                  stroke="rgba(255, 255, 255, 0.4)" 
+                  stroke-width="8" />
+        </svg>
+
+        <div class="custom-character">
+            <div class="character-art"></div>
+        </div>
+    </div>
+
+    <script>
+        // Plugins Register 
+        gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
+
+        window.addEventListener("load", () => {
+            const character = document.querySelector(".custom-character");
+            const track = document.querySelector("#riseeTrack");
+
+            if(character && track) {
+                // Ball ni track start point ki pamputhunnam
+                gsap.set(character, {
+                    autoAlpha: 1, // Ball ni visible chesthunnam
+                    motionPath: {
+                        path: track,
+                        align: track,
+                        alignOrigin: [0.5, 0.5],
+                        start: 0,
+                        end: 0
+                    }
+                });
+
+                // Scroll Animation Core Logic
+                // GSAP Logic lo ee change check cheyi mowa
+gsap.to(".custom-character", {
+    scrollTrigger: {
+        trigger: "body",
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 1
+    },
+    motionPath: {
+        path: "#riseeTrack", // Exact ga ee ID ni path ki link chesam
+        align: "#riseeTrack", // Idhe magic! Ball path meede align avthundi
+        alignOrigin: [0.5, 0.5], // Ball center ni path ki lock chestundi
+        autoRotate: false
+    },
+    ease: "none"
+});
+            } else {
+                console.log("Error: Track or Character not found!");
+            }
+        });
+    </script>
+</body>
+</html>

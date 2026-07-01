@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { BookOpen, Clock, Users, Star, CheckCircle, Play, Wrench, Award, GraduationCap, FileText, Trophy, Video, Download, ExternalLink, Monitor, Search } from "lucide-react";
+import { BookOpen, Clock, Users, Star, CheckCircle, Play, Wrench, Award, GraduationCap, FileText, Trophy, Video, Download, ExternalLink, Monitor, Search, Radio } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CourseDashboard from "../components/CourseDashboard";
@@ -44,9 +44,9 @@ const Courses = () => {
           // Use instructor field directly, or fall back to ownerId.name
           instructor: course.instructor || course.ownerId?.name || 'Unknown Instructor',
           // Map enrollmentCount to students for the UI
-          students: course.enrollmentCount || course.students || 0,
-          // Ensure rating has a value
-          rating: course.rating || 4.5,
+          students: typeof course.enrollmentCount === 'number' ? course.enrollmentCount : (course.students || 0),
+          // Ensure rating has a value (showing 0 if no rating has been given yet)
+          rating: typeof course.rating === 'number' ? course.rating : 0.0,
         }));
         
         // Use backend data if available, otherwise fall back to defaultCourses
@@ -832,7 +832,7 @@ const Courses = () => {
       description: "EC2, S3, RDS, Lambda, VPC — pass the AWS SAA-C03 exam",
       resources: {
         videos: [
-          { title: "AWS Solutions Architect Course", url: "https://www.youtube.com/watch?v=Ia-UEzM3DuI", platform: "YouTube", videoId: "Ia-UEzM3DuI" },
+          { title: "AWS Solutions Architect Course", url: "https://www.youtube.com/watch?v=c3Cn4xYfxJY", platform: "YouTube", videoId: "c3Cn4xYfxJY" },
           { title: "AWS Lambda Tutorial", url: "https://www.youtube.com/watch?v=eOBq__bYWQo", platform: "YouTube", videoId: "eOBq__bYWQo" }
         ],
         pdfs: [{ title: "AWS Well-Architected Framework", url: "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html" }],
@@ -874,7 +874,7 @@ const Courses = () => {
       description: "SEO, Google Analytics, social media marketing, content strategy",
       resources: {
         videos: [
-          { title: "Digital Marketing Full Course", url: "https://www.youtube.com/watch?v=ZVuToMilP0A", platform: "YouTube", videoId: "ZVuToMilP0A" },
+          { title: "Digital Marketing Full Course", url: "https://www.youtube.com/watch?v=z0G39lT_o9U", platform: "YouTube", videoId: "z0G39lT_o9U" },
           { title: "SEO Tutorial for Beginners", url: "https://www.youtube.com/watch?v=xsVTqzratPs", platform: "YouTube", videoId: "xsVTqzratPs" }
         ],
         pdfs: [{ title: "Google SEO Starter Guide", url: "https://developers.google.com/search/docs/fundamentals/seo-starter-guide" }],
@@ -1130,9 +1130,9 @@ const Courses = () => {
       resources: {
         videos: [
           { title: "Competitive Programming - NPTEL IIT BHU", url: "https://nptel.ac.in/courses/106104015", platform: "NPTEL" },
-          { title: "CP Full Course 100 Hours", url: "https://www.youtube.com/watch?v=8hly31xrwQE", platform: "YouTube", videoId: "8hly31xrwQE" },
+          { title: "Competitive Programming Course", url: "https://www.youtube.com/watch?v=RBSGkl9jlOE", platform: "YouTube", videoId: "RBSGkl9jlOE" },
           { title: "Graph Algorithms Masterclass", url: "https://www.youtube.com/watch?v=tWVWeAqZ0WU", platform: "YouTube", videoId: "tWVWeAqZ0WU" },
-          { title: "Dynamic Programming Complete", url: "https://www.youtube.com/watch?v=aPQY3dAyzS0", platform: "YouTube", videoId: "aPQY3dAyzS0" }
+          { title: "Dynamic Programming Complete", url: "https://www.youtube.com/watch?v=oBt53YbR9Kk", platform: "YouTube", videoId: "oBt53YbR9Kk" }
         ],
         pdfs: [
           { title: "Competitive Programming Book", url: "https://cpbook.net/" },
@@ -1200,6 +1200,11 @@ const Courses = () => {
                 </p>
               </div>
               <div className="flex items-center gap-2.5 flex-shrink-0">
+                <button onClick={() => navigate('/live-rooms')}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-border/50 text-muted-foreground hover:text-foreground hover:border-red-500/30 hover:bg-white/3 transition-all duration-200">
+                  <Radio className="w-3.5 h-3.5 text-red-500 animate-pulse" />
+                  Live Rooms
+                </button>
                 <button onClick={() => navigate('/ai-tools')}
                   className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-white/3 transition-all duration-200">
                   <Wrench className="w-3.5 h-3.5" />
@@ -1283,7 +1288,9 @@ const Courses = () => {
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mb-5 pb-4 border-b border-border/30">
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{course.duration}</span>
                       <span className="flex items-center gap-1"><Users className="w-3 h-3" />{(course.students || course.enrollmentCount || 0).toLocaleString()}</span>
-                      <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-amber-400 text-amber-400" /><span className="font-semibold text-foreground">{course.rating}</span></span>
+                      {course.rating > 0 && (
+                        <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-amber-400 text-amber-400" /><span className="font-semibold text-foreground">{course.rating.toFixed(1)}</span></span>
+                      )}
                     </div>
 
                     {/* Actions */}

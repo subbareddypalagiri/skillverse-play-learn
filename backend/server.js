@@ -128,6 +128,8 @@ import showcaseRoutes from './routes/showcaseRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import syncRoutes from './routes/syncRoutes.js';
 import aiToolsRoutes from './routes/aiToolsRoutes.js';
+import liveRoutes from './routes/liveRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import startScheduler from './workers/jobFetcher.worker.js';
 import startAIToolsScheduler from './workers/aiToolsSync.worker.js';
 
@@ -146,6 +148,8 @@ app.use('/api/v1/showcase', showcaseRoutes);
 app.use('/api/v1/posts', postRoutes);
 app.use('/api/v1/sync', syncRoutes);
 app.use('/api/v1/ai-tools', aiToolsRoutes);
+app.use('/api/v1/live', liveRoutes);
+app.use('/api/v1/admin', adminRoutes);
 app.use('/uploads', express.static(uploadsDirectory));
 
 app.get('/api/v1', (req, res) => {

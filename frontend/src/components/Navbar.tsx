@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { UserCircle, Settings, X, Menu, ChevronDown } from "lucide-react";
+import { UserCircle, Settings, X, Menu, ChevronDown, Server } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -100,16 +100,16 @@ const Navbar = () => {
               <div className={cn("w-full h-full rounded-[10px] overflow-hidden", isLightNav ? "bg-[#f6f5fa]" : "bg-[#09090b]")}>
                 <img
                   src="/Risee.png"
-                  alt="Risee"
+                  alt="Haappy"
                   className="w-full h-full object-cover"
                 />
               </div>
             </div>
             <span className={cn(
-              "text-[19px] font-bold tracking-[-0.03em]",
-              isLightNav ? "text-[#2d3354]" : "text-white"
+              "text-[19px] font-bold tracking-[-0.03em] bg-gradient-to-r from-violet-400 to-pink-500 bg-clip-text text-transparent",
+              isLightNav ? "text-[#2d3354]" : ""
             )}>
-              Risee
+              Haappy
             </span>
           </Link>
 
@@ -238,6 +238,16 @@ const Navbar = () => {
                     {user.name}
                   </span>
                 </Link>
+                {user.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-red-500/30 text-red-500 hover:bg-red-500/5 hover:border-red-500/50 transition-all"
+                    title="Admin Control Center"
+                  >
+                    <Server className="w-3.5 h-3.5 animate-pulse" />
+                    <span>Admin</span>
+                  </Link>
+                )}
                 <Link
                   to="/profile"
                   className={cn(

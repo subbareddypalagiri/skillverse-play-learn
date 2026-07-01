@@ -66,6 +66,7 @@ const userSchema = new mongoose.Schema({
   
   // Permissions (RBAC)
   permissions: [String],
+  canHostLive: { type: Boolean, default: false },
   managedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   managedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   

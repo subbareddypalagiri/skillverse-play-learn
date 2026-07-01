@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { apiClient } from "@/lib/apiClient";
 import { useAuth } from "@/contexts/AuthContext";
-import { Eye, EyeOff, ArrowRight, Sparkles, BookOpen, Trophy, Zap, ChevronRight } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Sparkles, BookOpen, Trophy, Zap, ChevronRight, ShieldAlert } from "lucide-react";
 import NeatGradientBackground from "@/components/NeatGradientBackground";
 
 const FloatingOrb = ({ className }: { className: string }) => (
@@ -78,10 +78,10 @@ const Login = () => {
         <div className={`relative z-10 transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
           <Link to="/" className="inline-flex items-center gap-3 group">
             <div className="relative w-11 h-11 rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10">
-              <img src="/Risee.png" alt="Risee" className="w-full h-full object-cover" />
+              <img src="/Risee.png" alt="Haappy" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent animate-shine" />
             </div>
-            <span className="text-2xl font-bold text-gradient" style={{fontFamily:'Sora,sans-serif'}}>Risee</span>
+            <span className="text-2xl font-bold text-gradient bg-gradient-to-r from-violet-400 to-pink-500 bg-clip-text text-transparent" style={{fontFamily:'Sora,sans-serif'}}>Haappy</span>
           </Link>
         </div>
 
@@ -115,7 +115,7 @@ const Login = () => {
           {/* Testimonial */}
           <div className={`glass rounded-2xl p-5 max-w-md transition-all duration-700 delay-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <p className="text-sm text-foreground/80 leading-relaxed mb-4 italic">
-              "Risee completely transformed how I learn. Within 3 months I went from beginner to landing my first dev job."
+              "Haappy completely transformed how I learn. Within 3 months I went from beginner to landing my first dev job."
             </p>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">P</div>
@@ -132,7 +132,7 @@ const Login = () => {
 
         {/* Bottom text */}
         <div className="relative z-10 text-xs text-muted-foreground/50 animate-reveal-fade delay-700">
-          © {new Date().getFullYear()} Risee. Built for ambitious learners.
+          © {new Date().getFullYear()} Haappy. Built for ambitious learners.
         </div>
       </div>
 
@@ -145,9 +145,9 @@ const Login = () => {
         <div className="lg:hidden mb-10">
           <Link to="/" className="inline-flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-white/10">
-              <img src="/Risee.png" alt="Risee" className="w-full h-full object-cover" />
+              <img src="/Risee.png" alt="Haappy" className="w-full h-full object-cover" />
             </div>
-            <span className="text-xl font-bold text-gradient" style={{fontFamily:'Sora,sans-serif'}}>Risee</span>
+            <span className="text-xl font-bold text-gradient bg-gradient-to-r from-violet-400 to-pink-500 bg-clip-text text-transparent" style={{fontFamily:'Sora,sans-serif'}}>Haappy</span>
           </Link>
         </div>
 
@@ -164,30 +164,28 @@ const Login = () => {
 
           {/* Error */}
           {error && (
-            <div className="mb-5 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-sm flex items-start gap-3 animate-reveal-up">
-              <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-red-400 text-xs font-bold">!</span>
-              </div>
-              {error}
+            <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2.5 animate-shake">
+              <ShieldAlert className="w-4 h-4 flex-shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div className="space-y-1.5">
-              <label htmlFor="email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Email Address
+              <label htmlFor="email" className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">
+                Email address
               </label>
               <div className="relative">
                 <input
                   id="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="you@email.com"
+                  placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="premium-input"
+                  className="premium-input text-sm"
                 />
               </div>
             </div>

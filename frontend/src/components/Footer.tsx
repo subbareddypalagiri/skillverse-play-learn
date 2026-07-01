@@ -45,9 +45,9 @@ const Footer = ({ premium = false, midnight = false, neat = false }: FooterProps
           <div className="md:col-span-1">
             <Link to="/" className="inline-flex items-center gap-2.5 group mb-5">
               <div className="relative w-10 h-10 rounded-xl overflow-hidden ring-1 ring-white/10">
-                <img src="/Risee.png" alt="Risee" className="w-full h-full object-cover" />
+                <img src="/Risee.png" alt="Haappy" className="w-full h-full object-cover" />
               </div>
-              <span className="text-xl font-bold text-gradient" style={{fontFamily:'Sora,sans-serif'}}>Risee</span>
+              <span className="text-xl font-bold text-gradient bg-gradient-to-r from-violet-400 to-pink-500 bg-clip-text text-transparent" style={{fontFamily:'Sora,sans-serif'}}>Haappy</span>
             </Link>
             <p className="text-sm text-muted-foreground mb-5 leading-relaxed max-w-[200px]">
               The future of learning. Built for ambitious people who want to grow fast.
@@ -120,7 +120,7 @@ const Footer = ({ premium = false, midnight = false, neat = false }: FooterProps
         {/* Bottom bar */}
         <div className="py-5 border-t border-border/30 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           <p className="text-xs text-muted-foreground/60">
-            © {new Date().getFullYear()} Risee. All rights reserved.
+            © {new Date().getFullYear()} Haappy. All rights reserved.
           </p>
           <div className="flex items-center gap-4 text-xs text-muted-foreground/60">
             <span>Built with ❤️ for learners</span>

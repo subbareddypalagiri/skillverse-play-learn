@@ -1,11 +1,19 @@
 import PageLayout from "@/components/PageLayout";
 import ClubsSection from "@/components/ClubsSection";
 import AmbassadorEventForm from "@/components/AmbassadorEventForm";
-import { Calendar, MapPin, Users, Clock, Globe, Monitor, Sparkles, ArrowRight, Filter, Shield, LogIn } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, Globe, Monitor, Sparkles, ArrowRight, Filter, Shield, LogIn, FileCheck, Award, BadgeCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchEvents, fetchMyRegistrations } from "@/lib/eventsApi";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import apiClient from "@/lib/apiClient";
 
 const typeColors: Record<string, string> = {
   Competition: "bg-violet-500/10 text-violet-400 border-violet-500/20",
@@ -29,6 +37,8 @@ const categoryColors: Record<string, string> = {
 const Events = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { toast } = useToast();
+
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [events, setEvents] = useState<any[]>([]);
@@ -36,8 +46,29 @@ const Events = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAmbassadorForm, setShowAmbassadorForm] = useState(false);
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [appStatus, setAppStatus] = useState<any>(null);
+
+  // Form states
+  const [collegeName, setCollegeName] = useState(user?.collegeName || '');
+  const [skills, setSkills] = useState('');
+  const [eventsDesc, setEventsDesc] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const isAmbassador = user?.role === 'campus_ambassador' || user?.role === 'admin';
+
+  // Fetch application status
+  useEffect(() => {
+    if (user) {
+      apiClient.get('/events/ambassador/my-application')
+        .then(res => {
+          if (res.data?.data?.application) {
+            setAppStatus(res.data.data.application);
+          }
+        })
+        .catch(err => console.log('Error checking ambassador app:', err));
+    }
+  }, [user]);
 
   const loadEvents = async () => {
     try {
@@ -69,10 +100,45 @@ const Events = () => {
       return;
     }
     if (!isAmbassador) {
-      alert('Only Campus Ambassadors can create events. Contact your college admin to become an ambassador.');
+      setShowApplyModal(true);
       return;
     }
     setShowAmbassadorForm(true);
+  };
+
+  const handleApplySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!collegeName.trim() || !eventsDesc.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please specify your College Name and Event Plans.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const res = await apiClient.post('/events/ambassador/apply', {
+        collegeName,
+        skills,
+        plannedEventsDesc: eventsDesc
+      });
+      toast({
+        title: "Application Submitted",
+        description: "Your Campus Ambassador application is pending admin review."
+      });
+      setAppStatus(res.data.data.application);
+      setShowApplyModal(false);
+    } catch (err: any) {
+      toast({
+        title: "Submission Failed",
+        description: err.response?.data?.message || "Failed to submit application.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const categories = [
@@ -111,17 +177,33 @@ const Events = () => {
 
           {/* Ambassador Portal — better than separate login */}
           <div className="flex flex-col items-end gap-1.5">
-            <button
-              onClick={handleAmbassadorClick}
-              className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white whitespace-nowrap transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]"
-              style={{ background: isAmbassador ? 'linear-gradient(135deg,#7c3aed,#6366f1)' : 'linear-gradient(135deg,#374151,#1f2937)' }}>
-              {isAmbassador ? <Shield className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
-              {isAmbassador ? 'Plan Event' : 'Ambassador Portal'}
-            </button>
-            <p className="text-[10px] text-muted-foreground text-right max-w-[180px]">
+            {isAmbassador ? (
+              <button
+                onClick={handleAmbassadorClick}
+                className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white whitespace-nowrap transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]"
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                <Shield className="w-4 h-4" />
+                Plan Event
+              </button>
+            ) : appStatus?.status === 'pending' ? (
+              <Badge className="bg-yellow-500/10 border-yellow-500/20 text-yellow-500 py-3 px-4 rounded-xl flex items-center gap-2">
+                <FileCheck className="w-4 h-4" />
+                Ambassador Application Pending
+              </Badge>
+            ) : (
+              <button
+                onClick={handleAmbassadorClick}
+                className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white whitespace-nowrap transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.3)] bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600">
+                <Award className="w-4 h-4 text-yellow-400" />
+                Apply as Ambassador
+              </button>
+            )}
+            <p className="text-[10px] text-muted-foreground text-right max-w-[200px]">
               {isAmbassador
                 ? `Posting as ${user?.collegeName || 'Ambassador'}`
-                : 'Campus ambassadors login to plan events'}
+                : appStatus?.status === 'pending'
+                ? 'Your request is under verification by admins'
+                : 'Host events for your college campus'}
             </p>
           </div>
         </div>
@@ -282,6 +364,67 @@ const Events = () => {
         onClose={() => setShowAmbassadorForm(false)}
         onSuccess={loadEvents}
       />
+
+      {/* Ambassador Application Modal */}
+      <Dialog open={showApplyModal} onOpenChange={setShowApplyModal}>
+        <DialogContent className="sm:max-w-[475px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+              <Award className="w-5 h-5 text-yellow-500" />
+              Apply as Campus Ambassador
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Campus ambassadors have authorization to organize, publish, and manage college events and hackathons.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleApplySubmit} className="space-y-4 mt-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="college" className="text-xs font-semibold">College / Campus Name *</Label>
+              <Input
+                id="college"
+                placeholder="e.g. Stanford University, IIT Bombay"
+                value={collegeName}
+                onChange={e => setCollegeName(e.target.value)}
+                className="rounded-xl text-xs"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="skills" className="text-xs font-semibold">Organizing Skills & Background (comma separated)</Label>
+              <Input
+                id="skills"
+                placeholder="e.g. Event Management, Marketing, Public Relations"
+                value={skills}
+                onChange={e => setSkills(e.target.value)}
+                className="rounded-xl text-xs"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="eventsDesc" className="text-xs font-semibold">Describe the events you plan to organize *</Label>
+              <Textarea
+                id="eventsDesc"
+                placeholder="Briefly describe what hackathons or campus fests you plan to publish on the platform..."
+                value={eventsDesc}
+                onChange={e => setEventsDesc(e.target.value)}
+                className="rounded-xl min-h-[90px] text-xs"
+                required
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="w-full py-2.5 rounded-xl font-semibold mt-4 text-xs"
+              style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}
+            >
+              {submitting ? "Submitting application..." : "Submit Ambassador Application"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </PageLayout>
   );
 };

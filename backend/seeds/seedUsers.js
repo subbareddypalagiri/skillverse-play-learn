@@ -9,36 +9,12 @@ dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const usersData = [
   {
-    name: "John Developer",
-    email: "john@skillverse.com",
-    password: "Password123!",
-    role: "student",
-    bio: "Full Stack Developer passionate about Web Development and Open Source",
-    skills: ["JavaScript", "React", "Node.js", "MongoDB", "CSS", "HTML"],
-    hobbies: ["Coding", "Gaming", "Reading"],
-    socialLinks: {
-      linkedin: "https://linkedin.com/in/johndeveloper",
-      github: "https://github.com/johndeveloper",
-      leetcode: "https://leetcode.com/johndeveloper",
-      codeforces: "https://codeforces.com/profile/johndeveloper"
-    }
-  },
-  {
     name: "Emma Admin",
-    email: "admin@skillverse.com",
-    password: "Password123!",
+    email: "subbareddy123sub@gmail.com",
+    password: "Subbareddy@123",
     role: "admin",
     bio: "SkillVerse Platform Administrator",
     skills: ["Management", "System Design", "Community Building"]
-  },
-  {
-    name: "Mike Instructor",
-    email: "mike@skillverse.com",
-    password: "Password123!",
-    role: "instructor",
-    bio: "Experienced instructor teaching Full Stack Development",
-    skills: ["JavaScript", "React", "Node.js", "Teaching", "Mentoring"],
-    hobbies: ["Teaching", "Mentoring", "Blogging"]
   }
 ];
 

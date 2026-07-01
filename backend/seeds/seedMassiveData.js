@@ -1051,7 +1051,7 @@ const seedMassiveData = async () => {
         ratingCount: 1150,
         resources: {
           videos: [
-            { title: "AWS Solutions Architect Course", url: "https://www.youtube.com/watch?v=Ia-UEzM3DuI", platform: "YouTube", videoId: "Ia-UEzM3DuI" },
+            { title: "AWS Solutions Architect Course", url: "https://www.youtube.com/watch?v=c3Cn4xYfxJY", platform: "YouTube", videoId: "c3Cn4xYfxJY" },
             { title: "AWS EC2 Deep Dive", url: "https://www.youtube.com/watch?v=7m_q1ldzw0U", platform: "YouTube", videoId: "7m_q1ldzw0U" },
             { title: "AWS S3 Complete Guide", url: "https://www.youtube.com/watch?v=77lMCiiMilo", platform: "YouTube", videoId: "77lMCiiMilo" },
             { title: "AWS Lambda Tutorial", url: "https://www.youtube.com/watch?v=eOBq__bYWQo", platform: "YouTube", videoId: "eOBq__bYWQo" }
@@ -1123,7 +1123,7 @@ const seedMassiveData = async () => {
         ratingCount: 810,
         resources: {
           videos: [
-            { title: "Digital Marketing Full Course", url: "https://www.youtube.com/watch?v=ZVuToMilP0A", platform: "YouTube", videoId: "ZVuToMilP0A" },
+            { title: "Digital Marketing Full Course", url: "https://www.youtube.com/watch?v=z0G39lT_o9U", platform: "YouTube", videoId: "z0G39lT_o9U" },
             { title: "SEO Tutorial for Beginners", url: "https://www.youtube.com/watch?v=xsVTqzratPs", platform: "YouTube", videoId: "xsVTqzratPs" },
             { title: "Google Analytics 4 Tutorial", url: "https://www.youtube.com/watch?v=G6X1o8eX5Hk", platform: "YouTube", videoId: "G6X1o8eX5Hk" },
             { title: "Social Media Marketing", url: "https://www.youtube.com/watch?v=9UdYB2Og4HE", platform: "YouTube", videoId: "9UdYB2Og4HE" }

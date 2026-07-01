@@ -121,10 +121,10 @@ const Signup = () => {
         {/* Logo */}
         <div className={`relative z-10 transition-all duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}>
           <Link to="/" className="inline-flex items-center gap-3 group">
-            <div className="relative w-11 h-11 rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10">
-              <img src="/Risee.png" alt="Risee" className="w-full h-full object-cover" />
+            <div className="relative w-11 h-11 rounded-xl overflow-hidden shadow-lg ring-1 ring-white/10 flex items-center justify-center bg-gradient-to-br from-violet-500 to-pink-500">
+              <span className="font-extrabold text-lg text-white">H</span>
             </div>
-            <span className="text-2xl font-bold text-gradient" style={{fontFamily:'Sora,sans-serif'}}>Risee</span>
+            <span className="text-2xl font-bold text-gradient bg-gradient-to-r from-violet-400 to-pink-500 bg-clip-text text-transparent" style={{fontFamily:'Sora,sans-serif'}}>Haappy</span>
           </Link>
         </div>
 
@@ -190,9 +190,9 @@ const Signup = () => {
         <div className="lg:hidden mb-10">
           <Link to="/" className="inline-flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-white/10">
-              <img src="/Risee.png" alt="Risee" className="w-full h-full object-cover" />
+              <img src="/Risee.png" alt="Haappy" className="w-full h-full object-cover" />
             </div>
-            <span className="text-xl font-bold text-gradient" style={{fontFamily:'Sora,sans-serif'}}>Risee</span>
+            <span className="text-xl font-bold text-gradient bg-gradient-to-r from-violet-400 to-pink-500 bg-clip-text text-transparent" style={{fontFamily:'Sora,sans-serif'}}>Haappy</span>
           </Link>
         </div>
 

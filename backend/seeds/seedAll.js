@@ -31,8 +31,8 @@ const seedAll = async () => {
     const users = await User.create([
       {
         name: "Admin User",
-        email: "admin@skillverse.com",
-        password: "Password123!",
+        email: "subbareddy123sub@gmail.com",
+        password: "Subbareddy@123",
         role: "admin",
         bio: "SkillVerse Platform Administrator"
       },

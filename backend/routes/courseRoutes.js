@@ -9,7 +9,8 @@ import {
   getMyEnrollments,
   completeCourse,
   updateProgress,
-  getMyCredits
+  getMyCredits,
+  getPlatformStats
 } from '../controllers/courseController.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 
@@ -17,6 +18,7 @@ const router = express.Router();
 
 // Public routes
 router.get('/', getCourses);
+router.get('/stats', getPlatformStats);
 
 // Private routes (named paths — must be before /:id to avoid being shadowed)
 router.get('/my-enrollments', authenticate, getMyEnrollments);

@@ -1,0 +1,44 @@
+import mongoose from 'mongoose';
+
+const liveRoomSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: [true, 'Live stream title is required'],
+    trim: true,
+    maxlength: [150, 'Title cannot exceed 150 characters']
+  },
+  topic: {
+    type: String,
+    required: [true, 'Live stream topic is required'],
+    trim: true
+  },
+  category: {
+    type: String,
+    required: [true, 'Category is required']
+  },
+  hostId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['scheduled', 'live', 'ended'],
+    default: 'scheduled'
+  },
+  viewerCount: {
+    type: Number,
+    default: 0
+  },
+  startedAt: Date,
+  endedAt: Date,
+  // Mock streaming URL for demonstration
+  streamUrl: {
+    type: String,
+    default: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+  }
+}, {
+  timestamps: true
+});
+
+export default mongoose.model('LiveRoom', liveRoomSchema);

@@ -286,7 +286,7 @@ clubSchema.index({ type: 1, category: 1 });
 clubSchema.index({ 'members.id': 1 });
 clubSchema.index({ tags: 1 });
 clubSchema.index({ isActive: 1, isPrivate: 1 });
-clubSchema.createIndex({ name: 'text', description: 'text' });
+clubSchema.index({ name: 'text', description: 'text' });
 
 // Virtual for member count
 clubSchema.virtual('actualMemberCount').get(function() {

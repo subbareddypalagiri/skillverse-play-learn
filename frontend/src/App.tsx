@@ -34,6 +34,10 @@ import AITools from "./pages/AITools";
 import AIAssistant from "./pages/AIAssistant";
 import Settings from "./pages/Settings";
 import FloatingChatbot from "./components/FloatingChatbot";
+import LiveRooms from "./pages/LiveRooms";
+import CreateLiveRoom from "./pages/CreateLiveRoom";
+import LiveStreamView from "./components/LiveStreamView";
+import AdminConsole from "./pages/AdminConsole";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +69,10 @@ const App = () => (
                   <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                   <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
+                  <Route path="/admin" element={<ProtectedRoute><AdminConsole /></ProtectedRoute>} />
+                  <Route path="/live-rooms" element={<ProtectedRoute><LiveRooms /></ProtectedRoute>} />
+                  <Route path="/live-rooms/create" element={<ProtectedRoute><CreateLiveRoom /></ProtectedRoute>} />
+                  <Route path="/live-rooms/:id" element={<ProtectedRoute><LiveStreamView /></ProtectedRoute>} />
                   <Route path="/vibe" element={<ProtectedRoute><VibeTabs /></ProtectedRoute>} />
                   <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />
                   <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />

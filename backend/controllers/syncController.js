@@ -315,11 +315,26 @@ export const bookSession = async (req, res) => {
       });
     }
     
+    // Check if the mentee (current user) has already booked another session at the same date & time slot
+    const targetDate = new Date(scheduledAt);
+    const existingUserSession = await Mentor.findOne({
+      'sessions.mentee': req.user._id,
+      'sessions.scheduledAt': targetDate,
+      'sessions.status': 'scheduled'
+    });
+
+    if (existingUserSession) {
+      return res.status(400).json({
+        success: false,
+        message: 'You have already booked a mentoring session at this date & time slot'
+      });
+    }
+
     // Create session
     mentor.sessions.push({
       mentee: req.user._id,
       service,
-      scheduledAt: new Date(scheduledAt),
+      scheduledAt: targetDate,
       duration,
       status: 'scheduled',
       notes,

@@ -2,8 +2,8 @@ import PageLayout from "@/components/PageLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Clock, GraduationCap, Users, Video, MessageCircle, Handshake, Sparkles, Star, ArrowRight } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Calendar, Clock, GraduationCap, Users, Video, MessageCircle, Handshake, Sparkles, Star, ArrowRight, BadgeCheck, FileCheck } from "lucide-react";
+import { useMemo, useState, useEffect } from "react";
 
 const domains = [
   { id: "ai", name: "AI & Machine Learning" },
@@ -27,10 +27,85 @@ const mentors = [
   { id: "m4", domain: "cloud", name: "Ananya Rao", role: "DevOps Mentor", rating: 5.0, sessions: 410, avatar: "https://i.pravatar.cc/150?img=55" },
 ];
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import apiClient from "@/lib/apiClient";
+import { useAuth } from "@/contexts/AuthContext";
+
 const Sync = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [domain, setDomain] = useState<string>("ai");
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [appStatus, setAppStatus] = useState<any>(null);
+
+  // Form states
+  const [skillsStr, setSkillsStr] = useState('');
+  const [mentorDomain, setMentorDomain] = useState('Web Development');
+  const [experience, setExperience] = useState('');
+  const [bio, setBio] = useState('');
+  const [motivation, setMotivation] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
   const filteredTalks = useMemo(() => alumniTalks.filter(t => t.domain === domain), [domain]);
   const filteredMentors = useMemo(() => mentors.filter(m => m.domain === domain), [domain]);
+
+  // Fetch application status
+  useEffect(() => {
+    if (user) {
+      apiClient.get('/sync/apply/mentor/my-application')
+        .then(res => {
+          if (res.data?.data) {
+            setAppStatus(res.data.data);
+          }
+        })
+        .catch(err => console.log('Error checking mentor app:', err));
+    }
+  }, [user]);
+
+  const handleApplySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!skillsStr.trim() || !experience.trim() || !bio.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please specify skills, experience, and bio description.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const res = await apiClient.post('/sync/apply/mentor', {
+        domain: mentorDomain,
+        role: "Mentor",
+        company: "Independent",
+        yearsOfExperience: parseInt(experience) || 1,
+        expertise: skillsStr.split(',').map(s => s.trim()),
+        bio,
+        motivation
+      });
+      toast({
+        title: "Application Submitted",
+        description: "Your Mentor application is pending admin review."
+      });
+      setAppStatus(res.data.data);
+      setShowApplyModal(false);
+    } catch (err: any) {
+      toast({
+        title: "Submission Failed",
+        description: err.response?.data?.message || "Failed to submit application.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <PageLayout>
@@ -48,23 +123,48 @@ const Sync = () => {
             Join alumni expert talks and book 1:1 sessions with mentors in your domain.
           </p>
         </div>
-        <div className="w-full md:w-72">
-          <Select value={domain} onValueChange={setDomain}>
-            <SelectTrigger className="premium-input h-auto">
-              <SelectValue placeholder="Select domain" />
-            </SelectTrigger>
-            <SelectContent style={{ background: 'hsl(230,25%,8%)', border: '1px solid hsl(230,20%,14%)' }}>
-              <SelectGroup>
-                <SelectLabel className="text-muted-foreground text-xs">Domains</SelectLabel>
-                {domains.map(d => (
-                  <SelectItem key={d.id} value={d.id}
-                    className="text-foreground focus:bg-primary/10 focus:text-primary">
-                    {d.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 w-full md:w-auto">
+          {/* Apply to Mentor Indicator Button */}
+          {user?.role === 'instructor' || user?.role === 'admin' ? (
+            <Badge className="bg-emerald-500/10 border-emerald-500/20 text-emerald-400 py-2.5 px-4 rounded-xl flex items-center gap-1.5 h-10">
+              <BadgeCheck className="w-4 h-4" strokeWidth={2.5} />
+              Host Mentor Access Unlocked
+            </Badge>
+          ) : appStatus?.status === 'pending' || appStatus?.status === 'under_review' ? (
+            <Badge className="bg-yellow-500/10 border-yellow-500/20 text-yellow-500 py-2.5 px-4 rounded-xl flex items-center gap-1.5 h-10">
+              <FileCheck className="w-4 h-4" />
+              Mentor Request Pending
+            </Badge>
+          ) : (
+            <Button
+              onClick={() => setShowApplyModal(true)}
+              variant="outline"
+              className="h-10 rounded-xl border-primary/20 hover:border-primary/45 transition-all text-xs font-semibold px-4"
+            >
+              <Handshake className="w-4 h-4 text-primary mr-1.5" />
+              Apply as Mentor
+            </Button>
+          )}
+
+          <div className="w-full md:w-72">
+            <Select value={domain} onValueChange={setDomain}>
+              <SelectTrigger className="premium-input h-10">
+                <SelectValue placeholder="Select domain" />
+              </SelectTrigger>
+              <SelectContent style={{ background: 'hsl(230,25%,8%)', border: '1px solid hsl(230,20%,14%)' }}>
+                <SelectGroup>
+                  <SelectLabel className="text-muted-foreground text-xs">Domains</SelectLabel>
+                  {domains.map(d => (
+                    <SelectItem key={d.id} value={d.id}
+                      className="text-foreground focus:bg-primary/10 focus:text-primary">
+                      {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -198,6 +298,59 @@ const Sync = () => {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Mentor Application Modal */}
+      <Dialog open={showApplyModal} onOpenChange={setShowApplyModal}>
+        <DialogContent className="sm:max-w-[475px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+              <Handshake className="w-5 h-5 text-primary" />
+              Apply as Domain Mentor
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Mentors provide 1:1 session bookings and guide students in career roadmaps.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleApplySubmit} className="space-y-4 mt-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="domain" className="text-xs font-semibold">Specialization Domain *</Label>
+                <select id="domain" value={mentorDomain} onChange={e => setMentorDomain(e.target.value)} className="w-full h-10 px-3 rounded-xl border border-input bg-background text-xs text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  <option value="Web Development">Web Development</option>
+                  <option value="Cloud & DevOps">Cloud & DevOps</option>
+                  <option value="AI & ML">AI & ML</option>
+                  <option value="Data Science">Data Science</option>
+                  <option value="UI/UX Design">UI/UX Design</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="exp" className="text-xs font-semibold">Years of Experience *</Label>
+                <Input id="exp" placeholder="e.g. 3" type="number" min="0" value={experience} onChange={e => setExperience(e.target.value)} required className="rounded-xl text-xs" />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="skills" className="text-xs font-semibold">Specific Skills (comma separated) *</Label>
+              <Input id="skills" placeholder="e.g. React, Docker, ML Pipelines" value={skillsStr} onChange={e => setSkillsStr(e.target.value)} required className="rounded-xl text-xs" />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="bio" className="text-xs font-semibold">Mentor Bio Profile *</Label>
+              <Textarea id="bio" placeholder="Provide a brief introductory bio details..." value={bio} onChange={e => setBio(e.target.value)} required className="rounded-xl min-h-[70px] text-xs" />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="motive" className="text-xs font-semibold">Briefly explain your motivation</Label>
+              <Textarea id="motive" placeholder="Why do you want to mentor students..." value={motivation} onChange={e => setMotivation(e.target.value)} className="rounded-xl min-h-[70px] text-xs" />
+            </div>
+
+            <Button type="submit" disabled={submitting} className="w-full py-2.5 rounded-xl font-semibold mt-4 text-xs" style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+              {submitting ? "Submitting application..." : "Submit Mentor Request"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </PageLayout>
   );
 };

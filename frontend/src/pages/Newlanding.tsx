@@ -3,6 +3,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import Navbar from '../components/Navbar'; 
+import apiClient from '@/lib/apiClient';
+import { Users, BookOpen, Award, Building } from 'lucide-react';
 
 import './Newlanding.css';
 
@@ -169,6 +171,28 @@ const NewLanding: React.FC = () => {
     };
   }, []);
 
+  // Dynamic Platform Stats State
+  const [stats, setStats] = React.useState({
+    learners: 0,
+    courses: 0,
+    successRate: 100,
+    partners: 12
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await apiClient.get('/courses/stats');
+        if (response.data?.data) {
+          setStats(response.data.data);
+        }
+      } catch (err) {
+        console.error('Error fetching platform stats:', err);
+      }
+    };
+    fetchStats();
+  }, []);
+
   // DATA ARRAYS
   const signals = [
     { num: '01', date: '2026.05.15', title: 'unlimited events', desc: 'Meet your personal AI learning companion — adaptive, contextual, always available.' },
@@ -188,10 +212,10 @@ const NewLanding: React.FC = () => {
   ];
 
   const statsData = [
-    { val: '10K+', label: 'Active Learners', icon: '👥' },
-    { val: '500+', label: 'Expert Courses', icon: '📚' },
-    { val: '95%', label: 'Success Rate', icon: '🏆' },
-    { val: '50+', label: 'Industry Partners', icon: '🚀' },
+    { val: stats.learners.toLocaleString(), label: 'Active Learners', iconName: 'Users' },
+    { val: stats.courses.toLocaleString(), label: 'Expert Courses', iconName: 'BookOpen' },
+    { val: `${stats.successRate}%`, label: 'Success Rate', iconName: 'Award' },
+    { val: stats.partners.toLocaleString(), label: 'Industry Partners', iconName: 'Building' },
   ];
 
   const principles = [
@@ -202,11 +226,11 @@ const NewLanding: React.FC = () => {
   ];
 
   const colophons = [
-    { head: 'Platform', items: ['Risee Team', 'Interface Lab'] },
+    { head: 'Platform', items: ['Haappy Team', 'Interface Lab'] },
     { head: 'Stack', items: ['React + Vite', 'Supabase', 'Tailwind CSS'] },
     { head: 'Typography', items: ['Bebas Neue', 'IBM Plex Mono', 'IBM Plex Sans'] },
     { head: 'Location', items: ['India', 'Everywhere'] },
-    { head: 'Contact', items: ['hello@risee.app', 'Twitter/X'] },
+    { head: 'Contact', items: ['hello@haappy.app', 'Twitter/X'] },
     { head: 'Year', items: ['2026', 'Ongoing'] },
   ];
 
@@ -327,13 +351,22 @@ const NewLanding: React.FC = () => {
           </div>
 
           <div id="stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginTop: '16px' }}>
-            {statsData.map((s, i) => (
-              <div key={i} className="stat-card fade-up" style={{ transitionDelay: `${i * 0.1}s` }}>
-                <div style={{ fontSize: '1.2rem', marginBottom: '.75rem' }}>{s.icon}</div>
-                <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem', color: '#f2f2f2', letterSpacing: '.05em' }}>{s.val}</div>
-                <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '9px', letterSpacing: '.2em', textTransform: 'uppercase', color: '#6b6b6b', marginTop: '4px' }}>{s.label}</div>
-              </div>
-            ))}
+            {statsData.map((s, i) => {
+              let IconComponent = Users;
+              if (s.iconName === 'BookOpen') IconComponent = BookOpen;
+              if (s.iconName === 'Award') IconComponent = Award;
+              if (s.iconName === 'Building') IconComponent = Building;
+
+              return (
+                <div key={i} className="stat-card fade-up" style={{ transitionDelay: `${i * 0.1}s` }}>
+                  <div style={{ marginBottom: '.75rem', color: '#c77b3f' }}>
+                    <IconComponent className="w-5 h-5" />
+                  </div>
+                  <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '2rem', color: '#f2f2f2', letterSpacing: '.05em' }}>{s.val}</div>
+                  <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '9px', letterSpacing: '.2em', textTransform: 'uppercase', color: '#6b6b6b', marginTop: '4px' }}>{s.label}</div>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -379,7 +412,7 @@ const NewLanding: React.FC = () => {
           </div>
           <div className="fade-up" style={{ marginTop: '6rem', paddingTop: '2rem', borderTop: '1px solid rgba(61,61,61,.2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '9px', letterSpacing: '.2em', textTransform: 'uppercase', color: '#6b6b6b' }}>
-              © 2026 Risee. All rights reserved.
+              © 2026 Haappy. All rights reserved.
             </p>
             <p style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '9px', color: '#6b6b6b' }}>
               Designed with intention. Built with precision.
