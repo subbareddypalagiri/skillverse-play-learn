@@ -9,6 +9,7 @@
     "npm": ">=9.0.0"
   },
   "scripts": {
+    "build": "echo 'Backend ready for serverless deployment'",
     "start": "cross-env NODE_ENV=production node server.js",
     "dev": "cross-env NODE_ENV=development nodemon server.js",
     "test": "jest --detectOpenHandles --forceExit",
