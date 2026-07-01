@@ -5,31 +5,31 @@ services:
   - type: web
     name: skillverse-backend
     runtime: node
-    region: oregon
+    region: singapore   # Closest to India for low latency
     plan: free
     rootDir: backend
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: npm install --omit=dev
+    startCommand: node server.js
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 5000
+        value: 10000   # Render uses 10000 internally
       - key: MONGODB_URI
-        sync: false   # Set this in Render Dashboard
+        value: mongodb+srv://myapiuser:Rise12345@cluster0.2fgdxiq.mongodb.net/skillverse?retryWrites=true&w=majority&appName=Cluster0
       - key: JWT_SECRET
-        generateValue: true
+        value: f0e3b5fe1422303503673dfd5709b1992371e3d0ad78e9ccf91d8260463ce4ce0a85ca928496eb2ce2ee1a0053947b66c86538ff007492b33384cf1c27768511
       - key: JWT_EXPIRE
         value: 15m
       - key: JWT_REFRESH_SECRET
-        generateValue: true
+        value: f6e6d3d53942292efdcacaa41493590ef624b7abf8cf1469c525c29334afb19fcdc4b5ee2f5ea5d2630ab8ab6765c5ef68f17ac92f0840a1fc9147aea6d856e0
       - key: JWT_REFRESH_EXPIRE
         value: 7d
       - key: BCRYPT_ROUNDS
         value: 12
       - key: CORS_ORIGINS
-        sync: false   # Set this to your Vercel frontend URL after deploy
+        sync: false   # ← Set this in Render Dashboard after deploy (your Vercel URL)
       - key: LOG_LEVEL
         value: info
       - key: RATE_LIMIT_WINDOW_MS
@@ -37,12 +37,17 @@ services:
       - key: RATE_LIMIT_MAX_REQUESTS
         value: 100
       - key: AUTH_RATE_LIMIT_MAX
-        value: 5
+        value: 10
       - key: DEFAULT_PAGE_SIZE
         value: 20
       - key: MAX_PAGE_SIZE
         value: 100
-      # Optional - Email (Nodemailer)
+      # Optional — External APIs
+      - key: JSEARCH_API_KEY
+        sync: false
+      - key: GITHUB_API_TOKEN
+        sync: false
+      # Optional — Email
       - key: EMAIL_HOST
         sync: false
       - key: EMAIL_PORT
@@ -55,12 +60,7 @@ services:
         sync: false
       - key: EMAIL_FROM_NAME
         value: Skillverse
-      # Optional - External APIs
-      - key: JSEARCH_API_KEY
-        sync: false
-      - key: GITHUB_API_TOKEN
-        sync: false
-      # Optional - AWS S3
+      # Optional — AWS S3
       - key: AWS_REGION
         sync: false
       - key: AWS_ACCESS_KEY_ID
