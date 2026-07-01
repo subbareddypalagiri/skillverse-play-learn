@@ -10,6 +10,146 @@ const typeColors: Record<string, string> = {
   place: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
 };
 
+// Comprehensive B.Tech career database mapping
+const careerDatabase: Record<string, any> = {
+  cse: {
+    subs: {
+      aiml: {
+        name: "Artificial Intelligence & ML",
+        roles: [
+          {
+            title: "MLOps Engineer",
+            desc: "Automates deployment, monitoring, and scaling of machine learning models in production.",
+            salary: { fresher: "₹8L - ₹15L", mid: "₹18L - ₹32L", expert: "₹40L - ₹80L+" },
+            promotions: ["Associate MLOps Engineer", "Senior MLOps Specialist", "Principal ML Platform Architect", "VP of Artificial Intelligence"]
+          },
+          {
+            title: "Computer Vision Engineer",
+            desc: "Develops algorithms to help machines process, analyze, and extract features from visual data.",
+            salary: { fresher: "₹7L - ₹13L", mid: "₹15L - ₹26L", expert: "₹35L - ₹70L" },
+            promotions: ["CV Researcher", "Lead Vision Scientist", "Director of Applied Perception"]
+          }
+        ]
+      },
+      datasci: {
+        name: "Data Science & Analytics",
+        roles: [
+          {
+            title: "Data Platform Architect",
+            desc: "Builds high-performance pipelines and storage clusters to handle Petabytes of live analytics datasets.",
+            salary: { fresher: "₹9L - ₹16L", mid: "₹20L - ₹38L", expert: "₹45L - ₹90L+" },
+            promotions: ["Data Engineer", "Senior Analytics Lead", "Director of Data Systems"]
+          }
+        ]
+      },
+      cyber: {
+        name: "Cybersecurity",
+        roles: [
+          {
+            title: "Security Penetration Tester",
+            desc: "Identifies and patches vulnerabilities in enterprise servers through authorized, controlled hacks.",
+            salary: { fresher: "₹6L - ₹12L", mid: "₹14L - ₹25L", expert: "₹30L - ₹65L" },
+            promotions: ["Security Consultant", "Senior Ethical Hacker", "Chief Information Security Officer (CISO)"]
+          }
+        ]
+      }
+    }
+  },
+  ece: {
+    subs: {
+      vlsi: {
+        name: "VLSI Design & Semiconductors",
+        roles: [
+          {
+            title: "ASIC Design Engineer",
+            desc: "Architects high-performance custom integrated circuits and microchip processing logic blocks.",
+            salary: { fresher: "₹9L - ₹18L", mid: "₹22L - ₹38L", expert: "₹45L - ₹85L+" },
+            promotions: ["Silicon Design Associate", "Lead SoC Architect", "Head of Silicon R&D"]
+          }
+        ]
+      },
+      embedded: {
+        name: "Embedded Systems & IoT",
+        roles: [
+          {
+            title: "Firmware Engineer",
+            desc: "Writes low-level code directly onto microcontrollers and hardware controllers.",
+            salary: { fresher: "₹5L - ₹10L", mid: "₹12L - ₹22L", expert: "₹28L - ₹55L" },
+            promotions: ["Hardware Integration Specialist", "Lead System Developer", "Engineering Director"]
+          }
+        ]
+      }
+    }
+  },
+  mech: {
+    subs: {
+      robotics: {
+        name: "Robotics & Automation",
+        roles: [
+          {
+            title: "Automation Systems Engineer",
+            desc: "Designs kinematics logic interfaces and feedback sensor grids for industrial robotic arms.",
+            salary: { fresher: "₹6L - ₹11L", mid: "₹13L - ₹24L", expert: "₹28L - ₹60L" },
+            promotions: ["Junior Automation Dev", "Senior Automation Lead", "Robotics Director"]
+          }
+        ]
+      },
+      automotive: {
+        name: "Automotive Diagnostics",
+        roles: [
+          {
+            title: "EV Drivetrain Programmer",
+            desc: "Writes battery thermal balance and kinetic regenerative braking control models.",
+            salary: { fresher: "₹7L - ₹13L", mid: "₹15L - ₹28L", expert: "₹32L - ₹70L" },
+            promotions: ["EV Subsystems Specialist", "Lead Propulsion Architect", "VP Powertrain Development"]
+          }
+        ]
+      }
+    }
+  },
+  civil: {
+    subs: {
+      smartcity: {
+        name: "Smart City Infrastructure",
+        roles: [
+          {
+            title: "Urban Modeling Specialist",
+            desc: "Simulates traffic flow, utility grids, and environmental impacts using GIS pipelines.",
+            salary: { fresher: "₹5L - ₹9L", mid: "₹10L - ₹18L", expert: "₹24L - ₹50L" },
+            promotions: ["Urban Modeler", "Infrastructure Planner", "Smart City Architect"]
+          }
+        ]
+      },
+      structural: {
+        name: "Parametric Structural Analysis",
+        roles: [
+          {
+            title: "Parametric CAD Modeler",
+            desc: "Calculates structural integrity and load dynamics using custom automated evaluation code.",
+            salary: { fresher: "₹5L - ₹10L", mid: "₹11L - ₹20L", expert: "₹25L - ₹55L" },
+            promotions: ["Structural Associate", "Lead Analysis Engineer", "Chief Structural Consultant"]
+          }
+        ]
+      }
+    }
+  },
+  metal: {
+    subs: {
+      nanomaterials: {
+        name: "Nanotechnology & Materials",
+        roles: [
+          {
+            title: "Corrosion Diagnostics Analyst",
+            desc: "Simulates molecular material breakdown cycles to extend product lifecycle durations.",
+            salary: { fresher: "₹6L - ₹11L", mid: "₹12L - ₹24L", expert: "₹28L - ₹60L" },
+            promotions: ["Materials Specialist", "Lead Metallurgy Analyst", "Director of Material Integrity"]
+          }
+        ]
+      }
+    }
+  }
+};
+
 const CareerHub = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
@@ -19,6 +159,11 @@ const CareerHub = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const itemsPerPage = 12;
+
+  // Selected guidance matrix states
+  const [selectedBranch, setSelectedBranch] = useState("cse");
+  const [selectedSub, setSelectedSub] = useState("aiml");
+  const [selectedRole, setSelectedRole] = useState<any>(null);
 
   const fetchOpportunities = async (search = "", location = "all", type = "all") => {
     try {
@@ -76,6 +221,151 @@ const CareerHub = () => {
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           Refresh
         </button>
+      </div>
+
+      {/* Dynamic Know Your Role Career Guidance Matrix */}
+      <div className="rounded-2xl border border-border/50 p-6 mb-6 animate-reveal-up delay-75"
+        style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-foreground" style={{ fontFamily: 'Sora, sans-serif' }}>
+              Know Your Role // Career Guidance Matrix
+            </h2>
+            <p className="text-xs text-muted-foreground">Select a B.Tech branch to analyze salary growth, career ladders, and promotions</p>
+          </div>
+        </div>
+
+        {/* B.Tech Core Branch Selectors */}
+        <div className="flex flex-wrap gap-2 mb-5">
+          {[
+            { id: 'cse', name: 'Computer Science', color: 'from-blue-500/10 to-indigo-500/10' },
+            { id: 'ece', name: 'Electronics & Comm.', color: 'from-amber-500/10 to-orange-500/10' },
+            { id: 'mech', name: 'Mechanical Systems', color: 'from-emerald-500/10 to-teal-500/10' },
+            { id: 'civil', name: 'Civil & Structuring', color: 'from-cyan-500/10 to-blue-500/10' },
+            { id: 'metal', name: 'Metallurgy & Materials', color: 'from-rose-500/10 to-pink-500/10' },
+          ].map(branch => (
+            <button
+              key={branch.id}
+              onClick={() => {
+                setSelectedBranch(branch.id);
+                // Auto-select first sub-branch
+                const subs = Object.keys(careerDatabase[branch.id]?.subs || {});
+                if (subs.length > 0) setSelectedSub(subs[0]);
+                setSelectedRole(null);
+              }}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all duration-200 ${
+                selectedBranch === branch.id
+                  ? 'bg-primary text-white border-primary shadow-[0_0_15px_rgba(124,58,237,0.2)]'
+                  : 'bg-muted/10 text-muted-foreground border-border/50 hover:border-primary/40 hover:text-foreground'
+              }`}
+            >
+              {branch.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Selected Branch Sub-Branches */}
+        {selectedBranch && careerDatabase[selectedBranch] && (
+          <div className="mb-5 animate-reveal-up">
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Sub-Specializations</div>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(careerDatabase[selectedBranch].subs).map(([subId, subData]: [string, any]) => (
+                <button
+                  key={subId}
+                  onClick={() => {
+                    setSelectedSub(subId);
+                    setSelectedRole(null);
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150 ${
+                    selectedSub === subId
+                      ? 'bg-foreground text-background border-foreground'
+                      : 'bg-muted/5 text-muted-foreground border-border/30 hover:border-muted hover:text-foreground'
+                  }`}
+                >
+                  {subData.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Roles Grid and Details */}
+        {selectedSub && selectedBranch && careerDatabase[selectedBranch]?.subs[selectedSub] && (
+          <div className="grid md:grid-cols-5 gap-6 mt-4 pt-4 border-t border-border/30 animate-reveal-up">
+            
+            {/* Roles List (Left 2 cols) */}
+            <div className="md:col-span-2 space-y-2">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Target Roles</div>
+              {careerDatabase[selectedBranch].subs[selectedSub].roles.map((role: any) => (
+                <button
+                  key={role.title}
+                  onClick={() => setSelectedRole(role)}
+                  className={`w-full text-left p-3 rounded-xl border transition-all duration-150 flex flex-col gap-1 ${
+                    selectedRole?.title === role.title
+                      ? 'border-primary/60 bg-primary/5 shadow-inner'
+                      : 'border-border/30 bg-muted/5 hover:border-border/80'
+                  }`}
+                >
+                  <span className="text-xs font-bold text-foreground">{role.title}</span>
+                  <span className="text-[10px] text-muted-foreground line-clamp-1">{role.desc}</span>
+                  <span className="text-[10px] text-violet-400 font-semibold mt-1">Fresher Start: {role.salary.fresher}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Role Insights & Salary Details (Right 3 cols) */}
+            <div className="md:col-span-3">
+              {selectedRole ? (
+                <div className="p-4 rounded-xl border border-border/50 bg-muted/10 space-y-4 animate-reveal-up">
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">{selectedRole.title}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{selectedRole.desc}</p>
+                  </div>
+
+                  {/* Career Levels Breakdown */}
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2.5">Salary Spectrum</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/15">
+                        <div className="text-[10px] text-emerald-400 font-bold">Fresher Start</div>
+                        <div className="text-xs font-bold mt-0.5 text-foreground">{selectedRole.salary.fresher}</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-violet-500/5 border border-violet-500/15">
+                        <div className="text-[10px] text-violet-400 font-bold">Mid-Range</div>
+                        <div className="text-xs font-bold mt-0.5 text-foreground">{selectedRole.salary.mid}</div>
+                      </div>
+                      <div className="p-2.5 rounded-lg bg-pink-500/5 border border-pink-500/15">
+                        <div className="text-[10px] text-pink-400 font-bold">Lead/Expert</div>
+                        <div className="text-xs font-bold mt-0.5 text-foreground">{selectedRole.salary.expert}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Promotion Path Ladder */}
+                  <div className="pt-2 border-t border-border/30">
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold mb-2">Promotional Path & Career Ladder</div>
+                    <div className="space-y-2 relative pl-3 before:absolute before:left-1 before:top-2 before:bottom-2 before:w-0.5 before:bg-primary/20">
+                      {selectedRole.promotions.map((step: string, idx: number) => (
+                        <div key={idx} className="relative text-xs text-muted-foreground flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary absolute -left-[11px]" />
+                          <span className="font-semibold text-foreground text-[11px]">{step}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="h-full flex items-center justify-center p-6 border border-dashed border-border/50 rounded-xl bg-muted/5">
+                  <p className="text-xs text-muted-foreground">Select a target career role to inspect detailed growth pathways.</p>
+                </div>
+              )}
+            </div>
+
+          </div>
+        )}
       </div>
 
       {/* Filters */}
