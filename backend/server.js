@@ -33,18 +33,18 @@ const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:3000,http:
   .split(',')
   .map(o => o.trim());
 
-// Allow all Vercel preview deployment URLs automatically
-const vercelPreviewPattern = /^https:\/\/skillverse-play-learn-wzcb.*\.vercel\.app$/;
+// Allow all Vercel deployment URLs automatically
+const vercelPreviewPattern = /^https:\/\/.*\.vercel\.app$/;
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, server-to-server)
-    if (!origin) {
+    // Allow requests with no origin (mobile apps, curl, server-to-server) or wildcard *
+    if (!origin || allowedOrigins.includes('*')) {
       callback(null, true);
     } else if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else if (vercelPreviewPattern.test(origin)) {
-      // Allow all Vercel preview deployments for this project
+      // Allow all Vercel deployments
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
