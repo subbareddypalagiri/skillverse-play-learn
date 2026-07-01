@@ -218,23 +218,54 @@ const initializeApp = async () => {
 };
 
 // ============================================================
-// UNHANDLED REJECTION HANDLER
+// START APPLICATION
 // ============================================================
+
+// Connect DB on module load (for Vercel serverless + normal server)
+const startDB = async () => {
+  try {
+    await connectDB();
+    // Only start scheduler workers in non-serverless environments
+    if (process.env.VERCEL !== '1') {
+      startScheduler();
+      startAIToolsScheduler();
+    }
+  } catch (error) {
+    logger.error('Failed to connect to DB:', error);
+  }
+};
+
+// Start DB connection immediately
+startDB();
+
+// Normal server mode (Railway, local, Render etc.)
+if (process.env.VERCEL !== '1') {
+  const server = app.listen(PORT, () => {
+    logger.info(`Server running on port ${PORT} in ${NODE_ENV} mode`);
+    logger.info(`Health Check: http://localhost:${PORT}/health`);
+  });
+
+  process.on('SIGTERM', () => {
+    server.close(() => {
+      mongoose.connection.close(false);
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGINT', () => {
+    server.close(() => {
+      mongoose.connection.close(false);
+      process.exit(0);
+    });
+  });
+}
 
 process.on('unhandledRejection', (reason, promise) => {
   logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  process.exit(1);
 });
 
 process.on('uncaughtException', (error) => {
   logger.error('Uncaught Exception:', error);
-  process.exit(1);
 });
-
-// ============================================================
-// START APPLICATION
-// ============================================================
-
-initializeApp();
 
 export default app;
