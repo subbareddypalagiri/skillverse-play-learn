@@ -30,12 +30,23 @@ const Login = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [stats, setStats] = useState({ learners: 0, courses: 0, successRate: 100 });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/dashboard';
   const { login } = useAuth();
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    // Fetch live stats from the backend stats api
+    apiClient.get('/courses/stats')
+      .then(res => {
+        if (res.data?.data) {
+          setStats(res.data.data);
+        }
+      })
+      .catch(err => console.log('Error loading stats:', err));
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -107,9 +118,9 @@ const Login = () => {
 
           {/* Stats row */}
           <div className="flex flex-wrap gap-3">
-            <StatPill icon={BookOpen} label="Expert Courses" value="500+" delay="0.4s" />
-            <StatPill icon={Trophy} label="Success Rate" value="95%" delay="0.5s" />
-            <StatPill icon={Zap} label="Active Learners" value="10K+" delay="0.6s" />
+            <StatPill icon={BookOpen} label="Expert Courses" value={stats.courses > 0 ? `${stats.courses}` : "18"} delay="0.4s" />
+            <StatPill icon={Trophy} label="Success Rate" value={`${stats.successRate}%`} delay="0.5s" />
+            <StatPill icon={Zap} label="Active Learners" value={stats.learners > 0 ? `${stats.learners}` : "150+"} delay="0.6s" />
           </div>
 
           {/* Testimonial */}
@@ -118,9 +129,9 @@ const Login = () => {
               "Haappy completely transformed how I learn. Within 3 months I went from beginner to landing my first dev job."
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">P</div>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">A</div>
               <div>
-                <div className="text-xs font-semibold text-foreground">Priya Sharma</div>
+                <div className="text-xs font-semibold text-foreground">Ankit Pal</div>
                 <div className="text-[11px] text-muted-foreground">Full-Stack Developer</div>
               </div>
               <div className="ml-auto flex gap-0.5">
