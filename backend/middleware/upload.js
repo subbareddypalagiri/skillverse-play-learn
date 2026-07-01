@@ -3,15 +3,17 @@ import path from 'path';
 import multer from 'multer';
 import { ValidationError } from '../utils/errorHandler.js';
 
-const uploadsDir = path.resolve(process.cwd(), 'uploads');
+const isServerless = !!process.env.VERCEL;
+const baseDir = isServerless ? '/tmp' : process.cwd();
+const uploadsDir = path.resolve(baseDir, 'uploads');
 const reelsDir = path.resolve(uploadsDir, 'reels');
 
 if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir);
+  fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
 if (!fs.existsSync(reelsDir)) {
-  fs.mkdirSync(reelsDir);
+  fs.mkdirSync(reelsDir, { recursive: true });
 }
 
 const storage = multer.diskStorage({

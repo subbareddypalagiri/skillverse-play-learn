@@ -133,7 +133,8 @@ import adminRoutes from './routes/adminRoutes.js';
 import startScheduler from './workers/jobFetcher.worker.js';
 import startAIToolsScheduler from './workers/aiToolsSync.worker.js';
 
-const uploadsDirectory = path.resolve(process.cwd(), 'uploads');
+const isServerless = !!process.env.VERCEL;
+const uploadsDirectory = path.resolve(isServerless ? '/tmp' : process.cwd(), 'uploads');
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
