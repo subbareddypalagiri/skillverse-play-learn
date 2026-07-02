@@ -105,7 +105,7 @@ export const createReel = async (req, res, next) => {
         ? tags.map(t => String(t).trim()).filter(Boolean)
         : [];
 
-    const normalizedVideoPath = req.file.path.replace(/\\/g, '/');
+    const cleanVideoUrl = `/uploads/reels/${req.file.filename}`;
 
     const reel = await Reel.create({
       userId: req.userId,
@@ -115,7 +115,7 @@ export const createReel = async (req, res, next) => {
       category,
       tags: tagList,
       duration: parsedDuration,
-      videoUrl: `/${normalizedVideoPath}`,
+      videoUrl: cleanVideoUrl,
       videoSize: req.file.size,
       courseLink,
       sourceCourseId: sourceCourseId || undefined,
