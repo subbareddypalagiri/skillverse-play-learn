@@ -125,23 +125,6 @@ const CreateLiveRoom: React.FC = () => {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="stream" className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <Link2 className="w-3.5 h-3.5" />
-                Custom Video Source URL (optional)
-              </Label>
-              <Input
-                id="stream"
-                placeholder="e.g. https://domain.com/source.mp4"
-                value={streamUrl}
-                onChange={e => setStreamUrl(e.target.value)}
-                className="rounded-xl text-xs"
-              />
-              <p className="text-[10px] text-muted-foreground">
-                Leave empty to run with our default mock studio feed.
-              </p>
-            </div>
-
             <Button
               type="submit"
               disabled={submitting}
