@@ -29,6 +29,7 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
     category: 'technical',
     campusLocation: 'In Campus',
     mode: 'offline',
+    eventLink: '',
     eventType: 'workshop',
     date: '',
     time: '',
@@ -60,6 +61,7 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
         displayTime: form.time,
         location: form.venue,
         isOnline: form.mode === 'online',
+        eventLink: form.mode === 'online' ? form.eventLink : undefined,
         startDate,
         endDate: new Date(startDate.getTime() + 3 * 60 * 60 * 1000),
         capacity: parseInt(form.capacity),
@@ -133,10 +135,37 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
                 </select>
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Location *</label>
+                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Campus Location *</label>
                 <select className={inputClass} value={form.campusLocation} onChange={e => setForm({ ...form, campusLocation: e.target.value })}>
                   <option value="In Campus">In Campus</option>
                   <option value="Out of Campus">Out of Campus</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Event Mode *</label>
+                <select className={inputClass} value={form.mode} onChange={e => setForm({ ...form, mode: e.target.value })}>
+                  <option value="offline">Offline / In-person</option>
+                  <option value="online">Online / Virtual</option>
+                </select>
+              </div>
+              {form.mode === 'online' && (
+                <div className="col-span-2">
+                  <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Online Event Link (Meeting URL) *</label>
+                  <input type="url" className={inputClass} value={form.eventLink} onChange={e => setForm({ ...form, eventLink: e.target.value })} required placeholder="e.g., https://meet.google.com/xyz or Zoom link" />
+                </div>
+              )}
+              <div>
+                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Event Type *</label>
+                <select className={inputClass} value={form.eventType} onChange={e => setForm({ ...form, eventType: e.target.value })}>
+                  <option value="workshop">Workshop</option>
+                  <option value="webinar">Webinar</option>
+                  <option value="hackathon">Hackathon</option>
+                  <option value="meetup">Meetup</option>
+                  <option value="conference">Conference</option>
+                  <option value="seminar">Seminar</option>
+                  <option value="cultural">Cultural</option>
+                  <option value="competition">Competition</option>
+                  <option value="tour">Tour</option>
                 </select>
               </div>
               <div>
