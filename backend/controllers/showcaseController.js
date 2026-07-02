@@ -21,7 +21,8 @@ const upsertShowcase = async (userId, platformData) => {
 
 export const getShowcase = async (req, res) => {
   try {
-    const userId = req.params.userId || req.user._id;
+    const isValidHexId = req.params.userId && /^[0-9a-fA-F]{24}$/.test(req.params.userId);
+    const userId = isValidHexId ? req.params.userId : req.user._id;
     let showcase = await Showcase.findOne({ userId });
     if (!showcase) showcase = await Showcase.create({ userId });
     res.status(200).json({ success: true, data: showcase });

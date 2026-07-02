@@ -109,8 +109,8 @@ interface ShowcaseResponse {
   message?: string;
 }
 
-export const getShowcase = async (userId?: string): Promise<ShowcaseData> => {
-  const url = userId ? `/showcase/${userId}` : '/showcase';
+export const getShowcase = async (userId?: any): Promise<ShowcaseData> => {
+  const url = typeof userId === 'string' && userId.trim().length > 0 && userId !== '[object Object]' ? `/showcase/${userId.trim()}` : '/showcase';
   const response = await apiClient.get<ShowcaseResponse>(url);
   return response.data.data;
 };
@@ -194,5 +194,5 @@ export const parseConnectInput = (platform: PlatformId, input: string): string =
   };
   const match = patterns[platform]?.exec(trimmed);
   if (match) return match[1];
-  return trimmed.replace(/^@/, '');
+  return trimmed.replace(/^@/, '').replace(/\/$/, '');
 };

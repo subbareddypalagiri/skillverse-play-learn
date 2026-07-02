@@ -140,21 +140,32 @@ export default function ShowcaseTab() {
   const [headline, setHeadline] = useState("");
   const [portfolioTitle, setPortfolioTitle] = useState("");
 
-  const showcaseQuery = useQuery({ queryKey: ["showcase"], queryFn: getShowcase });
-  const statsQuery = useQuery({ queryKey: ["showcase-stats"], queryFn: getShowcaseStats });
+  const showcaseQuery = useQuery({
+    queryKey: ["showcase"],
+    queryFn: () => getShowcase(),
+    staleTime: 1000 * 60 * 5,
+  });
+  const statsQuery = useQuery({
+    queryKey: ["showcase-stats"],
+    queryFn: () => getShowcaseStats(),
+    staleTime: 1000 * 60 * 5,
+  });
 
   const connectMutation = useMutation({
     mutationFn: async ({ platform, value, extra }: { platform: PlatformId; value: string; extra?: { headline?: string; title?: string } }) => {
       return CONNECT_FNS[platform](value, extra);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data) {
+        queryClient.setQueryData(["showcase"], data);
+      }
       queryClient.invalidateQueries({ queryKey: ["showcase"] });
       queryClient.invalidateQueries({ queryKey: ["showcase-stats"] });
       setConnecting(null);
       setInputs({});
       setHeadline("");
       setPortfolioTitle("");
-      toast.success("Profile connected!");
+      toast.success("Profile connected successfully!");
     },
     onError: (err: { response?: { data?: { message?: string } } }) => {
       toast.error(err.response?.data?.message || "Connection failed — check username or URL");
@@ -163,7 +174,10 @@ export default function ShowcaseTab() {
 
   const disconnectMutation = useMutation({
     mutationFn: disconnectPlatform,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data) {
+        queryClient.setQueryData(["showcase"], data);
+      }
       queryClient.invalidateQueries({ queryKey: ["showcase"] });
       queryClient.invalidateQueries({ queryKey: ["showcase-stats"] });
       toast.success("Disconnected");
@@ -172,8 +186,12 @@ export default function ShowcaseTab() {
 
   const refreshMutation = useMutation({
     mutationFn: refreshPlatform,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (data) {
+        queryClient.setQueryData(["showcase"], data);
+      }
       queryClient.invalidateQueries({ queryKey: ["showcase"] });
+      queryClient.invalidateQueries({ queryKey: ["showcase-stats"] });
       toast.success("Stats refreshed");
     },
     onError: () => toast.error("Refresh failed"),
