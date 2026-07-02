@@ -1150,9 +1150,9 @@ const Courses = () => {
   ];
 
   const [competitiveExams, setCompetitiveExams] = useState(() =>
-    initialCompetitiveExams.map((exam, idx) => ({
+    initialCompetitiveExams.map((exam) => ({
       ...exam,
-      students: exam.students || [4890, 3450, 5120, 8940, 6780, 5430, 4210, 9210, 7340, 6120][idx % 10]
+      students: 0
     }))
   );
 
@@ -1327,9 +1327,6 @@ const Courses = () => {
                     <div className="flex items-center gap-3 text-xs text-zinc-400 mb-5 pb-4 border-b border-zinc-800/80">
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{course.duration}</span>
                       <span className="flex items-center gap-1"><Users className="w-3 h-3" />{(course.students || course.enrollmentCount || 0).toLocaleString()}</span>
-                      {course.rating > 0 && (
-                        <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-amber-400 text-amber-400" /><span className="font-semibold text-white">{course.rating.toFixed(1)}</span></span>
-                      )}
                     </div>
 
                     {/* Actions */}

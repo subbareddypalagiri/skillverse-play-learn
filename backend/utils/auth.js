@@ -41,7 +41,7 @@ export const verifyRefreshToken = (token) => {
 };
 
 export const extractTokenFromHeader = (authHeader) => {
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader || !authHeader.startsWith('Bearer ') || authHeader === 'Bearer undefined' || authHeader === 'Bearer null') {
     throw new AuthenticationError('Invalid authorization header');
   }
   return authHeader.substring(7);
