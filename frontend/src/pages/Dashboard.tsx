@@ -7,6 +7,8 @@ import { useCourseContext } from "../contexts/CourseContext";
 import { useAuth } from "@/contexts/AuthContext";
 import EmptyState from "@/components/EmptyState";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { fetchEvents } from "@/lib/eventsApi";
 
 const StatCard = ({ label, value, icon: Icon, color, delay }: any) => (
   <div
@@ -32,18 +34,26 @@ const Dashboard = () => {
   const { enrolledCourses, updateProgress } = useCourseContext();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [liveEvents, setLiveEvents] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchEvents({ limit: 5 })
+      .then(res => {
+        if (res?.success && Array.isArray(res.data)) {
+          setLiveEvents(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const userStreak = (user as any)?.streak || 0;
+  const userAchievements = (user as any)?.achievementsCount || (user as any)?.achievements?.length || 0;
 
   const stats = [
     { label: "Courses in Progress", value: enrolledCourses.length.toString(), icon: BookOpen, color: "bg-violet-500/20 text-violet-400", delay: "0.1s" },
-    { label: "Upcoming Events", value: "5", icon: Calendar, color: "bg-cyan-500/20 text-cyan-400", delay: "0.2s" },
-    { label: "Achievements", value: "12", icon: Trophy, color: "bg-amber-500/20 text-amber-400", delay: "0.3s" },
-    { label: "Study Streak", value: "7 days", icon: Flame, color: "bg-orange-500/20 text-orange-400", delay: "0.4s" },
-  ];
-
-  const upcomingEvents = [
-    { name: "Coding Hackathon", date: "Dec 15", type: "Competition", color: "text-violet-400 bg-violet-500/10" },
-    { name: "Mountain Trek", date: "Dec 20", type: "Adventure", color: "text-cyan-400 bg-cyan-500/10" },
-    { name: "Tech Talk: AI Trends", date: "Dec 22", type: "Learning", color: "text-emerald-400 bg-emerald-500/10" },
+    { label: "Upcoming Events", value: liveEvents.length.toString(), icon: Calendar, color: "bg-cyan-500/20 text-cyan-400", delay: "0.2s" },
+    { label: "Achievements", value: userAchievements.toString(), icon: Trophy, color: "bg-amber-500/20 text-amber-400", delay: "0.3s" },
+    { label: "Study Streak", value: `${userStreak} days`, icon: Flame, color: "bg-orange-500/20 text-orange-400", delay: "0.4s" },
   ];
 
   return (
@@ -178,19 +188,31 @@ const Dashboard = () => {
                 <Calendar className="w-4 h-4 text-muted-foreground" />
               </div>
               <div className="p-4 space-y-3">
-                {upcomingEvents.map((event, idx) => (
-                  <div key={idx} className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/3 transition-all duration-200 cursor-pointer group">
-                    <div className="flex-shrink-0 text-center min-w-[36px]">
-                      <div className="text-[10px] text-muted-foreground">{event.date.split(' ')[0]}</div>
-                      <div className="text-lg font-bold text-foreground leading-none" style={{fontFamily:'Sora,sans-serif'}}>{event.date.split(' ')[1]}</div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">{event.name}</p>
-                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${event.color}`}>{event.type}</span>
-                    </div>
+                {liveEvents.length > 0 ? (
+                  liveEvents.slice(0, 3).map((event, idx) => {
+                    const eventDate = new Date(event.date || event.startDate || event.createdAt || Date.now());
+                    const monthStr = eventDate.toLocaleString('default', { month: 'short' });
+                    const dayStr = eventDate.getDate();
+                    return (
+                      <div key={idx} onClick={() => navigate(`/events/${event._id || event.id}`)} className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/3 transition-all duration-200 cursor-pointer group">
+                        <div className="flex-shrink-0 text-center min-w-[36px]">
+                          <div className="text-[10px] text-muted-foreground uppercase">{monthStr}</div>
+                          <div className="text-lg font-bold text-foreground leading-none" style={{fontFamily:'Sora,sans-serif'}}>{dayStr}</div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">{event.title}</p>
+                          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400">{event.type || event.mode || 'Upcoming'}</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-6 text-muted-foreground text-xs">
+                    No upcoming events right now.
                   </div>
-                ))}
+                )}
               </div>
+
               <div className="p-4 pt-0">
                 <button onClick={() => navigate('/events')}
                   className="w-full py-2.5 rounded-xl text-xs font-medium text-primary border border-primary/20 hover:bg-primary/10 transition-all duration-200 flex items-center justify-center gap-1.5 group">

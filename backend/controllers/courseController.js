@@ -465,7 +465,7 @@ export const getMyCredits = async (req, res, next) => {
  */
 export const getPlatformStats = async (req, res, next) => {
   try {
-    const totalLearners = await User.countDocuments({ role: 'student' });
+    const totalLearners = await User.countDocuments({ isDeleted: false });
     const totalCourses = await Course.countDocuments({ isActive: true, isPublished: true, isDeleted: false });
     
     // Success rate: percentage of enrollments that are completed

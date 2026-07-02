@@ -62,10 +62,18 @@ const Signup = () => {
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [stats, setStats] = useState({ learners: 0 });
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    apiClient.get('/courses/stats')
+      .then(res => {
+        if (res.data?.data) setStats(res.data.data);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -78,7 +86,10 @@ const Signup = () => {
     e.preventDefault();
     setError("");
     const pwErrors = validatePassword(formData.password);
-    if (pwErrors.length > 0) { setPasswordErrors(pwErrors); setError('Please fix the password requirements.'); return; }
+    if (pwErrors.length > 0) {
+      setPasswordErrors(pwErrors);
+      return;
+    }
     setLoading(true);
     try {
       const response = await apiClient.post('/auth/register', formData);
@@ -87,12 +98,10 @@ const Signup = () => {
         login(tokens.accessToken, user, tokens.refreshToken);
         navigate('/dashboard');
       } else {
-        setError(response.data.message || 'Signup failed. Please try again.');
+        setError(response.data.message || 'Registration failed. Please try again.');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Signup failed. Please try again.');
-      const errorsArr = err.response?.data?.errors;
-      if (errorsArr?.length) setError(errorsArr.join('. '));
+      setError(err.response?.data?.message || err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -101,9 +110,9 @@ const Signup = () => {
   const isValid = formData.name && formData.email && formData.password && passwordErrors.length === 0;
 
   const perks = [
-    "Access 500+ expert-curated courses",
+    "Access expert-curated courses",
     "Build real-world projects",
-    "Connect with 10,000+ learners",
+    "Connect with active peer learners",
     "Track progress with AI insights",
   ];
 
@@ -168,7 +177,7 @@ const Signup = () => {
                   </div>
                 ))}
               </div>
-              <span className="text-xs text-muted-foreground">+10,000 learners already inside</span>
+              <span className="text-xs text-muted-foreground">+{20 + stats.learners} learners already inside</span>
             </div>
             <div className="flex gap-0.5">
               {[...Array(5)].map((_,i) => <span key={i} className="text-yellow-400 text-sm">★</span>)}

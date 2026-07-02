@@ -120,7 +120,7 @@ const Login = () => {
           <div className="flex flex-wrap gap-3">
             <StatPill icon={BookOpen} label="Expert Courses" value={stats.courses > 0 ? `${stats.courses}` : "18"} delay="0.4s" />
             <StatPill icon={Trophy} label="Success Rate" value={`${stats.successRate}%`} delay="0.5s" />
-            <StatPill icon={Zap} label="Active Learners" value={stats.learners > 0 ? `${stats.learners}` : "150+"} delay="0.6s" />
+            <StatPill icon={Zap} label="Active Learners" value={`${20 + stats.learners}+`} delay="0.6s" />
           </div>
 
           {/* Testimonial */}
