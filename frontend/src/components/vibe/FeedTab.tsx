@@ -13,11 +13,14 @@ import {
   MessageCircle,
   Share2,
   Bookmark,
-  Loader2
+  Loader2,
+  Trash2
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import apiClient from "@/lib/apiClient";
 
 const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1").replace(/\/api\/v1\/?$/, "");
 
@@ -28,11 +31,27 @@ const resolveMediaUrl = (url: string) => {
 };
 
 export default function FeedTab() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
   const [activeCommentPostId, setActiveCommentPostId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      try {
+        await apiClient.delete(`/posts/${id}`);
+      } catch {
+        await apiClient.delete(`/reels/${id}`);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts-feed"] });
+      queryClient.invalidateQueries({ queryKey: ["my-reels"] });
+    }
+  });
+
 
   const categories = ['all', 'general', 'achievement', 'project', 'learning', 'career', 'question', 'tip'];
 
@@ -242,6 +261,19 @@ export default function FeedTab() {
                   >
                     <Share2 className="w-4 h-4" />
                   </button>
+
+                  {user && (post.user?._id === user._id || (post as any).userId === user._id) && (
+                    <button
+                      onClick={() => {
+                        if (window.confirm("Are you sure you want to delete this post?")) {
+                          deleteMutation.mutate(post._id);
+                        }
+                      }}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-red-400/80 hover:bg-red-500/10 hover:text-red-400 ml-auto transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
 
                 {/* Recent Comments Preview */}

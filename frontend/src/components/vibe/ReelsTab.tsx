@@ -19,11 +19,15 @@ import {
   Play,
   Loader2,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Trash2
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import apiClient from "@/lib/apiClient";
+
 
 const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1").replace(/\/api\/v1\/?$/, "");
 
@@ -43,7 +47,9 @@ const CenteredReel = ({
   onComment,
   onShare,
   onSave,
-  onViewed
+  onViewed,
+  canDelete,
+  onDelete
 }: {
   reel: ReelItem;
   isActive: boolean;
@@ -54,6 +60,8 @@ const CenteredReel = ({
   onShare: () => void;
   onSave: () => void;
   onViewed: () => void;
+  canDelete?: boolean;
+  onDelete?: () => void;
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -196,6 +204,14 @@ const CenteredReel = ({
               <Share2 className="w-5 h-5 text-white" />
             </div>
           </button>
+
+          {canDelete && (
+            <button onClick={onDelete} className="flex flex-col items-center gap-1 group mt-2">
+              <div className="w-11 h-11 rounded-full bg-red-500/20 group-hover:bg-red-500 flex items-center justify-center transition-all border border-red-500/30">
+                <Trash2 className="w-5 h-5 text-red-400 group-hover:text-white" />
+              </div>
+            </button>
+          )}
         </div>
       </div>
 
@@ -207,6 +223,7 @@ const CenteredReel = ({
 };
 
 export default function ReelsTab() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -214,6 +231,21 @@ export default function ReelsTab() {
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
   const [activeCommentReelId, setActiveCommentReelId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      try {
+        await apiClient.delete(`/reels/${id}`);
+      } catch {
+        await apiClient.delete(`/posts/${id}`);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reels-feed"] });
+      queryClient.invalidateQueries({ queryKey: ["my-reels"] });
+    }
+  });
+
 
   const feedQuery = useInfiniteQuery({
     queryKey: ["reels-feed", "latest"],
@@ -355,6 +387,12 @@ export default function ReelsTab() {
             onShare={() => handleShare(reel)}
             onSave={() => actionMutation.mutate({ type: "save", reelId: reel._id })}
             onViewed={() => trackReelView(reel._id).catch(() => {})}
+            canDelete={Boolean(user && (reel.creator?._id === user._id || (reel as any).userId === user._id || (reel as any).user?._id === user._id))}
+            onDelete={() => {
+              if (window.confirm("Are you sure you want to delete this reel?")) {
+                deleteMutation.mutate(reel._id);
+              }
+            }}
           />
         ))}
 

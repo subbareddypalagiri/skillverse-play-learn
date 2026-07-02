@@ -1,8 +1,10 @@
 import Reel from '../models/Reel.js';
+import Post from '../models/Post.js';
 import ReelFollow from '../models/ReelFollow.js';
 import { successResponse, paginatedResponse } from '../utils/responseHandler.js';
 import { NotFoundError, ValidationError, AuthorizationError } from '../utils/errorHandler.js';
 import { uploadReelVideo } from '../utils/cloudinary.js';
+
 
 const buildFeedQuery = ({ category, tag, userId, mode }) => {
   const query = { isPublished: true, isDeleted: false };
@@ -407,22 +409,48 @@ export const toggleFollowCreator = async (req, res, next) => {
  */
 export const deleteReel = async (req, res, next) => {
   try {
-    const reel = await getReelForInteraction(req.params.id);
+    let deleted = false;
+    const reel = await Reel.findById(req.params.id);
+    if (reel && !reel.isDeleted) {
+      if (reel.userId.toString() !== req.userId.toString() && req.user?.role !== 'admin') {
+        throw new AuthorizationError('Not authorized to delete this reel');
+      }
+      reel.isDeleted = true;
+      reel.deletedAt = new Date();
+      reel.updatedBy = req.userId;
+      await reel.save();
+      deleted = true;
 
-    if (reel.userId.toString() !== req.userId.toString() && req.user.role !== 'admin') {
-      throw new AuthorizationError('Not authorized to delete this reel');
+      if (reel.videoUrl) {
+        await Post.updateMany({ 'mediaUrls.url': reel.videoUrl, userId: req.userId }, { isDeleted: true, deletedAt: new Date() });
+      }
     }
 
-    reel.isDeleted = true;
-    reel.deletedAt = new Date();
-    reel.updatedBy = req.userId;
-    await reel.save();
+    const post = await Post.findById(req.params.id);
+    if (post && !post.isDeleted) {
+      if (post.userId.toString() !== req.userId.toString() && req.user?.role !== 'admin') {
+        throw new AuthorizationError('Not authorized to delete this post');
+      }
+      post.isDeleted = true;
+      post.deletedAt = new Date();
+      await post.save();
+      deleted = true;
+
+      if (post.mediaUrls?.[0]?.url) {
+        await Reel.updateMany({ videoUrl: post.mediaUrls[0].url, userId: req.userId }, { isDeleted: true, deletedAt: new Date() });
+      }
+    }
+
+    if (!deleted) {
+      throw new NotFoundError('Reel or Post not found');
+    }
 
     return successResponse(res, 200, 'Reel deleted successfully');
   } catch (error) {
     next(error);
   }
 };
+
 
 /**
  * @desc    Get available reel categories

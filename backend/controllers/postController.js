@@ -326,21 +326,47 @@ export const trackPostView = async (req, res, next) => {
  */
 export const deletePost = async (req, res, next) => {
   try {
-    const post = await getPostForInteraction(req.params.id);
+    let deleted = false;
+    const post = await Post.findById(req.params.id);
+    if (post && !post.isDeleted) {
+      if (post.userId.toString() !== req.userId.toString() && req.user?.role !== 'admin') {
+        throw new AuthorizationError('Not authorized to delete this post');
+      }
+      post.isDeleted = true;
+      post.deletedAt = new Date();
+      await post.save();
+      deleted = true;
 
-    if (post.userId.toString() !== req.userId.toString() && req.user?.role !== 'admin') {
-      throw new AuthorizationError('Not authorized to delete this post');
+      if (post.mediaUrls?.[0]?.url) {
+        await Reel.updateMany({ videoUrl: post.mediaUrls[0].url, userId: req.userId }, { isDeleted: true, deletedAt: new Date() });
+      }
     }
 
-    post.isDeleted = true;
-    post.deletedAt = new Date();
-    await post.save();
+    const reel = await Reel.findById(req.params.id);
+    if (reel && !reel.isDeleted) {
+      if (reel.userId.toString() !== req.userId.toString() && req.user?.role !== 'admin') {
+        throw new AuthorizationError('Not authorized to delete this reel');
+      }
+      reel.isDeleted = true;
+      reel.deletedAt = new Date();
+      await reel.save();
+      deleted = true;
 
-    return successResponse(res, 200, 'Post deleted successfully');
+      if (reel.videoUrl) {
+        await Post.updateMany({ 'mediaUrls.url': reel.videoUrl, userId: req.userId }, { isDeleted: true, deletedAt: new Date() });
+      }
+    }
+
+    if (!deleted) {
+      throw new NotFoundError('Post or Reel not found');
+    }
+
+    return successResponse(res, 200, 'Deleted successfully');
   } catch (error) {
     next(error);
   }
 };
+
 
 /**
  * @desc    Get post categories
