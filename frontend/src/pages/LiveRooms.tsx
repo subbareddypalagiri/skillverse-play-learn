@@ -299,7 +299,7 @@ const LiveRooms: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleApply} className="space-y-4 mt-2">
+          <form onSubmit={submitApplication} className="space-y-4 mt-2">
             <div className="space-y-1.5">
               <Label htmlFor="skills" className="text-xs font-semibold">Specialization & Skills (comma separated) *</Label>
               <Input
