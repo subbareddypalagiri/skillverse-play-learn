@@ -27,6 +27,7 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
     title: '',
     description: '',
     category: 'technical',
+    customCategory: '',
     campusLocation: 'In Campus',
     mode: 'offline',
     eventLink: '',
@@ -47,21 +48,22 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
     setCreating(true);
     try {
       const startDate = new Date(`${form.date}T${form.time}`);
+      const finalCategory = form.category === 'custom' ? form.customCategory : form.category;
       const payload: Record<string, unknown> = {
         title: form.title,
         description: form.description,
-        category: form.category,
+        category: finalCategory,
         campusLocation: form.campusLocation,
         mode: form.mode,
         eventType: showTourFields ? 'tour' : form.eventType,
-        type: form.category.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' '),
+        type: finalCategory.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' '),
         venue: form.venue,
         duration: form.duration,
         displayDate: new Date(form.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         displayTime: form.time,
         location: form.venue,
         isOnline: form.mode === 'online',
-        eventLink: form.mode === 'online' ? form.eventLink : undefined,
+        eventLink: form.eventLink || undefined,
         startDate,
         endDate: new Date(startDate.getTime() + 3 * 60 * 60 * 1000),
         capacity: parseInt(form.capacity),
@@ -93,103 +95,108 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
     }
   };
 
-  const inputClass = "w-full px-4 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary text-sm";
+  const inputClass = "w-full px-4 py-2.5 rounded-lg bg-zinc-900/50 border border-zinc-800 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 text-sm transition-all";
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl rounded-2xl border border-border/60 max-h-[90vh] overflow-y-auto"
         style={{ background: 'hsl(230,25%,7%)' }}>
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2" style={{ fontFamily: 'Sora, sans-serif' }}>
+          <DialogTitle className="text-xl font-bold text-white flex items-center gap-2" style={{ fontFamily: 'Sora, sans-serif' }}>
             <Plus className="w-5 h-5 text-primary" />
             {success ? 'Event Published!' : 'Plan a New Event'}
           </DialogTitle>
-          <p className="text-xs text-muted-foreground">Campus Ambassador Portal — {user?.collegeName || 'Your College'}</p>
+          <p className="text-xs text-zinc-400">Campus Ambassador Portal — {user?.collegeName || 'Your College'}</p>
         </DialogHeader>
 
         {success ? (
           <div className="flex flex-col items-center py-10">
             <CheckCircle className="w-12 h-12 text-emerald-400 mb-3" />
-            <p className="text-sm text-muted-foreground">Students can now discover and join your event</p>
+            <p className="text-sm text-zinc-400">Students can now discover and join your event</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="col-span-2">
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Event Title *</label>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Event Title *</label>
                 <input className={inputClass} value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required placeholder="e.g., Ooty Fun Tour" />
               </div>
               <div className="col-span-2">
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Description *</label>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Description *</label>
                 <textarea className={`${inputClass} resize-none`} rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} required />
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Category *</label>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Category *</label>
                 <select className={inputClass} value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
-                  <option value="cultural">Cultural</option>
-                  <option value="technical">Technical</option>
-                  <option value="non-technical">Non-Technical</option>
-                  <option value="fun-tours">Fun Tours</option>
-                  <option value="industrial-tours">Industrial Tours</option>
-                  <option value="hackathons">Hackathons</option>
+                  <option value="cultural" className="bg-zinc-900">Cultural</option>
+                  <option value="technical" className="bg-zinc-900">Technical</option>
+                  <option value="non-technical" className="bg-zinc-900">Non-Technical</option>
+                  <option value="fun-tours" className="bg-zinc-900">Fun Tours</option>
+                  <option value="industrial-tours" className="bg-zinc-900">Industrial Tours</option>
+                  <option value="hackathons" className="bg-zinc-900">Hackathons</option>
+                  <option value="custom" className="bg-zinc-900">Custom (Type your own)</option>
                 </select>
               </div>
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Campus Location *</label>
-                <select className={inputClass} value={form.campusLocation} onChange={e => setForm({ ...form, campusLocation: e.target.value })}>
-                  <option value="In Campus">In Campus</option>
-                  <option value="Out of Campus">Out of Campus</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Event Mode *</label>
-                <select className={inputClass} value={form.mode} onChange={e => setForm({ ...form, mode: e.target.value })}>
-                  <option value="offline">Offline / In-person</option>
-                  <option value="online">Online / Virtual</option>
-                </select>
-              </div>
-              {form.mode === 'online' && (
-                <div className="col-span-2">
-                  <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Online Event Link (Meeting URL) *</label>
-                  <input type="url" className={inputClass} value={form.eventLink} onChange={e => setForm({ ...form, eventLink: e.target.value })} required placeholder="e.g., https://meet.google.com/xyz or Zoom link" />
+              {form.category === 'custom' && (
+                <div>
+                  <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Custom Category *</label>
+                  <input className={inputClass} value={form.customCategory} onChange={e => setForm({ ...form, customCategory: e.target.value })} required placeholder="e.g., Art & Design" />
                 </div>
               )}
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Event Type *</label>
-                <select className={inputClass} value={form.eventType} onChange={e => setForm({ ...form, eventType: e.target.value })}>
-                  <option value="workshop">Workshop</option>
-                  <option value="webinar">Webinar</option>
-                  <option value="hackathon">Hackathon</option>
-                  <option value="meetup">Meetup</option>
-                  <option value="conference">Conference</option>
-                  <option value="seminar">Seminar</option>
-                  <option value="cultural">Cultural</option>
-                  <option value="competition">Competition</option>
-                  <option value="tour">Tour</option>
+              <div className={form.category === 'custom' ? "col-span-2" : ""}>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Campus Location *</label>
+                <select className={inputClass} value={form.campusLocation} onChange={e => setForm({ ...form, campusLocation: e.target.value })}>
+                  <option value="In Campus" className="bg-zinc-900">In Campus</option>
+                  <option value="Out of Campus" className="bg-zinc-900">Out of Campus</option>
                 </select>
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Date *</label>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Event Mode *</label>
+                <select className={inputClass} value={form.mode} onChange={e => setForm({ ...form, mode: e.target.value })}>
+                  <option value="offline" className="bg-zinc-900">Offline / In-person</option>
+                  <option value="online" className="bg-zinc-900">Online / Virtual</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Event / Registration Link</label>
+                <input type="url" className={inputClass} value={form.eventLink} onChange={e => setForm({ ...form, eventLink: e.target.value })} placeholder={form.mode === 'online' ? "Meeting URL (e.g., Zoom/Meet)" : "Registration URL (Optional)"} required={form.mode === 'online'} />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Event Type *</label>
+                <select className={inputClass} value={form.eventType} onChange={e => setForm({ ...form, eventType: e.target.value })}>
+                  <option value="workshop" className="bg-zinc-900">Workshop</option>
+                  <option value="webinar" className="bg-zinc-900">Webinar</option>
+                  <option value="hackathon" className="bg-zinc-900">Hackathon</option>
+                  <option value="meetup" className="bg-zinc-900">Meetup</option>
+                  <option value="conference" className="bg-zinc-900">Conference</option>
+                  <option value="seminar" className="bg-zinc-900">Seminar</option>
+                  <option value="cultural" className="bg-zinc-900">Cultural</option>
+                  <option value="competition" className="bg-zinc-900">Competition</option>
+                  <option value="tour" className="bg-zinc-900">Tour</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Date *</label>
                 <input type="date" className={inputClass} value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} required />
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Time *</label>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Time *</label>
                 <input type="time" className={inputClass} value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} required />
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Venue *</label>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Venue *</label>
                 <input className={inputClass} value={form.venue} onChange={e => setForm({ ...form, venue: e.target.value })} required />
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Duration *</label>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Duration *</label>
                 <input className={inputClass} value={form.duration} onChange={e => setForm({ ...form, duration: e.target.value })} required placeholder="e.g., 2 days" />
               </div>
               <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Capacity *</label>
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">Capacity *</label>
                 <input type="number" className={inputClass} value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} required />
               </div>
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground mb-1.5 block">College Name</label>
+              <div className="col-span-2">
+                <label className="text-xs font-semibold text-zinc-400 mb-1.5 block">College Name</label>
                 <input className={inputClass} value={form.collegeName} onChange={e => setForm({ ...form, collegeName: e.target.value })} placeholder="Your college name" />
               </div>
             </div>
