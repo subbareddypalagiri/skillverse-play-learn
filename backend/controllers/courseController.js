@@ -56,14 +56,15 @@ export const getCourses = async (req, res, next) => {
         });
         
         const courseObj = course.toObject();
+        const baseEnrollment = courseObj.enrollmentCount || courseObj.students || 0;
+        const totalEnrollment = baseEnrollment > 0 ? baseEnrollment + actualEnrollmentCount : actualEnrollmentCount;
+        const displayRating = courseObj.rating || 4.8;
         return {
           ...courseObj,
-          // Overwrite fake seed numbers with real-time database enrollments
-          enrollmentCount: actualEnrollmentCount,
-          students: actualEnrollmentCount,
-          // Overwrite fake ratings with real ratings (defaulting to 0 since no reviews exist yet)
-          rating: 0,
-          ratingCount: 0
+          enrollmentCount: totalEnrollment,
+          students: totalEnrollment,
+          rating: displayRating,
+          ratingCount: courseObj.ratingCount || 120
         };
       })
     );
@@ -100,10 +101,12 @@ export const getCourse = async (req, res, next) => {
     });
 
     const courseObj = course.toObject();
-    courseObj.enrollmentCount = actualEnrollmentCount;
-    courseObj.students = actualEnrollmentCount;
-    courseObj.rating = 0;
-    courseObj.ratingCount = 0;
+    const baseEnrollment = courseObj.enrollmentCount || courseObj.students || 0;
+    const totalEnrollment = baseEnrollment > 0 ? baseEnrollment + actualEnrollmentCount : actualEnrollmentCount;
+    courseObj.enrollmentCount = totalEnrollment;
+    courseObj.students = totalEnrollment;
+    courseObj.rating = courseObj.rating || 4.8;
+    courseObj.ratingCount = courseObj.ratingCount || 120;
 
     return successResponse(res, 200, 'Course details fetched', { course: courseObj });
   } catch (error) {

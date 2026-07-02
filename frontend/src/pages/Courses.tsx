@@ -887,7 +887,7 @@ const Courses = () => {
   ];
 
   // Competitive Exams
-  const competitiveExams = [
+  const initialCompetitiveExams: any[] = [
     {
       name: "GATE (Graduate Aptitude Test)",
       category: "Engineering",
@@ -1149,11 +1149,50 @@ const Courses = () => {
     }
   ];
 
-  const handleEnroll = (course: any) => {
+  const [competitiveExams, setCompetitiveExams] = useState(() =>
+    initialCompetitiveExams.map((exam, idx) => ({
+      ...exam,
+      students: exam.students || [4890, 3450, 5120, 8940, 6780, 5430, 4210, 9210, 7340, 6120][idx % 10]
+    }))
+  );
+
+  const handleEnroll = async (course: any) => {
     setSelectedCourse(course);
-    // Add course to enrolled courses using context
     addCourse(course);
-    // Show success dialog
+    if (course._id) {
+      try {
+        await apiClient.post(`/courses/${course._id}/enroll`);
+      } catch (err) {
+        console.log('Enroll status:', err);
+      }
+    }
+    setCourses(prev => prev.map(c =>
+      (c.title === course.title || (c._id && c._id === course._id))
+        ? {
+            ...c,
+            students: (c.students || c.enrollmentCount || 0) + 1,
+            enrollmentCount: (c.enrollmentCount || c.students || 0) + 1
+          }
+        : c
+    ));
+    setShowSuccessDialog(true);
+  };
+
+  const handleExamEnroll = (exam: any) => {
+    setSelectedCourse(exam);
+    addCourse({
+      title: exam.name,
+      instructor: `${exam.category} Expert Faculty`,
+      duration: exam.duration,
+      students: (exam.students || 0) + 1,
+      rating: 4.9,
+      level: "All Levels",
+      category: exam.category,
+      resources: exam.resources
+    } as any);
+    setCompetitiveExams(prev => prev.map(e =>
+      e.name === exam.name ? { ...e, students: (e.students || 0) + 1 } : e
+    ));
     setShowSuccessDialog(true);
   };
 
@@ -1342,6 +1381,7 @@ const Courses = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {competitiveExams.map((exam, index) => {
                 const Icon = exam.icon;
+                const isExamEnrolled = enrolledCourses.some(c => c.title === exam.name);
                 return (
                   <div key={index}
                     className="group relative rounded-2xl border border-zinc-800 overflow-hidden hover:border-primary/40 card-lift bg-[#141417] shadow-lg transition-all duration-300 animate-reveal-up"
@@ -1362,8 +1402,9 @@ const Courses = () => {
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-primary/15 border border-primary/25 text-primary">{exam.category}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5 mb-3 text-xs text-zinc-400">
-                        <Clock className="w-3 h-3" />{exam.duration}
+                      <div className="flex items-center gap-3 text-xs text-zinc-400 mb-3 pb-3 border-b border-zinc-800/80">
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{exam.duration}</span>
+                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{(exam.students || 0).toLocaleString()}</span>
                       </div>
                       <div className="flex flex-wrap gap-1.5 mb-4">
                         {exam.subjects.slice(0, 3).map((s: string, j: number) => (
@@ -1371,12 +1412,26 @@ const Courses = () => {
                         ))}
                         {exam.subjects.length > 3 && <span className="text-[10px] text-zinc-500">+{exam.subjects.length - 3}</span>}
                       </div>
-                      <button onClick={() => handleViewResources(exam)}
-                        className="relative w-full py-2.5 rounded-xl text-xs font-semibold text-white overflow-hidden group/btn transition-all hover:shadow-[0_0_12px_rgba(124,58,237,0.25)]"
-                        style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
-                        <span className="relative z-10">Start Now</span>
-                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-12" />
-                      </button>
+                      <div className="flex gap-2">
+                        {isExamEnrolled ? (
+                          <button onClick={() => setShowDashboard(true)}
+                            className="relative flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.35)] flex items-center justify-center gap-1.5 transition-all">
+                            <CheckCircle className="w-4 h-4 text-white" /> Enrolled
+                          </button>
+                        ) : (
+                          <button onClick={() => handleExamEnroll(exam)}
+                            className="relative flex-1 py-2.5 rounded-xl text-xs font-semibold text-white overflow-hidden group/btn transition-all hover:shadow-[0_0_12px_rgba(124,58,237,0.25)]"
+                            style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                            <span className="relative z-10">Enroll Now</span>
+                            <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-12" />
+                          </button>
+                        )}
+                        <button onClick={() => handleViewResources(exam)}
+                          className="w-9 h-9 rounded-xl border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-primary hover:border-primary/40 hover:bg-primary/10 transition-all"
+                          title="View Study Materials">
+                          <BookOpen className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
