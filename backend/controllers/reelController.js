@@ -2,6 +2,7 @@ import Reel from '../models/Reel.js';
 import ReelFollow from '../models/ReelFollow.js';
 import { successResponse, paginatedResponse } from '../utils/responseHandler.js';
 import { NotFoundError, ValidationError, AuthorizationError } from '../utils/errorHandler.js';
+import { uploadReelVideo } from '../utils/cloudinary.js';
 
 const buildFeedQuery = ({ category, tag, userId, mode }) => {
   const query = { isPublished: true, isDeleted: false };
@@ -105,7 +106,7 @@ export const createReel = async (req, res, next) => {
         ? tags.map(t => String(t).trim()).filter(Boolean)
         : [];
 
-    const cleanVideoUrl = `/uploads/reels/${req.file.filename}`;
+    const uploadResult = await uploadReelVideo(req.file.path, req.file.filename);
 
     const reel = await Reel.create({
       userId: req.userId,
@@ -114,9 +115,10 @@ export const createReel = async (req, res, next) => {
       description,
       category,
       tags: tagList,
-      duration: parsedDuration,
-      videoUrl: cleanVideoUrl,
-      videoSize: req.file.size,
+      duration: uploadResult.duration || parsedDuration,
+      videoUrl: uploadResult.videoUrl,
+      thumbnailUrl: uploadResult.thumbnailUrl || undefined,
+      videoSize: uploadResult.videoSize || req.file.size,
       courseLink,
       sourceCourseId: sourceCourseId || undefined,
       sourceCourseTitle,
