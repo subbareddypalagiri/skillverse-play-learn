@@ -55,7 +55,7 @@ export const createLiveRoom = async (req, res, next) => {
       throw new AuthorizationError('Not authorized to host live rooms. Please submit a Live Expert application.');
     }
 
-    const { title, topic, category, streamUrl } = req.body;
+    const { title, topic, category, isPrivate, passcode } = req.body;
 
     const newRoom = await LiveRoom.create({
       title,
@@ -64,11 +64,41 @@ export const createLiveRoom = async (req, res, next) => {
       hostId: req.userId,
       status: 'live',
       startedAt: new Date(),
-      viewerCount: Math.floor(Math.random() * 20) + 5, // Simulated initial views
-      streamUrl: streamUrl || undefined
+      viewerCount: 0,
+      isPrivate: isPrivate || false,
+      passcode: isPrivate ? passcode : undefined
     });
 
     return successResponse(res, 201, 'Live stream started successfully', { room: newRoom });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Verify passcode for a private live room
+ * @route   POST /api/v1/live/rooms/:id/verify-passcode
+ * @access  Private
+ */
+export const verifyPasscode = async (req, res, next) => {
+  try {
+    const { passcode } = req.body;
+    // We explicitly select the passcode since it's hidden by default
+    const room = await LiveRoom.findById(req.params.id).select('+passcode');
+    
+    if (!room) {
+      throw new NotFoundError('Live room not found');
+    }
+
+    if (!room.isPrivate) {
+      return successResponse(res, 200, 'Room is not private', { verified: true });
+    }
+
+    if (room.passcode !== passcode) {
+      return res.status(401).json({ success: false, message: 'Incorrect passcode' });
+    }
+
+    return successResponse(res, 200, 'Passcode verified successfully', { verified: true });
   } catch (error) {
     next(error);
   }

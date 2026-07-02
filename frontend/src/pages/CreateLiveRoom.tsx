@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import apiClient from '@/lib/apiClient';
-import { Radio, ArrowLeft, Video, Link2, BookOpen } from 'lucide-react';
+import { Radio, ArrowLeft, Video, Link2, BookOpen, Lock, ShieldAlert } from 'lucide-react';
 
 const CreateLiveRoom: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +18,8 @@ const CreateLiveRoom: React.FC = () => {
   const [title, setTitle] = useState('');
   const [topic, setTopic] = useState('');
   const [category, setCategory] = useState('Web Development');
-  const [streamUrl, setStreamUrl] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [passcode, setPasscode] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const categories = [
@@ -41,13 +42,23 @@ const CreateLiveRoom: React.FC = () => {
       return;
     }
 
+    if (isPrivate && !passcode.trim()) {
+      toast({
+        title: "Passcode Required",
+        description: "You must enter a passcode for a private room.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setSubmitting(true);
       const res = await apiClient.post('/live/rooms', {
         title,
         topic,
         category,
-        streamUrl: streamUrl.trim() || undefined
+        isPrivate,
+        passcode: isPrivate ? passcode.trim() : undefined
       });
 
       toast({
@@ -123,6 +134,42 @@ const CreateLiveRoom: React.FC = () => {
                 className="w-full min-h-[90px] p-3 rounded-xl border border-input bg-background text-xs text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 required
               />
+            </div>
+
+            <div className="pt-2 border-t border-border/50">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-primary" />
+                    Private Room
+                  </Label>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Require a passcode for students to join</p>
+                </div>
+                <div 
+                  onClick={() => setIsPrivate(!isPrivate)}
+                  className={`w-10 h-5 rounded-full relative cursor-pointer transition-colors ${isPrivate ? 'bg-primary' : 'bg-muted'}`}
+                >
+                  <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-all ${isPrivate ? 'left-5' : 'left-0.5'}`} />
+                </div>
+              </div>
+
+              {isPrivate && (
+                <div className="space-y-1.5 animate-in slide-in-from-top-2">
+                  <Label htmlFor="passcode" className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <ShieldAlert className="w-3.5 h-3.5" />
+                    Room Passcode *
+                  </Label>
+                  <Input
+                    id="passcode"
+                    type="text"
+                    placeholder="e.g. REACT2026"
+                    value={passcode}
+                    onChange={e => setPasscode(e.target.value)}
+                    className="rounded-xl text-xs"
+                    required={isPrivate}
+                  />
+                </div>
+              )}
             </div>
 
             <Button

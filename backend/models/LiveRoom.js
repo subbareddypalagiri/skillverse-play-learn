@@ -32,10 +32,14 @@ const liveRoomSchema = new mongoose.Schema({
   },
   startedAt: Date,
   endedAt: Date,
-  // Mock streaming URL for demonstration
-  streamUrl: {
+  isPrivate: {
+    type: Boolean,
+    default: false
+  },
+  passcode: {
     type: String,
-    default: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+    trim: true,
+    select: false // Automatically hide passcode from general queries for security
   }
 }, {
   timestamps: true

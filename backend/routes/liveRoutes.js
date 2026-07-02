@@ -4,6 +4,7 @@ import {
   getLiveRoom, 
   createLiveRoom, 
   endLiveRoom, 
+  verifyPasscode,
   submitLiveApplication, 
   getMyApplication,
   reviewLiveApplication 
@@ -20,6 +21,7 @@ router.get('/rooms/:id', getLiveRoom);
 router.use(authenticate);
 router.post('/rooms', createLiveRoom);
 router.post('/rooms/:id/end', endLiveRoom);
+router.post('/rooms/:id/verify-passcode', verifyPasscode);
 router.post('/apply', submitLiveApplication);
 router.get('/my-application', getMyApplication);
 

@@ -42,6 +42,29 @@ const LiveStreamView: React.FC = () => {
     fetchSession();
   }, [id, navigate, toast]);
 
+  const [ending, setEnding] = useState(false);
+
+  const handleEndStream = async () => {
+    if (!window.confirm("Are you sure you want to end this live broadcast for everyone?")) return;
+    
+    try {
+      setEnding(true);
+      await apiClient.post(`/live/rooms/${id}/end`);
+      toast({
+        title: "Broadcast Ended",
+        description: "The live room has been successfully closed."
+      });
+      navigate('/live-rooms');
+    } catch (err: any) {
+      toast({
+        title: "Error Ending Stream",
+        description: err.response?.data?.message || "Something went wrong.",
+        variant: "destructive"
+      });
+      setEnding(false);
+    }
+  };
+
   if (loading) {
     return (
       <PageLayout>
@@ -77,9 +100,21 @@ const LiveStreamView: React.FC = () => {
             </div>
           </div>
           
-          <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/5 flex items-center gap-2 pointer-events-auto">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-[10px] font-semibold text-white uppercase tracking-wider">{session?.category || 'Stream'}</span>
+          <div className="flex items-center gap-2 pointer-events-auto">
+            {isHost && (
+              <Button 
+                onClick={handleEndStream} 
+                disabled={ending}
+                size="sm" 
+                className="bg-red-600 hover:bg-red-700 text-white text-[10px] h-7 px-3 rounded-lg font-bold uppercase tracking-wide border border-red-500/50 shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all"
+              >
+                {ending ? 'Ending...' : 'End Broadcast'}
+              </Button>
+            )}
+            <div className="bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/5 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-[10px] font-semibold text-white uppercase tracking-wider">{session?.category || 'Stream'}</span>
+            </div>
           </div>
         </div>
 

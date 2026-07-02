@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from '@/contexts/AuthContext';
 import apiClient from '@/lib/apiClient';
 import { useNavigate } from 'react-router-dom';
-import { Users, Radio, Sparkles, Award, ShieldAlert, BadgeCheck, FileCheck, CheckCircle2 } from 'lucide-react';
+import { Users, Radio, Sparkles, Award, ShieldAlert, BadgeCheck, FileCheck, CheckCircle2, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 interface LiveSession {
@@ -26,6 +26,7 @@ interface LiveSession {
     role: string;
   };
   viewerCount: number;
+  isPrivate?: boolean;
 }
 
 const LiveRooms: React.FC = () => {
@@ -37,6 +38,11 @@ const LiveRooms: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [applicationStatus, setApplicationStatus] = useState<any>(null);
+
+  // Private room states
+  const [selectedPrivateRoom, setSelectedPrivateRoom] = useState<string | null>(null);
+  const [passcode, setPasscode] = useState('');
+  const [verifyingPasscode, setVerifyingPasscode] = useState(false);
 
   // Form states
   const [skills, setSkills] = useState('');
@@ -72,12 +78,12 @@ const LiveRooms: React.FC = () => {
     fetchLiveData();
   }, []);
 
-  const handleApply = async (e: React.FormEvent) => {
+  const submitApplication = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!skills.trim() || !pitch.trim()) {
+    if (!skills || !portfolioUrl || !pitch) {
       toast({
         title: "Validation Error",
-        description: "Please fill in all required fields (Skills and Live Pitch).",
+        description: "Please fill in all required fields to submit your application.",
         variant: "destructive"
       });
       return;
@@ -85,28 +91,57 @@ const LiveRooms: React.FC = () => {
 
     try {
       setSubmitting(true);
-      const res = await apiClient.post('/live/apply', {
+      await apiClient.post('/live/apply', {
         skills: skills.split(',').map(s => s.trim()),
         portfolioUrl,
         linkedinUrl,
-        certificateIds: certIds.split(',').map(c => c.trim()).filter(Boolean),
+        certifications: certIds.split(',').map(c => c.trim()),
         pitch
       });
 
       toast({
         title: "Application Submitted",
-        description: "Your Live Expert application has been sent for admin review."
+        description: "Your application to become a Live Expert is under review."
       });
-      setApplicationStatus(res.data.data.application);
       setShowApplyModal(false);
+      setApplicationStatus({ status: 'pending' });
     } catch (err: any) {
       toast({
         title: "Submission Failed",
-        description: err.response?.data?.message || "Something went wrong.",
+        description: err.response?.data?.message || "Failed to submit application.",
         variant: "destructive"
       });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleJoinRoom = async (session: LiveSession) => {
+    if (session.isPrivate) {
+      setSelectedPrivateRoom(session._id);
+      setPasscode('');
+    } else {
+      navigate(`/live-rooms/${session._id}`);
+    }
+  };
+
+  const submitPasscode = async () => {
+    if (!passcode.trim() || !selectedPrivateRoom) return;
+    
+    try {
+      setVerifyingPasscode(true);
+      const res = await apiClient.post(`/live/rooms/${selectedPrivateRoom}/verify-passcode`, { passcode });
+      if (res.data.data.verified) {
+        navigate(`/live-rooms/${selectedPrivateRoom}`);
+      }
+    } catch (err: any) {
+      toast({
+        title: "Access Denied",
+        description: err.response?.data?.message || "Incorrect passcode.",
+        variant: "destructive"
+      });
+    } finally {
+      setVerifyingPasscode(false);
     }
   };
 
@@ -230,15 +265,16 @@ const LiveRooms: React.FC = () => {
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-foreground mb-1 group-hover:text-red-500 transition-colors duration-200 line-clamp-1 leading-snug"
+                  <h3 className="font-bold text-foreground mb-1 group-hover:text-red-500 transition-colors duration-200 line-clamp-1 leading-snug flex items-center gap-2"
                     style={{ fontFamily: 'Sora, sans-serif', fontSize: '0.95rem' }}>
+                    {session.isPrivate && <Lock className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />}
                     {session.title}
                   </h3>
                   <p className="text-xs text-muted-foreground/80 line-clamp-2 leading-relaxed mb-4">{session.topic}</p>
                 </div>
 
                 <Button
-                  onClick={() => navigate(`/live-rooms/${session._id}`)}
+                  onClick={() => handleJoinRoom(session)}
                   className="w-full py-2.5 rounded-xl text-xs font-semibold text-white shadow-[0_0_15px_rgba(239,68,68,0.15)] group-hover:shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all"
                   style={{ background: 'linear-gradient(135deg,#ef4444,#6366f1)' }}
                 >
@@ -331,6 +367,53 @@ const LiveRooms: React.FC = () => {
               {submitting ? "Submitting application..." : "Submit Host Application"}
             </Button>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Private Room Passcode Modal */}
+      <Dialog open={!!selectedPrivateRoom} onOpenChange={() => setSelectedPrivateRoom(null)}>
+        <DialogContent className="sm:max-w-[400px] border-border/50 bg-card/95 backdrop-blur-xl p-0 overflow-hidden rounded-2xl">
+          <div className="p-6">
+            <DialogHeader className="mb-6">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 border border-primary/20">
+                <Lock className="w-6 h-6 text-primary" />
+              </div>
+              <DialogTitle className="text-xl font-bold text-foreground" style={{ fontFamily: 'Sora, sans-serif' }}>
+                Private Classroom
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground mt-2">
+                This stream is locked. Please enter the passcode provided by the host.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Room Passcode</Label>
+                <Input
+                  type="text"
+                  placeholder="Enter passcode..."
+                  value={passcode}
+                  onChange={e => setPasscode(e.target.value)}
+                  className="rounded-xl text-center tracking-widest uppercase font-bold"
+                  onKeyDown={e => e.key === 'Enter' && submitPasscode()}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" onClick={() => setSelectedPrivateRoom(null)} className="flex-1 rounded-xl">
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={submitPasscode} 
+                  disabled={!passcode.trim() || verifyingPasscode}
+                  className="flex-1 rounded-xl text-white shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+                  style={{ background: 'linear-gradient(135deg,#ef4444,#b91c1c)' }}
+                >
+                  {verifyingPasscode ? 'Verifying...' : 'Unlock & Join'}
+                </Button>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </PageLayout>
