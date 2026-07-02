@@ -135,23 +135,23 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className={`rounded-2xl border border-white/10 bg-gradient-to-br ${stat.bg} p-4 backdrop-blur`}
+                className="rounded-2xl border border-zinc-800 bg-[#141417] p-4 shadow-xl"
               >
                 <stat.icon className={`w-4 h-4 ${stat.color} mb-2`} />
                 <div className={`text-2xl font-bold ${stat.color}`}>
                   {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
                 </div>
-                <div className="text-xs text-white/40 mt-0.5">{stat.label}</div>
+                <div className="text-xs text-zinc-400 mt-0.5 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 rounded-2xl border border-dashed border-white/15 bg-white/[0.02]">
+          <div className="text-center py-16 rounded-2xl border border-dashed border-zinc-800 bg-[#141417]">
             <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
               <Play className="w-7 h-7 text-amber-400" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">No reels yet</h3>
-            <p className="text-white/40 text-sm mb-6 max-w-sm mx-auto">
+            <h3 className="text-lg font-semibold mb-2 text-white">No reels yet</h3>
+            <p className="text-zinc-400 text-sm mb-6 max-w-sm mx-auto">
               Post your first video and watch your analytics grow here
             </p>
             {onUploadClick && (
@@ -170,16 +170,16 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
       {/* Charts */}
       {reels.length > 1 && (
         <div className="grid md:grid-cols-2 gap-4 mb-8">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-            <h3 className="text-sm font-semibold text-white/70 mb-4 flex items-center gap-2">
+          <div className="rounded-2xl border border-zinc-800 bg-[#141417] p-5 shadow-xl">
+            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-amber-400" />
               Per-Reel Performance
             </h3>
             <ChartContainer config={chartConfig} className="h-[200px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barChartData}>
-                  <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Bar dataKey="views" fill="#60a5fa" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="likes" fill="#f87171" radius={[4, 4, 0, 0]} />
@@ -189,7 +189,7 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
           </div>
 
           {pieData.length > 0 && (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div className="rounded-2xl border border-zinc-800 bg-[#141417] p-5 shadow-xl">
               <h3 className="text-sm font-semibold text-white/70 mb-4 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-amber-400" />
                 Engagement Breakdown
@@ -229,31 +229,33 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
 
       {/* Top performer */}
       {topReel && (
-        <div className="mb-8 rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-orange-500/5 p-5">
+        <div className="mb-8 rounded-2xl border border-amber-500/30 bg-[#141417] p-5 shadow-2xl text-white">
           <div className="flex items-center gap-2 text-amber-400 mb-3">
             <Zap className="w-4 h-4" />
             <h3 className="font-semibold text-sm">Top Performer</h3>
           </div>
           <div className="flex gap-4">
-            <div className="w-20 h-20 rounded-xl overflow-hidden bg-black/40 flex-shrink-0 border border-white/10">
+            <div className="w-20 h-20 rounded-xl overflow-hidden bg-black flex-shrink-0 border border-zinc-800">
               {topReel.mediaUrls[0]?.url && (
-                <img
+                <video
                   src={resolveMediaUrl(topReel.mediaUrls[0].url)}
-                  alt="Top reel"
                   className="w-full h-full object-cover"
+                  muted
+                  playsInline
+                  preload="metadata"
                 />
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white/80 text-sm line-clamp-2">{topReel.caption || "Untitled Reel"}</p>
+              <p className="text-white text-sm font-medium line-clamp-2">{topReel.caption || "Untitled Reel"}</p>
               <div className="flex gap-4 mt-2 text-sm">
-                <span className="flex items-center gap-1 text-blue-400">
+                <span className="flex items-center gap-1 text-blue-400 font-bold">
                   <Eye className="w-3.5 h-3.5" />{topReel.stats?.views || 0}
                 </span>
-                <span className="flex items-center gap-1 text-red-400">
+                <span className="flex items-center gap-1 text-red-400 font-bold">
                   <Heart className="w-3.5 h-3.5" />{topReel.stats?.likes || 0}
                 </span>
-                <span className="flex items-center gap-1 text-cyan-400">
+                <span className="flex items-center gap-1 text-cyan-400 font-bold">
                   <MessageCircle className="w-3.5 h-3.5" />{topReel.stats?.comments || 0}
                 </span>
               </div>
@@ -265,7 +267,7 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
       {/* Reels list */}
       {reels.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
             <Play className="w-5 h-5 text-amber-400" />
             All Reels ({reels.length})
           </h3>
@@ -273,26 +275,28 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
             {reels.map((reel) => (
               <div
                 key={reel._id}
-                className="rounded-2xl border border-white/10 bg-white/[0.03] overflow-hidden hover:border-amber-500/30 transition-all group"
+                className="rounded-2xl border border-zinc-800 bg-[#141417] overflow-hidden hover:border-amber-500/40 shadow-xl transition-all group text-white"
               >
                 <div className="flex gap-4 p-4">
-                  <div className="w-24 h-24 rounded-xl overflow-hidden bg-black/40 flex-shrink-0 relative border border-white/10">
+                  <div className="w-24 h-24 rounded-xl overflow-hidden bg-black flex-shrink-0 relative border border-zinc-800">
                     {reel.mediaUrls[0]?.url && (
                       <>
-                        <img
+                        <video
                           src={resolveMediaUrl(reel.mediaUrls[0].url)}
-                          alt={reel.caption || "Reel"}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          muted
+                          playsInline
+                          preload="metadata"
                         />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
                           <Play className="w-5 h-5 text-white fill-white" />
                         </div>
                       </>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold line-clamp-2 mb-1">{reel.caption || "Untitled Reel"}</h4>
-                    <p className="text-xs text-white/40 mb-3">
+                    <h4 className="font-semibold line-clamp-2 mb-1 text-white">{reel.caption || "Untitled Reel"}</h4>
+                    <p className="text-xs text-zinc-400 mb-3 font-medium">
                       {new Date(reel.createdAt).toLocaleDateString()}
                     </p>
                     <div className="grid grid-cols-4 gap-2 text-center text-xs">
@@ -302,9 +306,9 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
                         { val: reel.stats?.comments || 0, label: "Comments", color: "text-cyan-400" },
                         { val: reel.stats?.shares || 0, label: "Shares", color: "text-green-400" },
                       ].map((s) => (
-                        <div key={s.label} className="bg-white/5 rounded-lg px-2 py-1.5">
+                        <div key={s.label} className="bg-zinc-800/80 rounded-lg px-2 py-1.5">
                           <div className={`font-bold ${s.color}`}>{s.val}</div>
-                          <div className="text-white/30">{s.label}</div>
+                          <div className="text-zinc-400 font-medium">{s.label}</div>
                         </div>
                       ))}
                     </div>

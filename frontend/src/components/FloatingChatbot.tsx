@@ -144,44 +144,44 @@ const FloatingChatbot = () => {
           </div>
 
           {/* Header */}
-          <div className="relative flex items-center justify-between p-4 border-b border-border/40 flex-shrink-0"
-            style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <div className="relative flex items-center justify-between p-4 border-b border-zinc-800 flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.03)' }}>
             <div className="flex items-center gap-3">
               <div className="relative w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
                 <Sparkles className="w-4.5 h-4.5 text-white" style={{width:'18px',height:'18px'}} />
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-background" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#121216]" />
               </div>
               <div>
                 {isEditingName ? (
                   <div className="flex items-center gap-1.5">
                     <input value={tempBotName} onChange={e => setTempBotName(e.target.value)}
-                      className="text-sm font-semibold text-foreground bg-white/5 border border-border/50 rounded-lg px-2 py-0.5 w-28 outline-none focus:border-primary/50"
+                      className="text-sm font-semibold text-white bg-white/10 border border-zinc-700 rounded-lg px-2 py-0.5 w-28 outline-none focus:border-primary/50"
                       onKeyDown={e => e.key === 'Enter' && saveBotName()} autoFocus />
                     <button onClick={saveBotName} className="text-emerald-400 hover:text-emerald-300"><Check className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => setIsEditingName(false)} className="text-muted-foreground hover:text-foreground"><X className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => setIsEditingName(false)} className="text-zinc-400 hover:text-white"><X className="w-3.5 h-3.5" /></button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-semibold text-foreground" style={{fontFamily:'Sora,sans-serif'}}>{botName}</span>
-                    <button onClick={() => setIsEditingName(true)} className="text-muted-foreground/50 hover:text-muted-foreground transition-colors">
+                    <span className="text-sm font-semibold text-white" style={{fontFamily:'Sora,sans-serif'}}>{botName}</span>
+                    <button onClick={() => setIsEditingName(true)} className="text-zinc-400 hover:text-white transition-colors">
                       <Edit2 className="w-3 h-3" />
                     </button>
                   </div>
                 )}
-                <p className="text-[10px] text-muted-foreground">Powered by Gemini AI</p>
+                <p className="text-[10px] text-zinc-400">Powered by Gemini AI</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
               <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
                 <DialogTrigger asChild>
-                  <button className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+                  <button className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-all">
                     <Settings className="w-4 h-4" />
                   </button>
                 </DialogTrigger>
-                <DialogContent style={{ background: 'hsl(230,25%,8%)', border: '1px solid hsl(230,20%,14%)' }} className="rounded-2xl max-w-xs">
+                <DialogContent style={{ background: 'hsl(230,25%,8%)', border: '1px solid hsl(230,20%,14%)' }} className="rounded-2xl max-w-xs text-white">
                   <DialogHeader>
-                    <DialogTitle className="text-foreground" style={{fontFamily:'Sora,sans-serif'}}>Chat Settings</DialogTitle>
+                    <DialogTitle className="text-white" style={{fontFamily:'Sora,sans-serif'}}>Chat Settings</DialogTitle>
                   </DialogHeader>
                   <div className="space-y-3 pt-2">
                     <button onClick={clearChat}
@@ -192,7 +192,7 @@ const FloatingChatbot = () => {
                 </DialogContent>
               </Dialog>
               <button onClick={() => setIsOpen(false)}
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all">
+                className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-all">
                 <Minimize2 className="w-4 h-4" />
               </button>
             </div>
@@ -207,8 +207,8 @@ const FloatingChatbot = () => {
                   <Sparkles className="w-6 h-6 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground text-sm mb-1" style={{fontFamily:'Sora,sans-serif'}}>Ask me anything!</p>
-                  <p className="text-xs text-muted-foreground max-w-[200px] leading-relaxed">
+                  <p className="font-semibold text-white text-sm mb-1" style={{fontFamily:'Sora,sans-serif'}}>Ask me anything!</p>
+                  <p className="text-xs text-zinc-400 max-w-[200px] leading-relaxed">
                     I'm your AI learning companion. Ask about courses, career advice, or anything you want to learn.
                   </p>
                 </div>
@@ -227,15 +227,15 @@ const FloatingChatbot = () => {
                   <div className={`px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed ${
                     msg.role === 'user'
                       ? 'text-white rounded-br-sm'
-                      : 'text-foreground/90 border border-border/40 rounded-bl-sm'
+                      : 'text-zinc-100 border border-zinc-700/60 rounded-bl-sm shadow-md'
                   }`}
                     style={msg.role === 'user'
                       ? { background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }
-                      : { background: 'rgba(255,255,255,0.04)' }
+                      : { background: 'rgba(255,255,255,0.08)' }
                     }>
                     <div className="whitespace-pre-wrap">{msg.content}</div>
                   </div>
-                  <span className="text-[10px] text-muted-foreground/50 px-1">{formatTime(msg.timestamp)}</span>
+                  <span className="text-[10px] text-zinc-400 px-1">{formatTime(msg.timestamp)}</span>
                 </div>
                 {msg.role === 'user' && (
                   <div className="w-7 h-7 rounded-xl flex-shrink-0 flex items-center justify-center mt-0.5 text-xs font-bold text-white"
@@ -252,8 +252,8 @@ const FloatingChatbot = () => {
                   style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
                   <Bot className="w-3.5 h-3.5 text-white" />
                 </div>
-                <div className="px-4 py-3 rounded-2xl rounded-bl-sm border border-border/40 flex items-center gap-1.5"
-                  style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <div className="px-4 py-3 rounded-2xl rounded-bl-sm border border-zinc-700/60 flex items-center gap-1.5"
+                  style={{ background: 'rgba(255,255,255,0.08)' }}>
                   {[0,1,2].map(i => (
                     <div key={i} className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce"
                       style={{ animationDelay: `${i * 0.15}s` }} />
@@ -266,22 +266,22 @@ const FloatingChatbot = () => {
 
           {/* File indicator */}
           {selectedFile && (
-            <div className="flex items-center gap-2 px-4 py-2 border-t border-border/30 bg-primary/5">
+            <div className="flex items-center gap-2 px-4 py-2 border-t border-zinc-800 bg-primary/10">
               <File className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs text-muted-foreground flex-1 truncate">{selectedFile.name}</span>
+              <span className="text-xs text-zinc-300 flex-1 truncate">{selectedFile.name}</span>
               <button onClick={() => { setSelectedFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                className="text-muted-foreground hover:text-foreground">
+                className="text-zinc-400 hover:text-white">
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
           )}
 
           {/* Input */}
-          <div className="flex items-end gap-2 p-3 border-t border-border/40 flex-shrink-0"
-            style={{ background: 'rgba(255,255,255,0.02)' }}>
+          <div className="flex items-end gap-2 p-3 border-t border-zinc-800 flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.03)' }}>
             <input type="file" ref={fileInputRef} onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="hidden" accept="image/*,.pdf,.txt" />
             <button onClick={() => fileInputRef.current?.click()}
-              className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-all flex-shrink-0">
+              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-white/10 transition-all flex-shrink-0">
               <Paperclip className="w-4 h-4" />
             </button>
             <div className="flex-1 relative">
@@ -291,7 +291,7 @@ const FloatingChatbot = () => {
                 onKeyDown={handleKeyPress}
                 placeholder="Ask anything..."
                 rows={1}
-                className="w-full bg-white/4 border border-border/40 rounded-xl px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground/50 outline-none resize-none transition-all focus:border-primary/50 focus:shadow-[0_0_0_2px_rgba(124,58,237,0.12)]"
+                className="w-full bg-white/10 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-zinc-400 outline-none resize-none transition-all focus:border-primary/50 focus:shadow-[0_0_0_2px_rgba(124,58,237,0.2)]"
                 style={{ maxHeight: '80px', fontFamily: 'DM Sans, sans-serif' }}
               />
             </div>

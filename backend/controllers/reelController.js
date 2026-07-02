@@ -322,6 +322,25 @@ export const addReelComment = async (req, res, next) => {
 };
 
 /**
+ * @desc    Get comments for a reel
+ * @route   GET /api/v1/reels/:id/comments
+ * @access  Private
+ */
+export const getReelComments = async (req, res, next) => {
+  try {
+    const reel = await Reel.findById(req.params.id).populate('comments.userId', 'name avatar');
+    if (!reel || reel.isDeleted) {
+      throw new NotFoundError('Reel not found');
+    }
+    return successResponse(res, 200, 'Comments fetched successfully', {
+      comments: reel.comments || []
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    Mark reel viewed
  * @route   POST /api/v1/reels/:id/view
  * @access  Private

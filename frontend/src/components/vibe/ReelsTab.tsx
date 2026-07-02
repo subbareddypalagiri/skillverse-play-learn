@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ReelItem,
   commentOnReel,
+  fetchReelComments,
   fetchReelsFeed,
   likeReel,
   saveReel,
@@ -20,13 +21,17 @@ import {
   Loader2,
   ChevronUp,
   ChevronDown,
-  Trash2
+  Trash2,
+  Send,
+  Copy,
+  Check
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import apiClient from "@/lib/apiClient";
+import { toast } from "sonner";
 
 
 const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1").replace(/\/api\/v1\/?$/, "");
@@ -232,6 +237,12 @@ export default function ReelsTab() {
   const [activeCommentReelId, setActiveCommentReelId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
 
+  const commentsQuery = useQuery({
+    queryKey: ["reel-comments", activeCommentReelId],
+    queryFn: () => fetchReelComments(activeCommentReelId!),
+    enabled: Boolean(activeCommentReelId && commentDialogOpen),
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       try {
@@ -324,16 +335,22 @@ export default function ReelsTab() {
 
   const handleShare = async (reel: ReelItem) => {
     const reelUrl = `${window.location.origin}/vibe?reel=${reel._id}`;
-    if (navigator.share) {
-      try {
+    try {
+      if (navigator.share) {
         await navigator.share({
           title: reel.title,
           text: reel.caption || reel.title,
           url: reelUrl
         });
+      } else {
+        await navigator.clipboard.writeText(reelUrl);
+        toast.success("Link copied to clipboard!");
+      }
+    } catch {
+      try {
+        await navigator.clipboard.writeText(reelUrl);
+        toast.success("Link copied to clipboard!");
       } catch {}
-    } else {
-      await navigator.clipboard.writeText(reelUrl);
     }
     await shareReel(reel._id);
     queryClient.invalidateQueries({ queryKey: ["reels-feed"] });
@@ -348,7 +365,8 @@ export default function ReelsTab() {
     if (!activeCommentReelId || !commentText.trim()) return;
     await actionMutation.mutateAsync({ type: "comment", reelId: activeCommentReelId, text: commentText });
     setCommentText("");
-    setCommentDialogOpen(false);
+    queryClient.invalidateQueries({ queryKey: ["reel-comments", activeCommentReelId] });
+    toast.success("Comment posted!");
   };
 
   if (feedQuery.isLoading) {
@@ -438,30 +456,53 @@ export default function ReelsTab() {
       </div>
 
       <Dialog open={commentDialogOpen} onOpenChange={setCommentDialogOpen}>
-        <DialogContent className="bg-zinc-900 border-zinc-700 text-white">
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md max-h-[80vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>Add a comment</DialogTitle>
+            <DialogTitle className="flex items-center gap-2 text-base font-semibold">
+              <MessageCircle className="w-5 h-5 text-cyan-400" /> Comments ({commentsQuery.data?.length || 0})
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="flex-1 overflow-y-auto max-h-[50vh] space-y-3 pr-1 py-2 border-y border-zinc-800">
+            {commentsQuery.isLoading ? (
+              <div className="py-8 flex justify-center">
+                <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
+              </div>
+            ) : commentsQuery.data && commentsQuery.data.length > 0 ? (
+              commentsQuery.data.map((c: any, idx: number) => (
+                <div key={c._id || idx} className="flex gap-3 text-sm bg-zinc-800/40 p-3 rounded-xl border border-zinc-800">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-black flex-shrink-0">
+                    {(c.userId?.name?.[0] || 'U').toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="font-semibold text-xs text-white">{c.userId?.name || 'User'}</span>
+                      <span className="text-[10px] text-zinc-400">{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : ''}</span>
+                    </div>
+                    <p className="text-zinc-300 text-xs break-words">{c.text}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="py-8 text-center text-zinc-400 text-xs">
+                No comments yet. Be the first to comment!
+              </div>
+            )}
+          </div>
+          <div className="pt-2 flex gap-2">
             <Input
-              placeholder="Write your comment..."
+              placeholder="Write a comment..."
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
-              className="bg-zinc-800 border-zinc-700 text-white"
+              onKeyDown={(e) => e.key === 'Enter' && submitComment()}
+              className="bg-zinc-800 border-zinc-700 text-white text-xs"
             />
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setCommentDialogOpen(false)} className="border-zinc-700">
-                Cancel
-              </Button>
-              <Button
-                onClick={submitComment}
-                disabled={!commentText.trim() || actionMutation.isPending}
-                className="bg-cyan-500 hover:bg-cyan-600 text-black"
-              >
-                {actionMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Post
-              </Button>
-            </div>
+            <Button
+              onClick={submitComment}
+              disabled={!commentText.trim() || actionMutation.isPending}
+              className="bg-cyan-500 hover:bg-cyan-600 text-black px-4 flex-shrink-0"
+            >
+              {actionMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -9,6 +9,7 @@ import {
   toggleLikeReel,
   toggleSaveReel,
   addReelComment,
+  getReelComments,
   trackReelView,
   trackReelShare,
   toggleFollowCreator,
@@ -24,6 +25,7 @@ router.get('/feed', getReelsFeed);
 router.get('/categories', getReelCategories);
 router.get('/me', getMyReels);
 router.get('/user/:userId', getReelsByUser);
+router.get('/:id/comments', getReelComments);
 
 router.post('/', reelUpload.single('video'), createReel);
 

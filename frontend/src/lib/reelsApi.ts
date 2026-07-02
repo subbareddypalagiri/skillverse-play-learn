@@ -132,6 +132,11 @@ export const followReelCreator = async (reelId: string) => {
   };
 };
 
+export const fetchReelComments = async (reelId: string) => {
+  const response = await apiClient.get(`/reels/${reelId}/comments`);
+  return response.data.data.comments || [];
+};
+
 export const commentOnReel = async (reelId: string, text: string) => {
   const response = await apiClient.post(`/reels/${reelId}/comments`, { text });
   return response.data.data;
