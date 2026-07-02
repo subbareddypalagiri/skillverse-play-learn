@@ -216,9 +216,9 @@ const LiveStreamView: React.FC = () => {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/10 overflow-hidden flex items-center justify-center font-bold text-white text-sm">
                 {session?.hostId?.avatar ? (
-                  <img src={session.hostId.avatar} alt={session.hostId.name} className="w-full h-full object-cover" />
+                  <img src={session.hostId.avatar} alt={session.hostId?.name || 'Host'} className="w-full h-full object-cover" />
                 ) : (
-                  session?.hostId?.name.charAt(0)
+                  (session?.hostId?.name || 'H').charAt(0).toUpperCase()
                 )}
               </div>
               <div>
@@ -226,7 +226,7 @@ const LiveStreamView: React.FC = () => {
                   {session?.title}
                   <BadgeCheck className="w-4 h-4 text-primary fill-primary/10" />
                 </h2>
-                <p className="text-[10px] text-white/70">{session?.hostId?.name} • Host</p>
+                <p className="text-[10px] text-white/70">{session?.hostId?.name || 'Host'} • Host</p>
               </div>
             </div>
 
@@ -263,7 +263,7 @@ const LiveStreamView: React.FC = () => {
                   {msg.avatar ? (
                     <img src={msg.avatar} alt={msg.sender} className="w-full h-full object-cover" />
                   ) : (
-                    msg.sender.charAt(0)
+                    (msg.sender || 'U').charAt(0).toUpperCase()
                   )}
                 </div>
                 <div className="flex-1">

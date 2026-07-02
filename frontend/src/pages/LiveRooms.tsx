@@ -213,16 +213,16 @@ const LiveRooms: React.FC = () => {
                   {/* Host Info */}
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full border border-primary/10 overflow-hidden bg-muted flex-shrink-0 flex items-center justify-center font-bold text-primary">
-                      {session.hostId.avatar ? (
-                        <img src={session.hostId.avatar} alt={session.hostId.name} className="w-full h-full object-cover" />
+                      {session.hostId?.avatar ? (
+                        <img src={session.hostId.avatar} alt={session.hostId?.name || 'Host'} className="w-full h-full object-cover" />
                       ) : (
-                        session.hostId.name.charAt(0)
+                        (session.hostId?.name || 'H').charAt(0).toUpperCase()
                       )}
                     </div>
                     <div>
                       <h4 className="font-semibold text-xs text-foreground flex items-center gap-1">
-                        {session.hostId.name}
-                        {(session.hostId.role === 'instructor' || session.hostId.role === 'admin') && (
+                        {session.hostId?.name || 'Anonymous Host'}
+                        {(session.hostId?.role === 'instructor' || session.hostId?.role === 'admin') && (
                           <BadgeCheck className="w-3.5 h-3.5 text-primary fill-primary/10" />
                         )}
                       </h4>
