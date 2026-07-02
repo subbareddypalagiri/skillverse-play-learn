@@ -896,24 +896,24 @@ const Courses = () => {
       icon: GraduationCap,
       resources: {
         videos: [
-          { title: "GATE CSE Foundations - NPTEL IIT", url: "https://nptel.ac.in/courses/106105152", platform: "NPTEL" },
-          { title: "GATE Digital Logic Design - NPTEL", url: "https://nptel.ac.in/courses/106105232", platform: "NPTEL" },
-          { title: "GATE Data Structures - NPTEL IIT Madras", url: "https://nptel.ac.in/courses/106105162", platform: "NPTEL" },
-          { title: "GATE Algorithms - NPTEL IIT Kharagpur", url: "https://nptel.ac.in/courses/106105033", platform: "NPTEL" },
-          { title: "GATE Mathematics - IIT Bombay", url: "https://nptel.ac.in/courses/111108133", platform: "NPTEL" },
-          { title: "GATE OS & DBMS Complete", url: "https://www.youtube.com/watch?v=GH-QY0cYhf0", platform: "YouTube", videoId: "GH-QY0cYhf0" }
+          { title: "GATE Data Structures & Algorithms Full Course", url: "https://www.youtube.com/watch?v=RBSGkl9jlOE", platform: "YouTube", videoId: "RBSGkl9jlOE" },
+          { title: "GATE DBMS & SQL Complete Masterclass", url: "https://www.youtube.com/watch?v=HXV3zeQKqGY", platform: "YouTube", videoId: "HXV3zeQKqGY" },
+          { title: "GATE Algorithms Masterclass - IIT Prep", url: "https://www.youtube.com/watch?v=8hly31xKli0", platform: "YouTube", videoId: "8hly31xKli0" },
+          { title: "GATE Operating Systems Complete Course", url: "https://www.youtube.com/watch?v=vBURTt97EkA", platform: "YouTube", videoId: "vBURTt97EkA" },
+          { title: "GATE Computer Networks Complete", url: "https://www.youtube.com/watch?v=qiQR5rTSshw", platform: "YouTube", videoId: "qiQR5rTSshw" },
+          { title: "GATE Digital Logic Complete Prep", url: "https://www.youtube.com/watch?v=cNN_tTXABUA", platform: "YouTube", videoId: "cNN_tTXABUA" }
         ],
         pdfs: [
-          { title: "GATE Previous Papers (10 Years)", url: "https://gate.iitbombay.ac.in/previous-question-papers" },
-          { title: "NPTEL GATE Study Materials", url: "https://nptel.ac.in/courses" },
-          { title: "Data Structures & Algorithms Notes", url: "https://www.geeksforgeeks.org/gate-cs-notes/" },
-          { title: "Digital Logic Design Complete", url: "https://en.wikibooks.org/wiki/Digital_Circuits" }
+          { title: "GATE Official Previous Question Papers (IIT)", url: "https://gate.iitbombay.ac.in/previous-question-papers" },
+          { title: "NPTEL GATE Study Portal & Notes", url: "https://nptel.ac.in/courses" },
+          { title: "GeeksforGeeks GATE CS Complete Notes", url: "https://www.geeksforgeeks.org/gate-cs-notes/" },
+          { title: "Digital Logic Design Handbook", url: "https://en.wikibooks.org/wiki/Digital_Circuits" }
         ],
         links: [
-          { title: "NPTEL GATE Portal", url: "https://nptel.ac.in" },
-          { title: "IIT GATE Official", url: "https://gate.iitbombay.ac.in/" },
-          { title: "GeeksforGeeks GATE", url: "https://www.geeksforgeeks.org/gate/" },
-          { title: "GATE CSE Curriculum", url: "https://gate.iitbombay.ac.in/gate-exam-details/syllabus" }
+          { title: "NPTEL SWAYAM Official Portal", url: "https://nptel.ac.in" },
+          { title: "IIT GATE Official Website", url: "https://gate.iitbombay.ac.in/" },
+          { title: "GeeksforGeeks GATE CS Portal", url: "https://www.geeksforgeeks.org/gate/" },
+          { title: "GATE CSE Official Syllabus", url: "https://gate.iitbombay.ac.in/gate-exam-details/syllabus" }
         ]
       }
     },
@@ -925,20 +925,20 @@ const Courses = () => {
       icon: Award,
       resources: {
         videos: [
-          { title: "GRE Full Course - 40 Hours", url: "https://www.youtube.com/watch?v=J6Y8gHmMXZQ", platform: "YouTube", videoId: "J6Y8gHmMXZQ" },
-          { title: "GRE Quantitative Reasoning", url: "https://www.youtube.com/watch?v=c3XsfwlhkI4", platform: "YouTube", videoId: "c3XsfwlhkI4" },
-          { title: "GRE Verbal Reasoning", url: "https://www.youtube.com/watch?v=TtMD01-PuBs", platform: "YouTube", videoId: "TtMD01-PuBs" },
-          { title: "GRE AWA Writing Guide", url: "https://www.youtube.com/watch?v=CxJeK9tQ0Ks", platform: "YouTube", videoId: "CxJeK9tQ0Ks" }
+          { title: "GRE Preparation Complete Guide & Walkthrough", url: "https://www.youtube.com/watch?v=4o6NCO39k18", platform: "YouTube", videoId: "4o6NCO39k18" },
+          { title: "GRE Quantitative Reasoning Masterclass", url: "https://www.youtube.com/watch?v=c3XsfwlhkI4", platform: "YouTube", videoId: "c3XsfwlhkI4" },
+          { title: "GRE Verbal Reasoning Complete Strategies", url: "https://www.youtube.com/watch?v=TtMD01-PuBs", platform: "YouTube", videoId: "TtMD01-PuBs" },
+          { title: "GRE Analytical Writing AWA Complete Guide", url: "https://www.youtube.com/watch?v=CxJeK9tQ0Ks", platform: "YouTube", videoId: "CxJeK9tQ0Ks" }
         ],
         pdfs: [
-          { title: "Official GRE Guide (Free)", url: "https://www.ets.org/gre" },
-          { title: "GRE Vocabulary List", url: "https://www.vocabularysize.com/gre" },
-          { title: "GRE Math Practice Book", url: "https://www.ets.org/gre/free" }
+          { title: "Official ETS GRE Prep Guide (Free Resources)", url: "https://www.ets.org/gre" },
+          { title: "GRE High-Frequency Vocabulary List", url: "https://www.vocabularysize.com/gre" },
+          { title: "GRE Quantitative Math Practice Book", url: "https://www.ets.org/gre/free" }
         ],
         links: [
-          { title: "ETS Official GRE Site", url: "https://www.ets.org/gre" },
-          { title: "Khan Academy GRE Prep", url: "https://www.khanacademy.org/test-prep/gre" },
-          { title: "Magoosh GRE Free Resources", url: "https://gre.magoosh.com/lessons" }
+          { title: "ETS Official GRE Website", url: "https://www.ets.org/gre" },
+          { title: "Khan Academy Official GRE Prep", url: "https://www.khanacademy.org/test-prep/gre" },
+          { title: "Magoosh GRE Free Lessons Portal", url: "https://gre.magoosh.com/lessons" }
         ]
       }
     },
@@ -950,20 +950,20 @@ const Courses = () => {
       icon: FileText,
       resources: {
         videos: [
-          { title: "IELTS Full Course - 20 Hours", url: "https://www.youtube.com/watch?v=DdKAG5xYrB4", platform: "YouTube", videoId: "DdKAG5xYrB4" },
-          { title: "TOEFL IBT Complete Guide", url: "https://www.youtube.com/watch?v=4jjxzXJpKHc", platform: "YouTube", videoId: "4jjxzXJpKHc" },
-          { title: "IELTS Speaking Tips", url: "https://www.youtube.com/watch?v=LFQZ1kp9_3A", platform: "YouTube", videoId: "LFQZ1kp9_3A" },
-          { title: "TOEFL Writing Tasks", url: "https://www.youtube.com/watch?v=S7fFfPYGNZc", platform: "YouTube", videoId: "S7fFfPYGNZc" }
+          { title: "IELTS Complete Band 9 Preparation Course", url: "https://www.youtube.com/watch?v=DdKAG5xYrB4", platform: "YouTube", videoId: "DdKAG5xYrB4" },
+          { title: "TOEFL iBT Complete Preparation Guide", url: "https://www.youtube.com/watch?v=4jjxzXJpKHc", platform: "YouTube", videoId: "4jjxzXJpKHc" },
+          { title: "IELTS Speaking Band 9 Mock Test & Tips", url: "https://www.youtube.com/watch?v=LFQZ1kp9_3A", platform: "YouTube", videoId: "LFQZ1kp9_3A" },
+          { title: "TOEFL Academic Writing Masterclass", url: "https://www.youtube.com/watch?v=S7fFfPYGNZc", platform: "YouTube", videoId: "S7fFfPYGNZc" }
         ],
         pdfs: [
-          { title: "IELTS Official Practice Tests", url: "https://www.ielts.org/" },
-          { title: "TOEFL Practice Book", url: "https://www.ets.org/toefl" },
-          { title: "Academic Vocabulary List", url: "https://academic.englishforums.com/vocabulary" }
+          { title: "Official IELTS Practice Tests", url: "https://www.ielts.org/" },
+          { title: "ETS TOEFL Practice Materials", url: "https://www.ets.org/toefl" },
+          { title: "Academic English Vocabulary Guide", url: "https://academic.englishforums.com/vocabulary" }
         ],
         links: [
           { title: "IELTS Official Portal", url: "https://www.ielts.org/" },
-          { title: "TOEFL Home Edition", url: "https://www.ets.org/toefl/test-takers/ibt/about/what-is" },
-          { title: "BBC Learning English", url: "https://www.bbc.co.uk/learningenglish/" }
+          { title: "TOEFL iBT Official Portal", url: "https://www.ets.org/toefl/test-takers/ibt/about/what-is" },
+          { title: "BBC Learning English Portal", url: "https://www.bbc.co.uk/learningenglish/" }
         ]
       }
     },
@@ -975,21 +975,21 @@ const Courses = () => {
       icon: Trophy,
       resources: {
         videos: [
-          { title: "UPSC IAS Complete Course", url: "https://www.youtube.com/watch?v=I9oKGEWNF7E", platform: "YouTube", videoId: "I9oKGEWNF7E" },
-          { title: "UPSC Polity by Laxmikanth", url: "https://www.youtube.com/watch?v=h0T0VB3yBz4", platform: "YouTube", videoId: "h0T0VB3yBz4" },
-          { title: "UPSC History NCERT Insights", url: "https://www.youtube.com/watch?v=uQqh4bDdVcc", platform: "YouTube", videoId: "uQqh4bDdVcc" },
-          { title: "UPSC Geography for IAS", url: "https://www.youtube.com/watch?v=OwKvb0jMDY4", platform: "YouTube", videoId: "OwKvb0jMDY4" },
-          { title: "UPSC Essay & Answer Writing", url: "https://www.youtube.com/watch?v=vRcgp4W-PFc", platform: "YouTube", videoId: "vRcgp4W-PFc" }
+          { title: "UPSC Civil Services Complete Strategy", url: "https://www.youtube.com/watch?v=I9oKGEWNF7E", platform: "YouTube", videoId: "I9oKGEWNF7E" },
+          { title: "Indian Polity Complete Course for UPSC", url: "https://www.youtube.com/watch?v=h0T0VB3yBz4", platform: "YouTube", videoId: "h0T0VB3yBz4" },
+          { title: "Modern Indian History Complete NCERT", url: "https://www.youtube.com/watch?v=uQqh4bDdVcc", platform: "YouTube", videoId: "uQqh4bDdVcc" },
+          { title: "UPSC Geography Masterclass", url: "https://www.youtube.com/watch?v=OwKvb0jMDY4", platform: "YouTube", videoId: "OwKvb0jMDY4" },
+          { title: "UPSC Essay & Answer Writing Masterclass", url: "https://www.youtube.com/watch?v=vRcgp4W-PFc", platform: "YouTube", videoId: "vRcgp4W-PFc" }
         ],
         pdfs: [
-          { title: "NCERT Books 6-12 (Free)", url: "https://ncert.nic.in/" },
-          { title: "UPSC Prelims Papers (20 Years)", url: "https://www.upsc.gov.in/" },
-          { title: "Indian Polity - M Laxmikanth", url: "https://www.upsc.gov.in/examination/civil-service-examination-cse" }
+          { title: "Official NCERT Textbooks 6-12 (Free Download)", url: "https://ncert.nic.in/" },
+          { title: "UPSC Official Previous Question Papers", url: "https://www.upsc.gov.in/" },
+          { title: "UPSC Civil Services Examination Syllabus", url: "https://www.upsc.gov.in/examination/civil-service-examination-cse" }
         ],
         links: [
           { title: "UPSC Official Portal", url: "https://www.upsc.gov.in/" },
-          { title: "NCERT Official Site", url: "https://ncert.nic.in/" },
-          { title: "Civil Services Syllabus", url: "https://www.upsc.gov.in/examination/civil-service-examination-cse" }
+          { title: "NCERT Official Website", url: "https://ncert.nic.in/" },
+          { title: "Civil Services Official Notification", url: "https://www.upsc.gov.in/examination/civil-service-examination-cse" }
         ]
       }
     },
@@ -1001,20 +1001,20 @@ const Courses = () => {
       icon: FileText,
       resources: {
         videos: [
-          { title: "SSC CGL Full Course - 100 Hours", url: "https://www.youtube.com/watch?v=M5lxTmf9BvU", platform: "YouTube", videoId: "M5lxTmf9BvU" },
-          { title: "SSC Quantitative Aptitude", url: "https://www.youtube.com/watch?v=8wfE7GYY5UM", platform: "YouTube", videoId: "8wfE7GYY5UM" },
-          { title: "SSC English Grammar Complete", url: "https://www.youtube.com/watch?v=ycnSVRBk5EM", platform: "YouTube", videoId: "ycnSVRBk5EM" },
-          { title: "SSC Reasoning Tricks", url: "https://www.youtube.com/watch?v=8Cv-Dy47zcg", platform: "YouTube", videoId: "8Cv-Dy47zcg" }
+          { title: "SSC CGL Complete Preparation Walkthrough", url: "https://www.youtube.com/watch?v=M5lxTmf9BvU", platform: "YouTube", videoId: "M5lxTmf9BvU" },
+          { title: "Quantitative Aptitude Complete Masterclass", url: "https://www.youtube.com/watch?v=8wfE7GYY5UM", platform: "YouTube", videoId: "8wfE7GYY5UM" },
+          { title: "English Grammar Complete Course for Competitive Exams", url: "https://www.youtube.com/watch?v=ycnSVRBk5EM", platform: "YouTube", videoId: "ycnSVRBk5EM" },
+          { title: "Logical Reasoning Complete Shortcuts", url: "https://www.youtube.com/watch?v=8Cv-Dy47zcg", platform: "YouTube", videoId: "8Cv-Dy47zcg" }
         ],
         pdfs: [
-          { title: "SSC Previous Papers (10 Years)", url: "https://ssc.nic.in/" },
-          { title: "Quantitative Aptitude Shortcuts", url: "https://www.sscadda.com/" },
-          { title: "English for SSC - Complete Guide", url: "https://www.studysmarter.co.uk/" }
+          { title: "SSC Official Previous Question Papers", url: "https://ssc.nic.in/" },
+          { title: "Quantitative Aptitude Shortcut Guide", url: "https://www.sscadda.com/" },
+          { title: "English Grammar Rules Handbook", url: "https://www.studysmarter.co.uk/" }
         ],
         links: [
           { title: "SSC Official Portal", url: "https://ssc.nic.in/" },
-          { title: "SSC Adda - Study Materials", url: "https://www.sscadda.com/" },
-          { title: "Testbook SSC Prep", url: "https://testbook.com/ssc" }
+          { title: "SSC Adda Study Portal", url: "https://www.sscadda.com/" },
+          { title: "Testbook SSC Preparation Hub", url: "https://testbook.com/ssc" }
         ]
       }
     },
@@ -1026,20 +1026,20 @@ const Courses = () => {
       icon: Award,
       resources: {
         videos: [
-          { title: "SBI PO Complete Course", url: "https://www.youtube.com/watch?v=DWRxL5r7fFo", platform: "YouTube", videoId: "DWRxL5r7fFo" },
-          { title: "IBPS RRB Prep - 50 Hours", url: "https://www.youtube.com/watch?v=9pGXLBxYaWE", platform: "YouTube", videoId: "9pGXLBxYaWE" },
-          { title: "Banking Awareness 2024", url: "https://www.youtube.com/watch?v=3Jm8bH3k1p8", platform: "YouTube", videoId: "3Jm8bH3k1p8" },
-          { title: "Banking Quantitative Aptitude", url: "https://www.youtube.com/watch?v=8Cv-Dy47zcg", platform: "YouTube", videoId: "8Cv-Dy47zcg" }
+          { title: "SBI PO Complete Preparation Walkthrough", url: "https://www.youtube.com/watch?v=DWRxL5r7fFo", platform: "YouTube", videoId: "DWRxL5r7fFo" },
+          { title: "IBPS Complete Quantitative Aptitude Course", url: "https://www.youtube.com/watch?v=9pGXLBxYaWE", platform: "YouTube", videoId: "9pGXLBxYaWE" },
+          { title: "Banking Awareness & Economy Masterclass", url: "https://www.youtube.com/watch?v=3Jm8bH3k1p8", platform: "YouTube", videoId: "3Jm8bH3k1p8" },
+          { title: "Banking Reasoning Shortcuts & Tricks", url: "https://www.youtube.com/watch?v=8Cv-Dy47zcg", platform: "YouTube", videoId: "8Cv-Dy47zcg" }
         ],
         pdfs: [
-          { title: "SBI/IBPS Previous Papers", url: "https://www.ibps.in/" },
-          { title: "Banking Awareness PDF", url: "https://www.sscadda.com/bank-awareness" },
-          { title: "Current Affairs Monthly", url: "https://www.edudose.com/" }
+          { title: "IBPS Official Previous Year Question Papers", url: "https://www.ibps.in/" },
+          { title: "Banking Awareness Study Guide", url: "https://www.sscadda.com/bank-awareness" },
+          { title: "Financial & Banking Current Affairs Guide", url: "https://www.edudose.com/" }
         ],
         links: [
           { title: "IBPS Official Portal", url: "https://www.ibps.in/" },
-          { title: "SBI Official Site", url: "https://www.sbi.co.in/" },
-          { title: "Banking & Finance News", url: "https://economictimes.indiatimes.com/markets" }
+          { title: "SBI Official Portal", url: "https://www.sbi.co.in/" },
+          { title: "Banking & Financial News Hub", url: "https://economictimes.indiatimes.com/markets" }
         ]
       }
     },
@@ -1051,21 +1051,21 @@ const Courses = () => {
       icon: GraduationCap,
       resources: {
         videos: [
-          { title: "CAT Complete Course - 80 Hours", url: "https://www.youtube.com/watch?v=gqmhJ5BvjV0", platform: "YouTube", videoId: "gqmhJ5BvjV0" },
-          { title: "CAT DILR Masterclass", url: "https://www.youtube.com/watch?v=5-Qs_5k8kok", platform: "YouTube", videoId: "5-Qs_5k8kok" },
-          { title: "CAT Verbal Ability & RC", url: "https://www.youtube.com/watch?v=pLGaJ7h5m_4", platform: "YouTube", videoId: "pLGaJ7h5m_4" },
-          { title: "GMAT Quantitative Reasoning", url: "https://www.youtube.com/watch?v=ZZxPx1A9wjk", platform: "YouTube", videoId: "ZZxPx1A9wjk" }
+          { title: "CAT Quantitative Aptitude Complete Course", url: "https://www.youtube.com/watch?v=gqmhJ5BvjV0", platform: "YouTube", videoId: "gqmhJ5BvjV0" },
+          { title: "CAT DILR (Data Interpretation & LR) Masterclass", url: "https://www.youtube.com/watch?v=5-Qs_5k8kok", platform: "YouTube", videoId: "5-Qs_5k8kok" },
+          { title: "CAT Verbal Ability & RC Complete Strategy", url: "https://www.youtube.com/watch?v=pLGaJ7h5m_4", platform: "YouTube", videoId: "pLGaJ7h5m_4" },
+          { title: "GMAT Quantitative Math Complete Guide", url: "https://www.youtube.com/watch?v=ZZxPx1A9wjk", platform: "YouTube", videoId: "ZZxPx1A9wjk" }
         ],
         pdfs: [
-          { title: "CAT Previous Papers (20 Years)", url: "https://www.iimcat.ac.in/" },
-          { title: "GMAT Official Guide", url: "https://www.mba.com/" },
-          { title: "XAT Preparation Books", url: "https://www.xlri.ac.in/" }
+          { title: "Official IIM CAT Previous Papers", url: "https://www.iimcat.ac.in/" },
+          { title: "GMAT Official Preparation Guide", url: "https://www.mba.com/" },
+          { title: "XAT Official Preparation Portal", url: "https://www.xlri.ac.in/" }
         ],
         links: [
-          { title: "IIM CAT Portal", url: "https://www.iimcat.ac.in/" },
-          { title: "GMAT Official", url: "https://www.mba.com/" },
-          { title: "XAT Official", url: "https://www.xlri.ac.in/" },
-          { title: "MBA Entrance Exams", url: "https://www.testfunda.com/" }
+          { title: "IIM CAT Official Portal", url: "https://www.iimcat.ac.in/" },
+          { title: "GMAT Official Website", url: "https://www.mba.com/" },
+          { title: "XAT Official Website", url: "https://www.xlri.ac.in/" },
+          { title: "MBA Entrance Exam Resource Hub", url: "https://www.testfunda.com/" }
         ]
       }
     },
@@ -1077,21 +1077,21 @@ const Courses = () => {
       icon: Trophy,
       resources: {
         videos: [
-          { title: "DSA & Coding Interview - 200 Hours", url: "https://www.youtube.com/watch?v=WO4sEKrKWec", platform: "YouTube", videoId: "WO4sEKrKWec" },
-          { title: "System Design Masterclass", url: "https://www.youtube.com/watch?v=UzLMhqg3XX0", platform: "YouTube", videoId: "UzLMhqg3XX0" },
-          { title: "NPTEL Data Structures - IIT Delhi", url: "https://nptel.ac.in/courses/106104166", platform: "NPTEL" },
-          { title: "Algorithms - NPTEL IIT Bombay", url: "https://nptel.ac.in/courses/106104001", platform: "NPTEL" }
+          { title: "Data Structures & Algorithms Complete Course (freeCodeCamp)", url: "https://www.youtube.com/watch?v=8hly31xKli0", platform: "YouTube", videoId: "8hly31xKli0" },
+          { title: "System Design Interview Masterclass", url: "https://www.youtube.com/watch?v=UzLMhqg3XX0", platform: "YouTube", videoId: "UzLMhqg3XX0" },
+          { title: "Dynamic Programming Complete Guide for Interviews", url: "https://www.youtube.com/watch?v=oBt53YbR9Kk", platform: "YouTube", videoId: "oBt53YbR9Kk" },
+          { title: "Graph Algorithms Complete Course", url: "https://www.youtube.com/watch?v=tWVWeAqZ0WU", platform: "YouTube", videoId: "tWVWeAqZ0WU" }
         ],
         pdfs: [
-          { title: "Cracking Coding Interview Book", url: "https://www.crackingthecodinginterview.com/" },
-          { title: "LeetCode DSA Problems", url: "https://leetcode.com/explore/" },
-          { title: "System Design Interview Guide", url: "https://github.com/donnemartin/system-design-primer" }
+          { title: "Cracking The Coding Interview Preparation Guide", url: "https://www.crackingthecodinginterview.com/" },
+          { title: "LeetCode Top 150 Interview Questions", url: "https://leetcode.com/explore/" },
+          { title: "System Design Primer GitHub Guide", url: "https://github.com/donnemartin/system-design-primer" }
         ],
         links: [
-          { title: "LeetCode Platform", url: "https://leetcode.com/" },
-          { title: "HackerRank Coding", url: "https://www.hackerrank.com/" },
-          { title: "GeeksforGeeks DSA", url: "https://www.geeksforgeeks.org/data-structures/" },
-          { title: "AlgoExpert", url: "https://www.algoexpert.io/" }
+          { title: "LeetCode Official Portal", url: "https://leetcode.com/" },
+          { title: "HackerRank Practice Hub", url: "https://www.hackerrank.com/" },
+          { title: "GeeksforGeeks DSA Complete Portal", url: "https://www.geeksforgeeks.org/data-structures/" },
+          { title: "NeetCode Roadmap & Solutions", url: "https://neetcode.io/" }
         ]
       }
     },
@@ -1103,21 +1103,21 @@ const Courses = () => {
       icon: Award,
       resources: {
         videos: [
-          { title: "AWS Solutions Architect - 20 Hours", url: "https://www.youtube.com/watch?v=ZccRLXICtG0", platform: "YouTube", videoId: "ZccRLXICtG0" },
-          { title: "Azure Administrator - 25 Hours", url: "https://www.youtube.com/watch?v=4PmAIbNrHKI", platform: "YouTube", videoId: "4PmAIbNrHKI" },
-          { title: "GCP Associate Cloud Engineer", url: "https://www.youtube.com/watch?v=jpno8FSqpc8", platform: "YouTube", videoId: "jpno8FSqpc8" },
-          { title: "Kubernetes Complete Course", url: "https://www.youtube.com/watch?v=d6WC5n9G_sM", platform: "YouTube", videoId: "d6WC5n9G_sM" }
+          { title: "AWS Certified Solutions Architect Complete Course", url: "https://www.youtube.com/watch?v=Ia-UEYYR44s", platform: "YouTube", videoId: "Ia-UEYYR44s" },
+          { title: "Microsoft Azure Fundamentals AZ-900 Complete Course", url: "https://www.youtube.com/watch?v=NKEFWybpOZA", platform: "YouTube", videoId: "NKEFWybpOZA" },
+          { title: "Google Cloud Associate Cloud Engineer Course", url: "https://www.youtube.com/watch?v=jpno8FSqpc8", platform: "YouTube", videoId: "jpno8FSqpc8" },
+          { title: "Kubernetes Complete Course for Beginners", url: "https://www.youtube.com/watch?v=d6WC5n9G_sM", platform: "YouTube", videoId: "d6WC5n9G_sM" }
         ],
         pdfs: [
-          { title: "AWS Certified Solutions Architect Guide", url: "https://d1.awsstatic.com/training-and-certification/docs-sa-assoc/AWS-Certified-Solutions-Architect-Associate_Exam-Guide.pdf" },
-          { title: "Azure Learning Path", url: "https://learn.microsoft.com/en-us/azure/" },
-          { title: "Kubernetes Official Docs", url: "https://kubernetes.io/docs/" }
+          { title: "AWS Solutions Architect Official Exam Guide", url: "https://d1.awsstatic.com/training-and-certification/docs-sa-assoc/AWS-Certified-Solutions-Architect-Associate_Exam-Guide.pdf" },
+          { title: "Microsoft Azure Official Learning Documentation", url: "https://learn.microsoft.com/en-us/azure/" },
+          { title: "Kubernetes Official Documentation Handbook", url: "https://kubernetes.io/docs/" }
         ],
         links: [
-          { title: "AWS Training", url: "https://aws.amazon.com/training/" },
-          { title: "Azure Learn", url: "https://learn.microsoft.com/en-us/azure/" },
-          { title: "Google Cloud Training", url: "https://cloud.google.com/training" },
-          { title: "Linux Academy", url: "https://www.pluralsight.com/" }
+          { title: "AWS Official Training Portal", url: "https://aws.amazon.com/training/" },
+          { title: "Microsoft Learn Official Portal", url: "https://learn.microsoft.com/en-us/azure/" },
+          { title: "Google Cloud Training Portal", url: "https://cloud.google.com/training" },
+          { title: "CNCF Cloud Native Hub", url: "https://www.cncf.io/" }
         ]
       }
     },
@@ -1129,22 +1129,21 @@ const Courses = () => {
       icon: Trophy,
       resources: {
         videos: [
-          { title: "Competitive Programming - NPTEL IIT BHU", url: "https://nptel.ac.in/courses/106104015", platform: "NPTEL" },
-          { title: "Competitive Programming Course", url: "https://www.youtube.com/watch?v=RBSGkl9jlOE", platform: "YouTube", videoId: "RBSGkl9jlOE" },
-          { title: "Graph Algorithms Masterclass", url: "https://www.youtube.com/watch?v=tWVWeAqZ0WU", platform: "YouTube", videoId: "tWVWeAqZ0WU" },
-          { title: "Dynamic Programming Complete", url: "https://www.youtube.com/watch?v=oBt53YbR9Kk", platform: "YouTube", videoId: "oBt53YbR9Kk" }
+          { title: "Competitive Programming Complete Guide", url: "https://www.youtube.com/watch?v=RBSGkl9jlOE", platform: "YouTube", videoId: "RBSGkl9jlOE" },
+          { title: "Graph Theory Algorithms Masterclass", url: "https://www.youtube.com/watch?v=tWVWeAqZ0WU", platform: "YouTube", videoId: "tWVWeAqZ0WU" },
+          { title: "Dynamic Programming Complete Bootcamp", url: "https://www.youtube.com/watch?v=oBt53YbR9Kk", platform: "YouTube", videoId: "oBt53YbR9Kk" },
+          { title: "Number Theory & Advanced Algorithms", url: "https://www.youtube.com/watch?v=8hly31xKli0", platform: "YouTube", videoId: "8hly31xKli0" }
         ],
         pdfs: [
-          { title: "Competitive Programming Book", url: "https://cpbook.net/" },
-          { title: "ICPC Problem Database", url: "https://codeforces.com/problemsets/acmsgru" },
-          { title: "Algorithm Notes Collection", url: "https://github.com/Ashishgup/Competitive-Programming" }
+          { title: "Competitive Programming Handbook (Free PDF)", url: "https://cses.fi/book/book.pdf" },
+          { title: "Codeforces Problem Archive", url: "https://codeforces.com/problemset" },
+          { title: "CP Algorithms Reference Guide", url: "https://cp-algorithms.com/" }
         ],
         links: [
-          { title: "Codeforces Contests", url: "https://codeforces.com/" },
-          { title: "AtCoder Contests", url: "https://atcoder.jp/" },
-          { title: "HackerRank Challenges", url: "https://www.hackerrank.com/challenges" },
-          { title: "SPOJ Problem Archive", url: "https://www.spoj.com/" },
-          { title: "Competitive Programming Guide", url: "https://github.com/topics/competitive-programming" }
+          { title: "Codeforces Official Portal", url: "https://codeforces.com/" },
+          { title: "AtCoder Official Portal", url: "https://atcoder.jp/" },
+          { title: "HackerRank Practice Hub", url: "https://www.hackerrank.com/challenges" },
+          { title: "CSES Problem Set Portal", url: "https://cses.fi/problemset/" }
         ]
       }
     }
@@ -1255,55 +1254,63 @@ const Courses = () => {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {courses.map((course, index) => {
+              const isEnrolled = enrolledCourses.some((c: any) => (c._id && course._id && c._id === course._id) || c.title === course.title);
               return (
                 <div
                   key={course._id || index}
-                  className="group relative rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 card-lift bg-card shadow-sm transition-all duration-300 animate-reveal-up"
+                  className="group relative rounded-2xl border border-zinc-800 overflow-hidden hover:border-primary/40 card-lift bg-[#141417] shadow-lg transition-all duration-300 animate-reveal-up"
                   style={{ animationDelay: `${index * 0.04}s` }}
                 >
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                    style={{ background: 'radial-gradient(ellipse at top, rgba(124,58,237,0.05) 0%, transparent 60%)' }} />
+                    style={{ background: 'radial-gradient(ellipse at top, rgba(124,58,237,0.08) 0%, transparent 60%)' }} />
                   <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   <div className="relative z-10 p-5">
                     {/* Category & Level */}
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/15 text-primary">
+                      <span className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-primary/15 border border-primary/25 text-primary">
                         {course.category}
                       </span>
-                      <span className="text-[10px] font-medium text-muted-foreground px-2 py-0.5 rounded-lg bg-border/30">
+                      <span className="text-[10px] font-medium text-zinc-400 px-2 py-0.5 rounded-lg bg-zinc-800/80">
                         {course.level}
                       </span>
                     </div>
 
                     {/* Title & Instructor */}
-                    <h3 className="font-bold text-foreground mb-1 group-hover:text-primary transition-colors duration-200 line-clamp-2 leading-snug"
+                    <h3 className="font-bold text-white mb-1 group-hover:text-primary transition-colors duration-200 line-clamp-2 leading-snug"
                       style={{ fontFamily: 'Sora, sans-serif', fontSize: '0.95rem' }}>
                       {course.title}
                     </h3>
-                    <p className="text-xs text-muted-foreground mb-2.5">{course.instructor}</p>
-                    <p className="text-xs text-muted-foreground/80 mb-4 line-clamp-2 leading-relaxed">{course.description}</p>
+                    <p className="text-xs text-zinc-400 mb-2.5">{course.instructor}</p>
+                    <p className="text-xs text-zinc-400/80 mb-4 line-clamp-2 leading-relaxed">{course.description}</p>
 
                     {/* Stats */}
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-5 pb-4 border-b border-border/30">
+                    <div className="flex items-center gap-3 text-xs text-zinc-400 mb-5 pb-4 border-b border-zinc-800/80">
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{course.duration}</span>
                       <span className="flex items-center gap-1"><Users className="w-3 h-3" />{(course.students || course.enrollmentCount || 0).toLocaleString()}</span>
                       {course.rating > 0 && (
-                        <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-amber-400 text-amber-400" /><span className="font-semibold text-foreground">{course.rating.toFixed(1)}</span></span>
+                        <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-amber-400 text-amber-400" /><span className="font-semibold text-white">{course.rating.toFixed(1)}</span></span>
                       )}
                     </div>
 
                     {/* Actions */}
                     <div className="flex gap-2">
-                      <button onClick={() => handleEnroll(course)}
-                        className="relative flex-1 py-2.5 rounded-xl text-xs font-semibold text-white overflow-hidden group/btn transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]"
-                        style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
-                        <span className="relative z-10">Enroll Now</span>
-                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-12" />
-                      </button>
+                      {isEnrolled ? (
+                        <button onClick={() => setShowDashboard(true)}
+                          className="relative flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.35)] flex items-center justify-center gap-1.5 transition-all">
+                          <CheckCircle className="w-4 h-4 text-white" /> Enrolled
+                        </button>
+                      ) : (
+                        <button onClick={() => handleEnroll(course)}
+                          className="relative flex-1 py-2.5 rounded-xl text-xs font-semibold text-white overflow-hidden group/btn transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]"
+                          style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
+                          <span className="relative z-10">Enroll Now</span>
+                          <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-500 skew-x-12" />
+                        </button>
+                      )}
                       {course.resources && (
                         <button onClick={() => handleViewResources(course)}
-                          className="w-9 h-9 rounded-xl border border-border/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-all"
+                          className="w-9 h-9 rounded-xl border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-primary hover:border-primary/40 hover:bg-primary/10 transition-all"
                           title="View Free Resources">
                           <BookOpen className="w-4 h-4" />
                         </button>
@@ -1337,32 +1344,32 @@ const Courses = () => {
                 const Icon = exam.icon;
                 return (
                   <div key={index}
-                    className="group relative rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 card-lift bg-card shadow-sm transition-all duration-300 animate-reveal-up"
+                    className="group relative rounded-2xl border border-zinc-800 overflow-hidden hover:border-primary/40 card-lift bg-[#141417] shadow-lg transition-all duration-300 animate-reveal-up"
                     style={{ animationDelay: `${index * 0.04}s` }}>
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                      style={{ background: 'radial-gradient(ellipse at top, rgba(124,58,237,0.05) 0%, transparent 60%)' }} />
+                      style={{ background: 'radial-gradient(ellipse at top, rgba(124,58,237,0.08) 0%, transparent 60%)' }} />
                     <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative z-10 p-5">
                       <div className="flex items-start gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                        <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/25 transition-colors">
                           <Icon className="w-5 h-5 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-foreground text-sm mb-1 group-hover:text-primary transition-colors truncate"
+                          <h3 className="font-bold text-white text-sm mb-1 group-hover:text-primary transition-colors truncate"
                             style={{ fontFamily: 'Sora, sans-serif' }}>
                             {exam.name}
                           </h3>
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-primary/8 border border-primary/15 text-primary">{exam.category}</span>
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-primary/15 border border-primary/25 text-primary">{exam.category}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5 mb-3 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1.5 mb-3 text-xs text-zinc-400">
                         <Clock className="w-3 h-3" />{exam.duration}
                       </div>
                       <div className="flex flex-wrap gap-1.5 mb-4">
                         {exam.subjects.slice(0, 3).map((s: string, j: number) => (
-                          <span key={j} className="text-[10px] px-1.5 py-0.5 rounded-md bg-border/40 text-muted-foreground">{s}</span>
+                          <span key={j} className="text-[10px] px-1.5 py-0.5 rounded-md bg-zinc-800 text-zinc-300">{s}</span>
                         ))}
-                        {exam.subjects.length > 3 && <span className="text-[10px] text-muted-foreground/60">+{exam.subjects.length - 3}</span>}
+                        {exam.subjects.length > 3 && <span className="text-[10px] text-zinc-500">+{exam.subjects.length - 3}</span>}
                       </div>
                       <button onClick={() => handleViewResources(exam)}
                         className="relative w-full py-2.5 rounded-xl text-xs font-semibold text-white overflow-hidden group/btn transition-all hover:shadow-[0_0_12px_rgba(124,58,237,0.25)]"
@@ -1386,8 +1393,8 @@ const Courses = () => {
                 <CheckCircle className="w-7 h-7 text-emerald-400" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'Sora, sans-serif' }}>Enrolled Successfully!</h2>
-                <p className="text-sm text-muted-foreground mt-1">You now have full access to course materials</p>
+                <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Sora, sans-serif' }}>Enrolled Successfully!</h2>
+                <p className="text-sm text-zinc-400 mt-1">You now have full access to course materials</p>
               </div>
             </DialogTitle>
           </DialogHeader>
@@ -1398,23 +1405,23 @@ const Courses = () => {
               <Play className="w-4 h-4" /> Go to Dashboard
             </button>
             <button onClick={() => setShowSuccessDialog(false)}
-              className="w-full py-3 rounded-xl text-sm font-medium text-muted-foreground border border-border/50 hover:text-foreground hover:border-border transition-all">
+              className="w-full py-3 rounded-xl text-sm font-medium text-zinc-400 border border-zinc-800 hover:text-white hover:border-zinc-700 transition-all">
               Continue Browsing
             </button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Free Resources Dialog - Clean Design */}
+      {/* Free Resources Dialog - Solid Premium Design */}
       <Dialog open={showResourcesDialog} onOpenChange={setShowResourcesDialog}>
-        <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto border-border/50">
+        <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto bg-[#141417] border border-zinc-800 text-white rounded-2xl shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-xl">
+            <DialogTitle className="flex items-center gap-2 text-xl text-white">
               <BookOpen className="w-5 h-5 text-primary" />
               Free Learning Resources
             </DialogTitle>
             {selectedCourse && (
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-zinc-400 mt-1">
                 {selectedCourse.title || selectedCourse.name}
               </p>
             )}
@@ -1427,30 +1434,30 @@ const Courses = () => {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Video className="w-4 h-4 text-primary" />
-                    <h3 className="font-semibold">Video Lectures</h3>
+                    <h3 className="font-semibold text-white">Video Lectures</h3>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {selectedCourse.resources.videos.map((video: any, idx: number) => {
                       const completed = video.videoId ? isVideoCompleted(video.videoId) : false;
                       return (
                         <div
                           key={idx}
-                          className={`flex items-center justify-between p-3 rounded-xl border border-border/50 hover:border-primary/30 transition-all group ${completed ? 'bg-primary/5 border-primary/20' : ''}`}
+                          className={`flex items-center justify-between p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/90 hover:border-primary/40 transition-all group ${completed ? 'bg-primary/10 border-primary/30' : ''}`}
                         >
                           <div className="flex items-center gap-3">
-                            <div className={`p-2 rounded-lg ${completed ? 'bg-primary/10' : 'bg-muted/50'}`}>
+                            <div className={`p-2 rounded-lg ${completed ? 'bg-primary/20' : 'bg-zinc-800'}`}>
                               {completed ? (
                                 <CheckCircle className="w-4 h-4 text-primary" />
                               ) : (
-                                <Play className="w-4 h-4 text-muted-foreground" />
+                                <Play className="w-4 h-4 text-zinc-400 group-hover:text-primary transition-colors" />
                               )}
                             </div>
                             <div className="flex-1">
-                              <p className="font-medium text-sm flex items-center gap-2">
+                              <p className="font-medium text-sm text-white flex items-center gap-2">
                                 {video.title}
-                                {completed && <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">Completed</Badge>}
+                                {completed && <Badge variant="secondary" className="text-xs bg-primary/20 text-primary">Completed</Badge>}
                               </p>
-                              <p className="text-xs text-muted-foreground">{video.platform}</p>
+                              <p className="text-xs text-zinc-400">{video.platform}</p>
                             </div>
                           </div>
                           <div className="flex gap-2">
@@ -1468,7 +1475,7 @@ const Courses = () => {
                               onClick={() => window.open(video.url, '_blank')}
                               size="sm"
                               variant="outline"
-                              className="border-border/50"
+                              className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
                             >
                               <ExternalLink className="w-3 h-3" />
                             </Button>
@@ -1485,24 +1492,24 @@ const Courses = () => {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <Download className="w-4 h-4 text-primary" />
-                    <h3 className="font-semibold">PDF Books & Guides</h3>
+                    <h3 className="font-semibold text-white">PDF Books & Guides</h3>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {selectedCourse.resources.pdfs.map((pdf: any, idx: number) => (
                       <a
                         key={idx}
                         href={pdf.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 rounded-xl border border-border/50 hover:border-primary/30 transition-all group"
+                        className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/90 hover:border-primary/40 transition-all group"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-muted/50 rounded-lg group-hover:bg-primary/10 transition-colors">
-                            <FileText className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                          <div className="p-2 bg-zinc-800 rounded-lg group-hover:bg-primary/20 transition-colors">
+                            <FileText className="w-4 h-4 text-zinc-400 group-hover:text-primary transition-colors" />
                           </div>
-                          <p className="font-medium text-sm group-hover:text-primary transition-colors">{pdf.title}</p>
+                          <p className="font-medium text-sm text-white group-hover:text-primary transition-colors">{pdf.title}</p>
                         </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <ExternalLink className="w-4 h-4 text-zinc-400 group-hover:text-primary transition-colors" />
                       </a>
                     ))}
                   </div>
@@ -1514,24 +1521,24 @@ const Courses = () => {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <ExternalLink className="w-4 h-4 text-primary" />
-                    <h3 className="font-semibold">Documentation & Resources</h3>
+                    <h3 className="font-semibold text-white">Documentation & Resources</h3>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {selectedCourse.resources.links.map((link: any, idx: number) => (
                       <a
                         key={idx}
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-between p-3 rounded-xl border border-border/50 hover:border-primary/30 transition-all group"
+                        className="flex items-center justify-between p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/90 hover:border-primary/40 transition-all group"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-muted/50 rounded-lg group-hover:bg-primary/10 transition-colors">
-                            <BookOpen className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                          <div className="p-2 bg-zinc-800 rounded-lg group-hover:bg-primary/20 transition-colors">
+                            <BookOpen className="w-4 h-4 text-zinc-400 group-hover:text-primary transition-colors" />
                           </div>
-                          <p className="font-medium text-sm group-hover:text-primary transition-colors">{link.title}</p>
+                          <p className="font-medium text-sm text-white group-hover:text-primary transition-colors">{link.title}</p>
                         </div>
-                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <ExternalLink className="w-4 h-4 text-zinc-400 group-hover:text-primary transition-colors" />
                       </a>
                     ))}
                   </div>
@@ -1539,19 +1546,19 @@ const Courses = () => {
               )}
 
               {/* Info Banner */}
-              <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
-                <p className="text-sm text-center text-muted-foreground">
-                  All resources are free and from legitimate sources
+              <div className="bg-primary/10 p-4 rounded-xl border border-primary/20">
+                <p className="text-sm text-center text-zinc-300">
+                  All resources are free and from legitimate, verified educational sources
                 </p>
               </div>
             </div>
           )}
           
-          <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
             <Button
               variant="outline"
               onClick={() => setShowResourcesDialog(false)}
-              className="border-border/50"
+              className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
             >
               Close
             </Button>

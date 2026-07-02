@@ -176,9 +176,8 @@ const VideoPlayerWithTracking = ({
   }, [isOpen, platform, videoId, courseTitle, videoTitle, isCompleted, videoDuration, isPlayerFocused, skipAttempts, userEngagement, updateVideoProgress]);
 
   const getEmbedUrl = () => {
-    if (platform === "YouTube") {
-      // Disable seeking/scrubbing for stricter control
-      return `https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1&enablejsapi=1&controls=1`;
+    if (videoId || platform === "YouTube") {
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
     } else if (platform === "NPTEL") {
       return originalUrl;
     }
