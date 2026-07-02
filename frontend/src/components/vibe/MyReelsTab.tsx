@@ -57,7 +57,7 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
     },
   });
 
-  const reels = reelsQuery.data?.reels || [];
+  const reels = reelsQuery.data?.data?.reels || reelsQuery.data?.reels || [];
 
   const totalStats = reels.reduce(
     (acc, reel) => ({

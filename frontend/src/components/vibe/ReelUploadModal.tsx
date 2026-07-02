@@ -34,8 +34,8 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
   });
 
   const publishMutation = useMutation({
-    mutationFn: async (data: { mediaUrl: string; caption: string; videoFile: File; postCategory: string }) => {
-      await uploadReel({
+    mutationFn: async (data: { caption: string; videoFile: File; postCategory: string }) => {
+      const createdReel = await uploadReel({
         video: data.videoFile,
         title: data.caption.slice(0, 80) || "My Reel",
         caption: data.caption,
@@ -44,15 +44,18 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
         duration: duration || 30,
       });
 
+      const videoUrl = createdReel?.videoUrl || "/uploads/reels/default.mp4";
+
       await createPost({
-        caption: data.caption,
+        caption: data.caption || "New Reel",
         mediaType: "video",
-        mediaUrls: [{ url: data.mediaUrl }],
-        category: data.postCategory as "general",
+        mediaUrls: [{ url: videoUrl }],
+        category: (data.postCategory || "general") as any,
         tags: ["reel"],
       });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts-feed"] });
       queryClient.invalidateQueries({ queryKey: ["/posts/feed"] });
       queryClient.invalidateQueries({ queryKey: ["my-reels"] });
       queryClient.invalidateQueries({ queryKey: ["reels-feed"] });
@@ -68,8 +71,8 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
       alert("Please select a video file");
       return;
     }
-    if (selectedFile.size > 100 * 1024 * 1024) {
-      alert("File size must be less than 100MB");
+    if (selectedFile.size > 200 * 1024 * 1024) {
+      alert("File size must be less than 200MB");
       return;
     }
 
@@ -101,20 +104,18 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
   const handleUpload = async () => {
     if (!file) return;
     try {
-      const uploadResult = await uploadMutation.mutateAsync(file);
       await publishMutation.mutateAsync({
-        mediaUrl: uploadResult.mediaUrl,
         caption,
         videoFile: file,
         postCategory: category,
       });
     } catch (error) {
-      alert("Failed to upload reel. Please try again.");
+      alert("Failed to upload reel. Please check your network or try again.");
       console.error(error);
     }
   };
 
-  const isUploading = uploadMutation.isPending || publishMutation.isPending;
+  const isUploading = publishMutation.isPending;
   const canUpload = file && !isUploading;
 
   return (
