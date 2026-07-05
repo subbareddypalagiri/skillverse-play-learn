@@ -106,13 +106,31 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
     onClose();
   };
 
+  const formatVideoUrl = (url: string) => {
+    let cleaned = url.trim();
+    if (!cleaned) return "";
+    // Google Drive share link -> direct streamable video link
+    if (cleaned.includes("drive.google.com/file/d/")) {
+      const match = cleaned.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+      }
+    }
+    // Dropbox share link -> raw streamable link
+    if (cleaned.includes("dropbox.com/") && cleaned.includes("dl=0")) {
+      return cleaned.replace("dl=0", "raw=1");
+    }
+    return cleaned;
+  };
+
   const handleUpload = async () => {
     if (uploadMode === 'link') {
-      if (!videoLink.trim()) return;
+      const formattedUrl = formatVideoUrl(videoLink);
+      if (!formattedUrl) return;
       try {
         setIsDirectUploading(true);
         const createdReel = await uploadReelDirect({
-          videoUrl: videoLink.trim(),
+          videoUrl: formattedUrl,
           title: caption.slice(0, 80) || "My Reel",
           caption,
           category,
@@ -124,7 +142,7 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
         await createPost({
           caption: caption || "New Reel",
           mediaType: "video",
-          mediaUrls: [{ url: videoLink.trim() }],
+          mediaUrls: [{ url: formattedUrl }],
           category: (category || "general") as any,
           tags: ["reel"],
         });
@@ -171,10 +189,10 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
           finalVideoUrl = cData.secure_url;
           finalDuration = Math.round(cData.duration || duration || 30);
         } else {
-          throw new Error("Cloudinary Direct Upload Error: " + (cData.error?.message || "Cloud storage rejected the file"));
+          throw new Error("CLOUDINARY_ERROR: " + (cData.error?.message || "Cloud storage rejected the file"));
         }
       } else if (file.size > 4 * 1024 * 1024) {
-        throw new Error("Cloudinary credentials (CLOUDINARY_URL or keys) are missing in Vercel Backend Environment Variables! Files over 4MB cannot be uploaded directly to Vercel Serverless. Please use the 'Paste Video Link' tab or add Cloudinary keys in Vercel!");
+        throw new Error("CLOUDINARY_ERROR: Cloudinary credentials in Vercel are missing or invalid! Since your file is over 4MB, please use the 'Paste Video Link' tab!");
       }
 
       if (finalVideoUrl) {
@@ -214,7 +232,13 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
       }
     } catch (error: any) {
       setIsDirectUploading(false);
-      alert(error.message || "Failed to upload reel. Please check your network or try again.");
+      const errMsg = error?.message || "Failed to upload reel.";
+      if (errMsg.includes("CLOUDINARY_ERROR") || errMsg.includes("Cloudinary") || errMsg.includes("cloud_name")) {
+        alert("⚠️ Cloudinary Configuration Alert:\n" + errMsg.replace("CLOUDINARY_ERROR: ", "") + "\n\n💡 Don't worry! Auto-switching you to the 'Paste Video Link' tab where you can publish instantly with 0 size limits!");
+        setUploadMode('link');
+      } else {
+        alert(errMsg + "\n\n💡 Tip: If file upload fails on Vercel, switch to the 'Paste Video Link' tab!");
+      }
       console.error(error);
     }
   };
@@ -333,19 +357,24 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
               ) : (
                 <div className="space-y-2">
                   <label className="block text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">
-                    Direct Video URL / Link (No Size Limit!)
+                    Direct Video URL / Link (0 Risk / No Size Limit!)
                   </label>
                   <input
                     type="url"
                     value={videoLink}
                     onChange={(e) => setVideoLink(e.target.value)}
-                    placeholder="https://... (Cloudinary, S3, Google Drive direct link, or MP4 URL)"
+                    placeholder="https://... (Google Drive link, Dropbox link, Cloudinary, or MP4)"
                     disabled={isUploading}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 disabled:opacity-50 text-sm"
                   />
-                  <p className="text-xs text-amber-400/80">
-                    ⚡ Instant Publish: Bypasses Vercel 4.5MB serverless limit completely!
-                  </p>
+                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-xs text-amber-300 space-y-1">
+                    <p className="font-semibold flex items-center gap-1.5">
+                      ⚡ 100% Risk-Free Instant Publish!
+                    </p>
+                    <p className="text-white/70 leading-relaxed">
+                      You can paste any <strong>Google Drive share link</strong> or <strong>Dropbox link</strong>! We automatically convert it into a high-speed HD video stream with zero size limits!
+                    </p>
+                  </div>
                 </div>
               )}
 

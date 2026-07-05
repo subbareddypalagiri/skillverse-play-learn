@@ -9,20 +9,23 @@ import { v2 as cloudinary } from 'cloudinary';
 export const getUploadSignature = async (req, res, next) => {
   try {
     const config = cloudinary.config();
-    let apiSecret = process.env.CLOUDINARY_API_SECRET || config.api_secret || '';
-    let cloudName = process.env.CLOUDINARY_CLOUD_NAME || config.cloud_name || '';
-    let apiKey = process.env.CLOUDINARY_API_KEY || config.api_key || '';
+    let apiSecret = (process.env.CLOUDINARY_API_SECRET || config.api_secret || '').trim();
+    let cloudName = (process.env.CLOUDINARY_CLOUD_NAME || config.cloud_name || '').trim();
+    let apiKey = (process.env.CLOUDINARY_API_KEY || config.api_key || '').trim();
 
     if (!apiSecret || !cloudName || !apiKey) {
       if (process.env.CLOUDINARY_URL) {
-        const match = process.env.CLOUDINARY_URL.match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/);
+        const match = process.env.CLOUDINARY_URL.trim().match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/i);
         if (match) {
-          apiKey = match[1];
-          apiSecret = match[2];
-          cloudName = match[3];
+          apiKey = match[1].trim();
+          apiSecret = match[2].trim();
+          cloudName = match[3].trim();
         }
       }
     }
+
+    // Cloudinary cloud names are strictly lowercase! Auto-correcting case sensitivity:
+    cloudName = cloudName.toLowerCase();
 
     if (!apiSecret || !cloudName || !apiKey) {
       return res.status(400).json({
