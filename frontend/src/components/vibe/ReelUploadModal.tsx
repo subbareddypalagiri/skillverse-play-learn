@@ -146,7 +146,10 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
     try {
       setIsDirectUploading(true);
       setUploadProgress(15);
-      const sigData = await getCloudinarySignature().catch(() => null);
+      const sigData = await getCloudinarySignature().catch((err: any) => {
+        console.error("Signature fetch failed:", err);
+        return null;
+      });
       let finalVideoUrl = "";
       let finalDuration = duration || 30;
 
@@ -164,10 +167,14 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
           body: cloudinaryFormData,
         });
         const cData = await res.json();
-        if (cData.secure_url) {
+        if (res.ok && cData.secure_url) {
           finalVideoUrl = cData.secure_url;
           finalDuration = Math.round(cData.duration || duration || 30);
+        } else {
+          throw new Error("Cloudinary Direct Upload Error: " + (cData.error?.message || "Cloud storage rejected the file"));
         }
+      } else if (file.size > 4 * 1024 * 1024) {
+        throw new Error("Cloudinary credentials (CLOUDINARY_URL or keys) are missing in Vercel Backend Environment Variables! Files over 4MB cannot be uploaded directly to Vercel Serverless. Please use the 'Paste Video Link' tab or add Cloudinary keys in Vercel!");
       }
 
       if (finalVideoUrl) {

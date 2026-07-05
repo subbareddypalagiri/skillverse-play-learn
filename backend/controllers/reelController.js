@@ -8,18 +8,30 @@ import { v2 as cloudinary } from 'cloudinary';
 
 export const getUploadSignature = async (req, res, next) => {
   try {
-    const timestamp = Math.round(new Date().getTime() / 1000);
-    const apiSecret = process.env.CLOUDINARY_API_SECRET || '';
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || '';
-    const apiKey = process.env.CLOUDINARY_API_KEY || '';
+    const config = cloudinary.config();
+    let apiSecret = process.env.CLOUDINARY_API_SECRET || config.api_secret || '';
+    let cloudName = process.env.CLOUDINARY_CLOUD_NAME || config.cloud_name || '';
+    let apiKey = process.env.CLOUDINARY_API_KEY || config.api_key || '';
+
+    if (!apiSecret || !cloudName || !apiKey) {
+      if (process.env.CLOUDINARY_URL) {
+        const match = process.env.CLOUDINARY_URL.match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/);
+        if (match) {
+          apiKey = match[1];
+          apiSecret = match[2];
+          cloudName = match[3];
+        }
+      }
+    }
 
     if (!apiSecret || !cloudName || !apiKey) {
       return res.status(400).json({
         success: false,
-        message: 'Cloudinary is not configured in backend environment variables'
+        message: 'Cloudinary is not configured in backend environment variables (CLOUDINARY_URL or API keys missing)'
       });
     }
 
+    const timestamp = Math.round(new Date().getTime() / 1000);
     const signature = cloudinary.utils.api_sign_request(
       { timestamp, folder: 'skillverse/reels' },
       apiSecret
