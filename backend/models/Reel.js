@@ -25,7 +25,7 @@ const reelSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 1,
-    max: 60
+    max: 600
   }, // in seconds
   videoSize: Number, // in bytes
   clipStartSeconds: Number,

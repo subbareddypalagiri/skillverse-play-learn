@@ -259,14 +259,14 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
       }
     } catch (error: any) {
       setIsDirectUploading(false);
-      const errMsg = error?.message || "Failed to upload reel.";
+      const errMsg = error.response?.data?.message || error.response?.data?.error || error?.message || "Failed to upload reel.";
       if (errMsg.includes("CLOUDINARY_ERROR") || errMsg.includes("Cloudinary") || errMsg.includes("cloud_name")) {
         alert("⚠️ Cloudinary Configuration Alert:\n" + errMsg.replace("CLOUDINARY_ERROR: ", "") + "\n\n💡 Don't worry! Auto-switching you to the 'Paste Video Link' tab where you can publish instantly with 0 size limits!");
         setUploadMode('link');
       } else {
-        alert(errMsg + "\n\n💡 Tip: If file upload fails on Vercel, switch to the 'Paste Video Link' tab!");
+        alert("⚠️ Upload Alert: " + errMsg + "\n\n💡 Tip: If file upload fails on Vercel/Railway, switch to the 'Paste Video Link' tab!");
       }
-      console.error(error);
+      console.error("Upload failed:", error.response?.data || error);
     }
   };
 
