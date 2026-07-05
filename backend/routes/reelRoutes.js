@@ -3,6 +3,7 @@ import { authenticate } from '../middleware/auth.js';
 import { reelUpload } from '../middleware/upload.js';
 import {
   createReel,
+  getUploadSignature,
   getReelsFeed,
   getMyReels,
   getReelsByUser,
@@ -23,6 +24,7 @@ router.use(authenticate);
 
 router.get('/feed', getReelsFeed);
 router.get('/categories', getReelCategories);
+router.get('/upload-signature', getUploadSignature);
 router.get('/me', getMyReels);
 router.get('/user/:userId', getReelsByUser);
 router.get('/:id/comments', getReelComments);

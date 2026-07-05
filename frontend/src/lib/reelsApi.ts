@@ -78,6 +78,28 @@ export const fetchReelCategories = async (): Promise<string[]> => {
   return response.data.data.categories || [];
 };
 
+export const getCloudinarySignature = async () => {
+  const response = await apiClient.get('/reels/upload-signature');
+  return response.data;
+};
+
+export const uploadReelDirect = async (payload: {
+  videoUrl: string;
+  title: string;
+  caption?: string;
+  description?: string;
+  category: string;
+  tags?: string;
+  duration: number;
+  thumbnailUrl?: string;
+  videoSize?: number;
+  courseLink?: string;
+  sourceCourseTitle?: string;
+}) => {
+  const response = await apiClient.post('/reels', payload);
+  return response.data.data.reel as ReelItem;
+};
+
 export const uploadReel = async (payload: {
   video: File;
   title: string;

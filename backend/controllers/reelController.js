@@ -4,6 +4,39 @@ import ReelFollow from '../models/ReelFollow.js';
 import { successResponse, paginatedResponse } from '../utils/responseHandler.js';
 import { NotFoundError, ValidationError, AuthorizationError } from '../utils/errorHandler.js';
 import { uploadReelVideo } from '../utils/cloudinary.js';
+import { v2 as cloudinary } from 'cloudinary';
+
+export const getUploadSignature = async (req, res, next) => {
+  try {
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const apiSecret = process.env.CLOUDINARY_API_SECRET || '';
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME || '';
+    const apiKey = process.env.CLOUDINARY_API_KEY || '';
+
+    if (!apiSecret || !cloudName || !apiKey) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cloudinary is not configured in backend environment variables'
+      });
+    }
+
+    const signature = cloudinary.utils.api_sign_request(
+      { timestamp, folder: 'skillverse/reels' },
+      apiSecret
+    );
+
+    return res.status(200).json({
+      success: true,
+      timestamp,
+      signature,
+      cloudName,
+      apiKey,
+      folder: 'skillverse/reels'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 
 const buildFeedQuery = ({ category, tag, userId, mode }) => {
@@ -87,19 +120,19 @@ const mapReel = async (reel, viewerId) => {
  */
 export const createReel = async (req, res, next) => {
   try {
-    if (!req.file) {
-      throw new ValidationError('Video file is required');
-    }
+    const { title, caption, description, category, tags, duration, courseLink, sourceCourseId, sourceCourseTitle, videoUrl: directVideoUrl, thumbnailUrl: directThumbnailUrl, videoSize: directVideoSize } = req.body;
 
-    const { title, caption, description, category, tags, duration, courseLink, sourceCourseId, sourceCourseTitle } = req.body;
+    if (!req.file && !directVideoUrl) {
+      throw new ValidationError('Video file or video URL is required');
+    }
 
     if (!title || !category) {
       throw new ValidationError('Title and category are required');
     }
 
     const parsedDuration = Number(duration);
-    if (!Number.isFinite(parsedDuration) || parsedDuration <= 0 || parsedDuration > 60) {
-      throw new ValidationError('Duration must be a number between 1 and 60 seconds');
+    if (!Number.isFinite(parsedDuration) || parsedDuration <= 0 || parsedDuration > 300) {
+      throw new ValidationError('Duration must be a number between 1 and 300 seconds');
     }
 
     const tagList = typeof tags === 'string'
@@ -108,7 +141,17 @@ export const createReel = async (req, res, next) => {
         ? tags.map(t => String(t).trim()).filter(Boolean)
         : [];
 
-    const uploadResult = await uploadReelVideo(req.file.path, req.file.filename);
+    let uploadResult;
+    if (req.file) {
+      uploadResult = await uploadReelVideo(req.file.path, req.file.filename);
+    } else {
+      uploadResult = {
+        videoUrl: directVideoUrl,
+        thumbnailUrl: directThumbnailUrl || null,
+        videoSize: Number(directVideoSize) || 0,
+        duration: parsedDuration
+      };
+    }
 
     const reel = await Reel.create({
       userId: req.userId,
@@ -120,7 +163,7 @@ export const createReel = async (req, res, next) => {
       duration: uploadResult.duration || parsedDuration,
       videoUrl: uploadResult.videoUrl,
       thumbnailUrl: uploadResult.thumbnailUrl || undefined,
-      videoSize: uploadResult.videoSize || req.file.size,
+      videoSize: uploadResult.videoSize || (req.file ? req.file.size : Number(directVideoSize) || 0),
       courseLink,
       sourceCourseId: sourceCourseId || undefined,
       sourceCourseTitle,

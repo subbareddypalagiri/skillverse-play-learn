@@ -1,10 +1,10 @@
 import { useState, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadReelVideo, createPost } from "@/lib/feedApi";
-import { uploadReel } from "@/lib/reelsApi";
+import { uploadReel, getCloudinarySignature, uploadReelDirect } from "@/lib/reelsApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Upload, Loader2, Play, Sparkles, Video } from "lucide-react";
+import { Upload, Loader2, Play, Sparkles, Video, Link as LinkIcon, CloudUpload } from "lucide-react";
 
 interface ReelUploadModalProps {
   isOpen: boolean;
@@ -21,12 +21,15 @@ const categories = [
 
 export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
   const queryClient = useQueryClient();
+  const [uploadMode, setUploadMode] = useState<'file' | 'link'>('file');
+  const [videoLink, setVideoLink] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState("");
   const [category, setCategory] = useState("general");
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isDirectUploading, setIsDirectUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadMutation = useMutation({
@@ -92,31 +95,125 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
 
   const handleClose = () => {
     setFile(null);
+    setVideoLink("");
     setCaption("");
     setCategory("general");
     setPreviewUrl("");
     setUploadProgress(0);
     setDuration(0);
+    setIsDirectUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
     onClose();
   };
 
   const handleUpload = async () => {
+    if (uploadMode === 'link') {
+      if (!videoLink.trim()) return;
+      try {
+        setIsDirectUploading(true);
+        const createdReel = await uploadReelDirect({
+          videoUrl: videoLink.trim(),
+          title: caption.slice(0, 80) || "My Reel",
+          caption,
+          category,
+          tags: "reel,vibe",
+          duration: 60,
+          videoSize: 0
+        });
+
+        await createPost({
+          caption: caption || "New Reel",
+          mediaType: "video",
+          mediaUrls: [{ url: videoLink.trim() }],
+          category: (category || "general") as any,
+          tags: ["reel"],
+        });
+
+        setIsDirectUploading(false);
+        queryClient.invalidateQueries({ queryKey: ["posts-feed"] });
+        queryClient.invalidateQueries({ queryKey: ["/posts/feed"] });
+        queryClient.invalidateQueries({ queryKey: ["my-reels"] });
+        queryClient.invalidateQueries({ queryKey: ["reels-feed"] });
+        handleClose();
+      } catch (err: any) {
+        setIsDirectUploading(false);
+        alert(err.message || "Failed to publish reel from link.");
+      }
+      return;
+    }
+
     if (!file) return;
     try {
-      await publishMutation.mutateAsync({
-        caption,
-        videoFile: file,
-        postCategory: category,
-      });
-    } catch (error) {
-      alert("Failed to upload reel. Please check your network or try again.");
+      setIsDirectUploading(true);
+      setUploadProgress(15);
+      const sigData = await getCloudinarySignature().catch(() => null);
+      let finalVideoUrl = "";
+      let finalDuration = duration || 30;
+
+      if (sigData && sigData.success && sigData.cloudName && sigData.apiKey && sigData.signature) {
+        setUploadProgress(30);
+        const cloudinaryFormData = new FormData();
+        cloudinaryFormData.append("file", file);
+        cloudinaryFormData.append("api_key", sigData.apiKey);
+        cloudinaryFormData.append("timestamp", String(sigData.timestamp));
+        cloudinaryFormData.append("signature", sigData.signature);
+        cloudinaryFormData.append("folder", sigData.folder || "skillverse/reels");
+
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${sigData.cloudName}/video/upload`, {
+          method: "POST",
+          body: cloudinaryFormData,
+        });
+        const cData = await res.json();
+        if (cData.secure_url) {
+          finalVideoUrl = cData.secure_url;
+          finalDuration = Math.round(cData.duration || duration || 30);
+        }
+      }
+
+      if (finalVideoUrl) {
+        setUploadProgress(90);
+        const createdReel = await uploadReelDirect({
+          videoUrl: finalVideoUrl,
+          title: caption.slice(0, 80) || "My Reel",
+          caption,
+          category,
+          tags: "reel,vibe",
+          duration: finalDuration,
+          videoSize: file.size
+        });
+
+        await createPost({
+          caption: caption || "New Reel",
+          mediaType: "video",
+          mediaUrls: [{ url: finalVideoUrl }],
+          category: (category || "general") as any,
+          tags: ["reel"],
+        });
+
+        setUploadProgress(100);
+        setIsDirectUploading(false);
+        queryClient.invalidateQueries({ queryKey: ["posts-feed"] });
+        queryClient.invalidateQueries({ queryKey: ["/posts/feed"] });
+        queryClient.invalidateQueries({ queryKey: ["my-reels"] });
+        queryClient.invalidateQueries({ queryKey: ["reels-feed"] });
+        handleClose();
+      } else {
+        setIsDirectUploading(false);
+        await publishMutation.mutateAsync({
+          caption,
+          videoFile: file,
+          postCategory: category,
+        });
+      }
+    } catch (error: any) {
+      setIsDirectUploading(false);
+      alert(error.message || "Failed to upload reel. Please check your network or try again.");
       console.error(error);
     }
   };
 
-  const isUploading = publishMutation.isPending;
-  const canUpload = file && !isUploading;
+  const isUploading = publishMutation.isPending || isDirectUploading;
+  const canUpload = (uploadMode === 'file' ? file : videoLink.trim()) && !isUploading;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
@@ -124,7 +221,7 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-purple-600/10 pointer-events-none" />
           <div className="relative p-6">
-            <DialogHeader className="mb-5">
+            <DialogHeader className="mb-4">
               <DialogTitle className="text-white flex items-center gap-2 text-xl">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
                   <Video className="w-4 h-4 text-black" />
@@ -134,71 +231,118 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
               <p className="text-sm text-white/50 mt-1">Share your story with the Vibe community</p>
             </DialogHeader>
 
+            {/* Upload Mode Tabs */}
+            <div className="flex bg-white/5 p-1 rounded-xl mb-4 border border-white/10">
+              <button
+                onClick={() => setUploadMode('file')}
+                disabled={isUploading}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all ${
+                  uploadMode === 'file'
+                    ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-lg'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                <CloudUpload className="w-3.5 h-3.5" />
+                Upload Video File
+              </button>
+              <button
+                onClick={() => setUploadMode('link')}
+                disabled={isUploading}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all ${
+                  uploadMode === 'link'
+                    ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-black shadow-lg'
+                    : 'text-white/60 hover:text-white'
+                }`}
+              >
+                <LinkIcon className="w-3.5 h-3.5" />
+                Paste Video Link
+              </button>
+            </div>
+
             <div className="space-y-4">
-              {!file ? (
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="group border-2 border-dashed border-white/15 rounded-2xl p-10 text-center cursor-pointer hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="video/*"
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                    <Upload className="w-7 h-7 text-amber-400" />
-                  </div>
-                  <p className="text-white/70 font-medium">Drop your video here</p>
-                  <p className="text-xs text-white/40 mt-1">MP4, WebM or OGG · Max 100MB</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="relative bg-black rounded-2xl overflow-hidden aspect-video border border-white/10">
-                    <video src={previewUrl} className="w-full h-full object-cover" controls />
-                    <div className="absolute top-3 left-3 px-2 py-1 rounded-lg bg-black/60 backdrop-blur text-xs text-amber-400 flex items-center gap-1">
-                      <Play className="w-3 h-3 fill-amber-400" />
-                      {duration > 0 ? `${duration}s` : 'Preview'}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/60 truncate max-w-[200px]">{file.name}</span>
-                    <span className="text-white/40">{(file.size / (1024 * 1024)).toFixed(1)} MB</span>
-                  </div>
-
-                  {uploadProgress > 0 && uploadProgress < 100 && (
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-xs text-white/50">
-                        <span>Uploading...</span>
-                        <span>{uploadProgress}%</span>
-                      </div>
-                      <div className="w-full bg-white/10 rounded-full h-1.5">
-                        <div
-                          className="bg-gradient-to-r from-amber-400 to-orange-500 h-full rounded-full transition-all"
-                          style={{ width: `${uploadProgress}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <button
-                    onClick={() => {
-                      setFile(null);
-                      setPreviewUrl("");
-                      setUploadProgress(0);
-                      if (fileInputRef.current) fileInputRef.current.value = "";
-                    }}
-                    disabled={isUploading}
-                    className="text-xs text-white/40 hover:text-white/70 disabled:opacity-50"
+              {uploadMode === 'file' ? (
+                !file ? (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="group border-2 border-dashed border-white/15 rounded-2xl p-8 text-center cursor-pointer hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
                   >
-                    Choose different video
-                  </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="video/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                    <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                      <Upload className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <p className="text-white/70 font-medium">Drop your video here</p>
+                    <p className="text-xs text-white/40 mt-1">MP4, WebM or OGG · Direct Cloud Upload Supported</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="relative bg-black rounded-2xl overflow-hidden aspect-video border border-white/10">
+                      <video src={previewUrl} className="w-full h-full object-cover" controls />
+                      <div className="absolute top-3 left-3 px-2 py-1 rounded-lg bg-black/60 backdrop-blur text-xs text-amber-400 flex items-center gap-1">
+                        <Play className="w-3 h-3 fill-amber-400" />
+                        {duration > 0 ? `${duration}s` : 'Preview'}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white/60 truncate max-w-[200px]">{file.name}</span>
+                      <span className="text-white/40">{(file.size / (1024 * 1024)).toFixed(1)} MB</span>
+                    </div>
+
+                    {uploadProgress > 0 && uploadProgress < 100 && (
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-xs text-white/50">
+                          <span>Uploading directly to Cloud...</span>
+                          <span>{uploadProgress}%</span>
+                        </div>
+                        <div className="w-full bg-white/10 rounded-full h-1.5">
+                          <div
+                            className="bg-gradient-to-r from-amber-400 to-orange-500 h-full rounded-full transition-all"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        setFile(null);
+                        setPreviewUrl("");
+                        setUploadProgress(0);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      disabled={isUploading}
+                      className="text-xs text-white/40 hover:text-white/70 disabled:opacity-50"
+                    >
+                      Choose different video
+                    </button>
+                  </div>
+                )
+              ) : (
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-white/60 mb-1 uppercase tracking-wider">
+                    Direct Video URL / Link (No Size Limit!)
+                  </label>
+                  <input
+                    type="url"
+                    value={videoLink}
+                    onChange={(e) => setVideoLink(e.target.value)}
+                    placeholder="https://... (Cloudinary, S3, Google Drive direct link, or MP4 URL)"
+                    disabled={isUploading}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 disabled:opacity-50 text-sm"
+                  />
+                  <p className="text-xs text-amber-400/80">
+                    ⚡ Instant Publish: Bypasses Vercel 4.5MB serverless limit completely!
+                  </p>
                 </div>
               )}
 
-              {file && (
+              {(file || uploadMode === 'link') && (
                 <>
                   <div>
                     <label className="block text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">Category</label>
