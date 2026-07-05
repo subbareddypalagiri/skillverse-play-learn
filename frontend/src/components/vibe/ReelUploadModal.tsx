@@ -79,6 +79,10 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
       return;
     }
 
+    if (previewUrl && previewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
     setFile(selectedFile);
     const url = URL.createObjectURL(selectedFile);
     setPreviewUrl(url);
@@ -88,12 +92,14 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
     video.preload = "metadata";
     video.onloadedmetadata = () => {
       setDuration(Math.round(video.duration));
-      URL.revokeObjectURL(video.src);
     };
     video.src = url;
   };
 
   const handleClose = () => {
+    if (previewUrl && previewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setFile(null);
     setVideoLink("");
     setCaption("");
@@ -342,6 +348,9 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
 
                     <button
                       onClick={() => {
+                        if (previewUrl && previewUrl.startsWith("blob:")) {
+                          URL.revokeObjectURL(previewUrl);
+                        }
                         setFile(null);
                         setPreviewUrl("");
                         setUploadProgress(0);
