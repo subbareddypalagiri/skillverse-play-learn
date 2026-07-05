@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadReelVideo, createPost } from "@/lib/feedApi";
 import { uploadReel, getCloudinarySignature, uploadReelDirect } from "@/lib/reelsApi";
+import axios from "axios";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2, Play, Sparkles, Video, Link as LinkIcon, CloudUpload } from "lucide-react";
@@ -28,6 +29,7 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
   const [category, setCategory] = useState("general");
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatusText, setUploadStatusText] = useState<string>("");
   const [duration, setDuration] = useState(0);
   const [isDirectUploading, setIsDirectUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -87,6 +89,7 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
     const url = URL.createObjectURL(selectedFile);
     setPreviewUrl(url);
     setUploadProgress(0);
+    setUploadStatusText("");
 
     const video = document.createElement("video");
     video.preload = "metadata";
@@ -106,6 +109,7 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
     setCategory("general");
     setPreviewUrl("");
     setUploadProgress(0);
+    setUploadStatusText("");
     setDuration(0);
     setIsDirectUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -169,7 +173,8 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
     if (!file) return;
     try {
       setIsDirectUploading(true);
-      setUploadProgress(15);
+      setUploadProgress(5);
+      setUploadStatusText("Connecting to Cloud storage...");
       const sigData = await getCloudinarySignature().catch((err: any) => {
         console.error("Signature fetch failed:", err);
         return null;
@@ -178,7 +183,8 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
       let finalDuration = duration || 30;
 
       if (sigData && sigData.success && sigData.cloudName && sigData.apiKey && sigData.signature) {
-        setUploadProgress(30);
+        setUploadProgress(10);
+        setUploadStatusText("Starting real-time video stream...");
         const cloudinaryFormData = new FormData();
         cloudinaryFormData.append("file", file);
         cloudinaryFormData.append("api_key", sigData.apiKey);
@@ -186,14 +192,28 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
         cloudinaryFormData.append("signature", sigData.signature);
         cloudinaryFormData.append("folder", sigData.folder || "skillverse/reels");
 
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${sigData.cloudName}/video/upload`, {
-          method: "POST",
-          body: cloudinaryFormData,
-        });
-        const cData = await res.json();
-        if (res.ok && cData.secure_url) {
+        const totalMB = (file.size / (1024 * 1024)).toFixed(1);
+
+        const res = await axios.post(
+          `https://api.cloudinary.com/v1_1/${sigData.cloudName}/video/upload`,
+          cloudinaryFormData,
+          {
+            onUploadProgress: (progressEvent) => {
+              if (progressEvent.total) {
+                const loadedMB = (progressEvent.loaded / (1024 * 1024)).toFixed(1);
+                const percent = Math.round((progressEvent.loaded * 80) / progressEvent.total) + 10;
+                setUploadProgress(percent);
+                setUploadStatusText(`Uploading video: ${loadedMB} MB / ${totalMB} MB`);
+              }
+            },
+          }
+        );
+        const cData = res.data;
+        if (res.status >= 200 && res.status < 300 && cData.secure_url) {
           finalVideoUrl = cData.secure_url;
           finalDuration = Math.round(cData.duration || duration || 30);
+          setUploadStatusText("Video uploaded! Publishing reel...");
+          setUploadProgress(92);
         } else {
           throw new Error("CLOUDINARY_ERROR: " + (cData.error?.message || "Cloud storage rejected the file"));
         }
@@ -202,7 +222,8 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
       }
 
       if (finalVideoUrl) {
-        setUploadProgress(90);
+        setUploadProgress(96);
+        setUploadStatusText("Finalizing and saving post...");
         const createdReel = await uploadReelDirect({
           videoUrl: finalVideoUrl,
           title: caption.slice(0, 80) || "My Reel",
