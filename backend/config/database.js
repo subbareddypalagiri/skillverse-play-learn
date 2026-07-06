@@ -14,11 +14,22 @@ const connectDB = async () => {
     const conn = await mongoose.connect(mongoUri, {
       retryWrites: true,
       w: 'majority',
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
+      maxPoolSize: 100, // High concurrency for 100+ classroom students
+      minPoolSize: 10,
     });
 
-    logger.info(`MongoDB connected successfully`);
+    logger.info(`MongoDB connected successfully with pool size 100`);
+
+    // Self-healing event listeners for runtime resilience
+    mongoose.connection.on('error', (err) => {
+      logger.error(`MongoDB runtime connection error: ${err.message}`);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      logger.warn('MongoDB disconnected! Auto-reconnecting...');
+    });
 
     // Enable query logging in development
     if (process.env.NODE_ENV === 'development') {
