@@ -55,7 +55,13 @@ const CareerHub = () => {
       
       const res = await apiClient.post('/ai-tools/analyze-career-gap', {
         targetRole: selectedRole.title,
-        checkedSkills: checkedList
+        checkedSkills: checkedList,
+        roleData: {
+          tools: custom.tools,
+          certs: custom.certs,
+          checklist: custom.checklist,
+          roadmap: custom.roadmap
+        }
       });
       if (res.data?.success) {
         setAiAnalysis(res.data.data);
@@ -585,50 +591,50 @@ const CareerHub = () => {
 
                         {/* AI Analysis Result Card */}
                         {aiAnalysis && (
-                          <div className="mt-6 p-6 rounded-3xl bg-slate-900/90 border border-violet-500/40 shadow-2xl space-y-6 animate-reveal-up">
-                            <div className="flex items-center justify-between border-b border-border/40 pb-4">
-                              <div className="flex items-center gap-2">
-                                <span className="px-3 py-1 rounded-full text-xs font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                          <div className="mt-6 p-6 md:p-8 rounded-3xl bg-slate-950 border-2 border-violet-500/60 shadow-2xl space-y-8 animate-reveal-up text-white">
+                            <div className="flex items-center justify-between border-b border-slate-800 pb-5">
+                              <div className="flex items-center gap-3">
+                                <span className="px-3.5 py-1.5 rounded-full text-xs font-black bg-violet-600 text-white shadow-md">
                                   AI Readiness Report
                                 </span>
-                                <h4 className="text-lg font-bold text-white">{aiAnalysis.targetRole}</h4>
+                                <h4 className="text-xl font-black text-white">{aiAnalysis.targetRole}</h4>
                               </div>
                               <div className="text-right">
-                                <span className="text-xs text-muted-foreground">AI Match Score</span>
-                                <div className="text-xl font-black text-emerald-400">{aiAnalysis.readinessScore}%</div>
+                                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">AI Match Score</span>
+                                <div className="text-3xl font-black text-emerald-400">{aiAnalysis.readinessScore}%</div>
                               </div>
                             </div>
 
                             {/* Skills Breakdown */}
-                            <div className="grid md:grid-cols-2 gap-4">
-                              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
-                                <h5 className="text-xs font-bold text-emerald-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                  <CheckCircle2 className="w-4 h-4" /> Matched Strengths ({aiAnalysis.skills.matchedEssential.length + aiAnalysis.skills.matchedAdvanced.length})
+                            <div className="grid md:grid-cols-2 gap-5">
+                              <div className="p-5 rounded-2xl bg-slate-900 border-2 border-emerald-500/50 shadow-lg">
+                                <h5 className="text-xs font-black text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Matched Strengths ({aiAnalysis.skills.matchedEssential.length + aiAnalysis.skills.matchedAdvanced.length})
                                 </h5>
-                                <div className="flex flex-wrap gap-1.5">
+                                <div className="flex flex-wrap gap-2">
                                   {[...aiAnalysis.skills.matchedEssential, ...aiAnalysis.skills.matchedAdvanced].map((s: string, idx: number) => (
-                                    <span key={idx} className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-200 text-xs font-medium">
+                                    <span key={idx} className="px-3 py-1.5 rounded-xl bg-emerald-500 text-white font-extrabold text-xs shadow-md border border-emerald-400">
                                       {s}
                                     </span>
                                   ))}
                                   {[...aiAnalysis.skills.matchedEssential, ...aiAnalysis.skills.matchedAdvanced].length === 0 && (
-                                    <span className="text-xs text-muted-foreground">No strengths checked yet. Check items above!</span>
+                                    <span className="text-xs text-slate-400 font-medium">No strengths checked yet. Check items above!</span>
                                   )}
                                 </div>
                               </div>
 
-                              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
-                                <h5 className="text-xs font-bold text-amber-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                  <Target className="w-4 h-4" /> Priority Skill Gaps ({aiAnalysis.skills.missingEssential.length + aiAnalysis.skills.missingAdvanced.length})
+                              <div className="p-5 rounded-2xl bg-slate-900 border-2 border-amber-500/50 shadow-lg">
+                                <h5 className="text-xs font-black text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                  <Target className="w-4 h-4 text-amber-400" /> Priority Skill Gaps ({aiAnalysis.skills.missingEssential.length + aiAnalysis.skills.missingAdvanced.length})
                                 </h5>
-                                <div className="flex flex-wrap gap-1.5">
+                                <div className="flex flex-wrap gap-2">
                                   {[...aiAnalysis.skills.missingEssential, ...aiAnalysis.skills.missingAdvanced].map((s: string, idx: number) => (
-                                    <span key={idx} className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-200 text-xs font-medium">
+                                    <span key={idx} className="px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs shadow-md border border-amber-300">
                                       {s}
                                     </span>
                                   ))}
                                   {[...aiAnalysis.skills.missingEssential, ...aiAnalysis.skills.missingAdvanced].length === 0 && (
-                                    <span className="text-xs text-emerald-400 font-bold">You have mastered all core skills! 🎉</span>
+                                    <span className="text-xs text-emerald-400 font-extrabold">You have mastered all core skills! 🎉</span>
                                   )}
                                 </div>
                               </div>
@@ -636,23 +642,84 @@ const CareerHub = () => {
 
                             {/* Recommended AI Tools */}
                             {aiAnalysis.recommendedTools?.length > 0 && (
-                              <div>
-                                <h5 className="text-xs font-bold text-violet-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                              <div className="pt-2">
+                                <h5 className="text-xs font-black text-violet-300 uppercase tracking-wider mb-4 flex items-center gap-2">
                                   <Zap className="w-4 h-4 text-amber-400 fill-amber-400" /> Recommended AI Tools to Master These Gaps
                                 </h5>
-                                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                                   {aiAnalysis.recommendedTools.map((tool: any, idx: number) => (
                                     <a key={idx} href={tool.link || '#'} target="_blank" rel="noreferrer"
-                                      className="p-3 rounded-xl bg-surface/80 border border-border/50 hover:border-violet-500/50 transition flex flex-col justify-between group">
+                                      className="p-4 rounded-2xl bg-slate-900 border-2 border-slate-800 hover:border-violet-500 transition flex flex-col justify-between group shadow-lg">
                                       <div>
-                                        <div className="flex items-center justify-between mb-1">
-                                          <span className="text-xs font-bold text-white group-hover:text-violet-400 transition">{tool.name}</span>
-                                          <ExternalLink className="w-3 h-3 text-muted-foreground group-hover:text-violet-400" />
+                                        <div className="flex items-center justify-between mb-1.5">
+                                          <span className="text-sm font-extrabold text-white group-hover:text-violet-300 transition">{tool.name}</span>
+                                          <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-violet-300" />
                                         </div>
-                                        <p className="text-[11px] text-muted-foreground line-clamp-2">{tool.description}</p>
+                                        <p className="text-xs text-slate-300 font-medium line-clamp-2">{tool.description}</p>
                                       </div>
-                                      <span className="mt-2 text-[10px] font-semibold text-violet-400 uppercase">{tool.category}</span>
+                                      <span className="mt-3 text-[10px] font-black text-violet-400 uppercase tracking-wider">{tool.category}</span>
                                     </a>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Core Role Requirements & Tech Stack */}
+                            <div className="pt-6 border-t border-slate-800">
+                              <h5 className="text-xs font-black text-violet-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <Award className="w-4 h-4 text-violet-400" /> What You Need to Become a {aiAnalysis.targetRole} (Core Requirements)
+                              </h5>
+                              <div className="grid md:grid-cols-2 gap-5">
+                                <div className="p-5 rounded-2xl bg-slate-900 border-2 border-slate-800 shadow-lg">
+                                  <span className="text-xs font-extrabold text-slate-300 uppercase tracking-wider block mb-3">Essential Competencies & Tools</span>
+                                  <div className="flex flex-wrap gap-2">
+                                    {aiAnalysis.skills?.matchedEssential.concat(aiAnalysis.skills?.missingEssential).map((s: string, idx: number) => (
+                                      <span key={idx} className="px-3 py-1.5 rounded-xl bg-violet-600 text-white font-extrabold text-xs shadow-md border border-violet-400">
+                                        {s}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="p-5 rounded-2xl bg-slate-900 border-2 border-slate-800 shadow-lg">
+                                  <span className="text-xs font-extrabold text-slate-300 uppercase tracking-wider block mb-3">Advanced Specializations & Certs</span>
+                                  <div className="flex flex-wrap gap-2">
+                                    {aiAnalysis.skills?.matchedAdvanced.concat(aiAnalysis.skills?.missingAdvanced).map((s: string, idx: number) => (
+                                      <span key={idx} className="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-extrabold text-xs shadow-md border border-indigo-400">
+                                        {s}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Customized Execution Roadmap */}
+                            {aiAnalysis.roadmap?.length > 0 && (
+                              <div className="pt-6 border-t border-slate-800">
+                                <h5 className="text-xs font-black text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                  <Calendar className="w-4 h-4 text-emerald-400" /> Your Customized AI Execution Roadmap
+                                </h5>
+                                <div className="grid md:grid-cols-2 gap-5">
+                                  {aiAnalysis.roadmap.map((road: any, idx: number) => (
+                                    <div key={idx} className="p-5 rounded-2xl bg-slate-900 border-2 border-slate-800 flex flex-col justify-between shadow-lg">
+                                      <div>
+                                        <div className="flex items-center justify-between mb-2">
+                                          <span className="text-sm font-black text-white">{road.week}</span>
+                                          <span className="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-emerald-500 text-white shadow-sm">
+                                            Step {idx + 1}
+                                          </span>
+                                        </div>
+                                        <p className="text-xs text-violet-300 font-extrabold mb-3">{road.focus}</p>
+                                        <ul className="space-y-2">
+                                          {road.actionItems?.map((item: string, i: number) => (
+                                            <li key={i} className="text-xs text-slate-300 font-medium flex items-start gap-2">
+                                              <span className="text-emerald-400 font-black mt-0.5">•</span>
+                                              <span>{item}</span>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    </div>
                                   ))}
                                 </div>
                               </div>

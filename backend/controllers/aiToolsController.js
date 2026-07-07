@@ -138,7 +138,7 @@ function triggerBackgroundSync() {
 
 export const analyzeCareerGap = async (req, res, next) => {
   try {
-    const { targetRole = 'Full Stack Developer', checkedSkills = [] } = req.body;
+    const { targetRole = 'Full Stack Developer', checkedSkills = [], roleData = null } = req.body;
 
     const roleRequirements = {
       'Full Stack Developer': {
@@ -160,15 +160,34 @@ export const analyzeCareerGap = async (req, res, next) => {
         essential: ['Figma / Adobe XD', 'UI Design Principles', 'User Research', 'Wireframing', 'Prototyping', 'Responsive Design'],
         advanced: ['Design Systems', 'Micro-interactions', 'HTML / CSS Basics', 'Usability Testing', '3D / Motion Design (Spline/After Effects)', 'AI UI Generators'],
         aiToolsQuery: { category: { $in: ['Image & Design', 'Web & App Design', 'Video & Animation', 'Productivity'] } }
-      },
-      'Default': {
-        essential: ['Communication', 'Problem Solving', 'Git & Version Control', 'Project Management', 'Data Analysis', 'Web Basics'],
-        advanced: ['AI Prompt Engineering', 'Automation Tools', 'Cloud Computing', 'System Architecture', 'Agile / Scrum', 'Leadership'],
-        aiToolsQuery: { category: { $in: ['Productivity', 'General AI', 'Coding & Dev'] } }
       }
     };
 
-    const config = roleRequirements[targetRole] || roleRequirements['Default'];
+    let config = roleRequirements[targetRole];
+    
+    // Dynamic Fallback using roleData from frontend (Supports ALL 150+ Roles!)
+    if (!config && roleData) {
+      const toolsList = Array.isArray(roleData.tools) ? roleData.tools.map(t => typeof t === 'object' ? t.name : String(t)).filter(Boolean) : [];
+      const certsList = Array.isArray(roleData.certs) ? roleData.certs.map(c => typeof c === 'object' ? c.title : String(c)).filter(Boolean) : [];
+      const checkList = Array.isArray(roleData.checklist) ? roleData.checklist.map(c => typeof c === 'object' ? c.label : String(c)).filter(Boolean) : [];
+      
+      const halfCheck = Math.ceil(checkList.length / 2);
+      const essential = [...new Set([...toolsList.slice(0, 6), ...checkList.slice(0, halfCheck)])];
+      const advanced = [...new Set([...toolsList.slice(6), ...certsList, ...checkList.slice(halfCheck)])];
+      
+      config = {
+        essential: essential.length > 0 ? essential : ['Core Domain Architecture', 'Technical Strategy', 'System Integration', 'Version Control'],
+        advanced: advanced.length > 0 ? advanced : ['Advanced Infrastructure', 'Industry Certifications', 'Cloud Scaling', 'Leadership'],
+        aiToolsQuery: { category: { $in: ['Coding & Dev', 'Productivity', 'General AI', 'Research & Data', 'AI Models'] } }
+      };
+    } else if (!config) {
+      config = {
+        essential: ['Communication', 'Problem Solving', 'Git & Version Control', 'Project Management', 'Data Analysis', 'Web Basics'],
+        advanced: ['AI Prompt Engineering', 'Automation Tools', 'Cloud Computing', 'System Architecture', 'Agile / Scrum', 'Leadership'],
+        aiToolsQuery: { category: { $in: ['Productivity', 'General AI', 'Coding & Dev'] } }
+      };
+    }
+
     const allRequired = [...config.essential, ...config.advanced];
     
     const userSkillsLower = checkedSkills.map(s => String(s).toLowerCase().trim());
@@ -182,51 +201,64 @@ export const analyzeCareerGap = async (req, res, next) => {
     const totalRequiredCount = allRequired.length;
     const totalMatchedCount = matchedEssential.length + (matchedAdvanced.length * 1.5);
     const maxPossibleScore = config.essential.length + (config.advanced.length * 1.5);
-    const readinessScore = Math.min(Math.round((totalMatchedCount / maxPossibleScore) * 100), 100);
+    const readinessScore = Math.min(Math.round((totalMatchedCount / (maxPossibleScore || 1)) * 100), 100);
 
     const recommendedTools = await AITool.find({
       isActive: true,
       ...config.aiToolsQuery
     }).sort({ isLatest: -1, downloads: -1 }).limit(6);
 
-    const roadmap = [
-      {
-        week: 'Week 1: Core Foundation & Essential Gaps',
-        focus: missingEssential.length > 0 ? `Master missing core concepts: ${missingEssential.slice(0, 3).join(', ')}` : 'Strengthen foundational problem-solving and clean coding practices.',
+    let roadmap = [];
+    if (roleData && Array.isArray(roleData.roadmap) && roleData.roadmap.length > 0) {
+      roadmap = roleData.roadmap.map((r, i) => ({
+        week: `Phase ${i + 1}: ${typeof r === 'object' ? r.title : `Milestone ${i + 1}`}`,
+        focus: typeof r === 'object' ? (r.desc || 'Complete targeted industry requirements.') : String(r),
         actionItems: [
-          'Complete 5 hands-on coding exercises / tutorials in your primary domain.',
-          'Set up a GitHub repo and practice daily commits with structured documentation.',
-          'Use AI Assistants (Cursor / GitHub Copilot) to explain complex edge cases.'
+          'Master core competencies and practical toolchain implementations.',
+          'Build and deploy a verifiable project artifact.',
+          'Review against industry benchmarks in Skillverse Career Hub.'
         ]
-      },
-      {
-        week: 'Week 2: Advanced Tooling & Architecture',
-        focus: missingAdvanced.length > 0 ? `Level up with industry tech: ${missingAdvanced.slice(0, 3).join(', ')}` : 'Deep dive into system architecture and performance optimization.',
-        actionItems: [
-          'Build a modular project integrating at least 2 advanced technologies.',
-          'Implement proper error handling, logging, and security best practices.',
-          'Explore AI productivity tools to automate repetitive workflow tasks.'
-        ]
-      },
-      {
-        week: 'Week 3: Real-World Capstone & Portfolio',
-        focus: 'Build an end-to-end production-ready showcase application.',
-        actionItems: [
-          'Deploy your project live on Vercel / Render / AWS with custom domain setup.',
-          'Write a comprehensive README.md with architecture diagrams and API specs.',
-          'Publish a short demo Reel or Showcase post on Skillverse to get community feedback.'
-        ]
-      },
-      {
-        week: 'Week 4: Interview Readiness & Mock Drills',
-        focus: 'Resume polish, behavioral alignment, and technical mock interviews.',
-        actionItems: [
-          'Align your resume keywords with industry job descriptions for high ATS score.',
-          'Practice system design and live coding problems under timed constraints.',
-          'Participate in Skillverse Career Hub mentorship sessions and apply for open roles.'
-        ]
-      }
-    ];
+      }));
+    } else {
+      roadmap = [
+        {
+          week: 'Week 1: Core Foundation & Essential Gaps',
+          focus: missingEssential.length > 0 ? `Master missing core concepts: ${missingEssential.slice(0, 3).join(', ')}` : 'Strengthen foundational problem-solving and clean coding practices.',
+          actionItems: [
+            'Complete 5 hands-on coding exercises / tutorials in your primary domain.',
+            'Set up a GitHub repo and practice daily commits with structured documentation.',
+            'Use AI Assistants (Cursor / GitHub Copilot) to explain complex edge cases.'
+          ]
+        },
+        {
+          week: 'Week 2: Advanced Tooling & Architecture',
+          focus: missingAdvanced.length > 0 ? `Level up with industry tech: ${missingAdvanced.slice(0, 3).join(', ')}` : 'Deep dive into system architecture and performance optimization.',
+          actionItems: [
+            'Build a modular project integrating at least 2 advanced technologies.',
+            'Implement proper error handling, logging, and security best practices.',
+            'Explore AI productivity tools to automate repetitive workflow tasks.'
+          ]
+        },
+        {
+          week: 'Week 3: Real-World Capstone & Portfolio',
+          focus: 'Build an end-to-end production-ready showcase application.',
+          actionItems: [
+            'Deploy your project live on Vercel / Render / AWS with custom domain setup.',
+            'Write a comprehensive README.md with architecture diagrams and API specs.',
+            'Publish a short demo Reel or Showcase post on Skillverse to get community feedback.'
+          ]
+        },
+        {
+          week: 'Week 4: Interview Readiness & Mock Drills',
+          focus: 'Resume polish, behavioral alignment, and technical mock interviews.',
+          actionItems: [
+            'Align your resume keywords with industry job descriptions for high ATS score.',
+            'Practice system design and live coding problems under timed constraints.',
+            'Participate in Skillverse Career Hub mentorship sessions and apply for open roles.'
+          ]
+        }
+      ];
+    }
 
     return successResponse(res, 200, 'Career gap analysis completed successfully', {
       targetRole,
@@ -243,7 +275,8 @@ export const analyzeCareerGap = async (req, res, next) => {
         missingAdvanced
       },
       recommendedTools: recommendedTools.map(formatTool),
-      roadmap
+      roadmap,
+      roleData: roleData || null
     });
   } catch (error) {
     next(error);
