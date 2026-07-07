@@ -13,17 +13,21 @@ import {
   Crown, UserPlus, Settings, Send, TrendingUp
 } from "lucide-react";
 import { useClubs } from "@/contexts/ClubContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Clubs = () => {
   const { clubs, createClub, joinClub, leaveClub, addPost, likePost, addComment, isUserMember, isUserAdmin } = useClubs();
+  const { user } = useAuth();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedClub, setSelectedClub] = useState<string | null>(null);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
   const [newPost, setNewPost] = useState({ content: '', mediaUrl: '' });
   const [newComment, setNewComment] = useState('');
 
-  // Mock current user - in production, get from auth
-  const currentUser = { id: 'user123', name: 'John Student' };
+  const currentUser = {
+    id: user?._id || 'guest',
+    name: user?.name || 'Guest User',
+  };
 
   const [newClub, setNewClub] = useState({
     name: '',

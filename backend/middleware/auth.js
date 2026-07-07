@@ -1,6 +1,6 @@
 import logger from '../config/logger.js';
 import { extractTokenFromHeader, verifyToken, checkPermission } from '../utils/auth.js';
-import { AuthenticationError, AuthorizationError } from '../utils/errorHandler.js';
+import { AuthenticationError, AuthorizationError, NotFoundError } from '../utils/errorHandler.js';
 
 export const authenticate = async (req, res, next) => {
   try {
@@ -78,9 +78,9 @@ export const checkOwnership = (resourceField = 'userId') => {
         return next();
       }
       
-      const resourceOwnerId = req.body[resourceField] || req.params.userId;
+      const resourceOwnerId = req.body[resourceField] || req.params[resourceField] || req.params.userId || req.params.id;
       
-      if (resourceOwnerId.toString() !== req.user._id.toString()) {
+      if (!resourceOwnerId || resourceOwnerId.toString() !== req.user._id.toString()) {
         throw new AuthorizationError('Not authorized to access this resource');
       }
       
@@ -102,11 +102,12 @@ export const checkResourceAccess = (Model, idParam = 'id') => {
       const resource = await Model.findById(resourceId).lean();
       
       if (!resource) {
-        throw new AuthenticationError('Resource not found');
+        throw new NotFoundError('Resource not found');
       }
       
+      const ownerId = resource.userId || resource.ownerId || resource.user || resource.authorId || resource.creatorId || resource.ambassadorId;
       // Check if user is owner or admin
-      if (resource.userId?.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      if ((!ownerId || ownerId.toString() !== req.user._id.toString()) && req.user.role !== 'admin') {
         throw new AuthorizationError('Not authorized to access this resource');
       }
       

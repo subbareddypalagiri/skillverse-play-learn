@@ -100,7 +100,7 @@ const courseSchema = new mongoose.Schema({
   
   // Status
   isActive: { type: Boolean, default: true },
-  isPublished: { type: Boolean, default: false },
+  isPublished: { type: Boolean, default: true },
   
   // Soft Delete
   isDeleted: { type: Boolean, default: false, index: true },

@@ -32,7 +32,17 @@ const EventDetailPage = () => {
     fetchEventById(id)
       .then(data => {
         setEvent(data);
-        setRegistered(!!data.isRegistered);
+        let isReg = !!data.isRegistered;
+        try {
+          const saved = localStorage.getItem('registeredEventIds');
+          if (saved) {
+            const ids = JSON.parse(saved);
+            if (ids.includes(id) || (data._id && ids.includes(data._id)) || (data.id && ids.includes(data.id))) {
+              isReg = true;
+            }
+          }
+        } catch {}
+        setRegistered(isReg);
       })
       .catch(() => setError('Event not found'))
       .finally(() => setLoading(false));
@@ -52,6 +62,14 @@ const EventDetailPage = () => {
         attendees: (prev.attendees || 0) + 1,
         registeredCount: (prev.registeredCount || 0) + 1
       }));
+      try {
+        const saved = localStorage.getItem('registeredEventIds');
+        const ids = saved ? JSON.parse(saved) : [];
+        if (!ids.includes(id!)) {
+          ids.push(id!);
+          localStorage.setItem('registeredEventIds', JSON.stringify(ids));
+        }
+      } catch {}
     } catch (err: any) {
       alert(err.response?.data?.message || 'Registration failed');
     } finally {

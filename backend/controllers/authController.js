@@ -123,7 +123,7 @@ export const getMe = async (req, res, next) => {
 export const updateMe = async (req, res, next) => {
   try {
     const allowedUpdates = [
-      'name', 'avatar', 'bio', 'hobbies', 'skills', 'socialLinks'
+      'name', 'avatar', 'bio', 'hobbies', 'skills', 'socialLinks', 'collegeName'
     ];
     
     const updates = {};

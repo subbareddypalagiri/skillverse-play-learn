@@ -42,7 +42,14 @@ const Events = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [events, setEvents] = useState<any[]>([]);
-  const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
+  const [registeredIds, setRegisteredIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('registeredEventIds');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAmbassadorForm, setShowAmbassadorForm] = useState(false);
@@ -87,9 +94,22 @@ const Events = () => {
   useEffect(() => { loadEvents(); }, [selectedCategory, selectedLocation]);
 
   useEffect(() => {
+    try {
+      localStorage.setItem('registeredEventIds', JSON.stringify(Array.from(registeredIds)));
+    } catch {}
+  }, [registeredIds]);
+
+  useEffect(() => {
     if (user) {
       fetchMyRegistrations()
-        .then(regs => setRegisteredIds(new Set(regs.map((r: any) => r._id || r.id))))
+        .then(regs => {
+          const backendIds = regs.map((r: any) => r._id || r.id).filter(Boolean);
+          setRegisteredIds(prev => {
+            const merged = new Set(prev);
+            backendIds.forEach(id => merged.add(id));
+            return merged;
+          });
+        })
         .catch(() => {});
     }
   }, [user]);

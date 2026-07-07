@@ -1149,12 +1149,18 @@ const Courses = () => {
     }
   ];
 
-  const [competitiveExams, setCompetitiveExams] = useState(() =>
-    initialCompetitiveExams.map((exam) => ({
+  const [competitiveExams, setCompetitiveExams] = useState(() => {
+    let savedExams: string[] = [];
+    try {
+      const saved = localStorage.getItem('enrolledExams');
+      if (saved) savedExams = JSON.parse(saved);
+    } catch {}
+    
+    return initialCompetitiveExams.map((exam) => ({
       ...exam,
-      students: 0
-    }))
-  );
+      students: savedExams.includes(exam.name) ? 1 : 0
+    }));
+  });
 
   const handleEnroll = async (course: any) => {
     setSelectedCourse(course);
@@ -1193,6 +1199,14 @@ const Courses = () => {
     setCompetitiveExams(prev => prev.map(e =>
       e.name === exam.name ? { ...e, students: (e.students || 0) + 1 } : e
     ));
+    try {
+      const saved = localStorage.getItem('enrolledExams');
+      const savedExams = saved ? JSON.parse(saved) : [];
+      if (!savedExams.includes(exam.name)) {
+        savedExams.push(exam.name);
+        localStorage.setItem('enrolledExams', JSON.stringify(savedExams));
+      }
+    } catch {}
     setShowSuccessDialog(true);
   };
 

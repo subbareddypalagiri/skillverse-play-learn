@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import apiClient from '@/lib/apiClient';
 
 interface Course {
   title: string;
@@ -38,21 +39,71 @@ interface CourseProviderProps {
 }
 
 export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
-  const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
+  const [enrolledCourses, setEnrolledCourses] = useState<Course[]>((() => {
+    try {
+      const saved = localStorage.getItem('enrolledCourses');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  }) as any);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('enrolledCourses', JSON.stringify(enrolledCourses));
+    } catch (e) {
+      console.error('Error saving enrolled courses:', e);
+    }
+  }, [enrolledCourses]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      apiClient.get('/courses/my-enrollments')
+        .then(res => {
+          if (res.data?.data?.enrollments) {
+            const backendCourses = res.data.data.enrollments.map((e: any) => ({
+              title: e.courseId?.title || 'Enrolled Course',
+              instructor: e.courseId?.ownerId?.name || 'Instructor',
+              duration: e.courseId?.duration || '12 weeks',
+              students: e.courseId?.students || 100,
+              rating: e.courseId?.rating || 4.8,
+              level: e.courseId?.level || 'Beginner',
+              category: e.courseId?.category || 'Development',
+              enrolledDate: e.enrolledAt || new Date().toISOString(),
+              progress: e.progress || 0,
+              completedLessons: e.completedLessonsCount || 0,
+              totalLessons: e.totalLessons || 20,
+              nextLesson: 'Course Introduction',
+              lastAccessed: e.lastActivityAt || new Date().toISOString(),
+            }));
+            setEnrolledCourses(prev => {
+              const existingTitles = new Set(prev.map(c => c.title));
+              const newCourses = backendCourses.filter((c: any) => !existingTitles.has(c.title));
+              if (newCourses.length === 0) return prev;
+              return [...prev, ...newCourses];
+            });
+          }
+        })
+        .catch(() => {});
+    }
+  }, []);
 
   const addCourse = (courseData: Omit<Course, 'enrolledDate' | 'progress' | 'completedLessons' | 'totalLessons' | 'nextLesson' | 'lastAccessed'>) => {
-    const now = new Date().toISOString();
-    const newCourse: Course = {
-      ...courseData,
-      enrolledDate: now,
-      progress: 0,
-      completedLessons: 0,
-      totalLessons: getTotalLessons(courseData.category),
-      nextLesson: getFirstLesson(courseData.category),
-      lastAccessed: now,
-    };
-    
-    setEnrolledCourses(prev => [...prev, newCourse]);
+    setEnrolledCourses(prev => {
+      if (prev.some(c => c.title === courseData.title)) return prev;
+      const now = new Date().toISOString();
+      const newCourse: Course = {
+        ...courseData,
+        enrolledDate: now,
+        progress: 0,
+        completedLessons: 0,
+        totalLessons: getTotalLessons(courseData.category),
+        nextLesson: getFirstLesson(courseData.category),
+        lastAccessed: now,
+      };
+      return [...prev, newCourse];
+    });
   };
 
   const updateProgress = (courseTitle: string, progress: number, completedLessons: number) => {

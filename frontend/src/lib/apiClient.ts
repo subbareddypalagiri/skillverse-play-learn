@@ -53,6 +53,14 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
+      localStorage.removeItem('enrolledCourses');
+      localStorage.removeItem('enrolledExams');
+      localStorage.removeItem('registeredEventIds');
+      localStorage.removeItem('careerHubCheckedSkills');
+      localStorage.removeItem('videoProgress');
+      localStorage.removeItem('clubs');
+      localStorage.removeItem('socialPosts');
+      localStorage.removeItem('userProfile');
       delete apiClient.defaults.headers.common['Authorization'];
       window.location.href = '/login';
     }

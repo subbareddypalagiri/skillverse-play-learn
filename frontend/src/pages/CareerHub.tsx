@@ -28,7 +28,20 @@ const CareerHub = () => {
   const [selectedRole, setSelectedRole] = useState<any>(null);
   const [guidanceLevel, setGuidanceLevel] = useState<'branches' | 'roles' | 'details'>('branches');
   const [branchCategory, setBranchCategory] = useState<'all' | 'ug' | 'pg' | 'emerging'>('all');
-  const [checkedSkills, setCheckedSkills] = useState<Record<string, boolean>>({});
+  const [checkedSkills, setCheckedSkills] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('careerHubCheckedSkills');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('careerHubCheckedSkills', JSON.stringify(checkedSkills));
+    } catch {}
+  }, [checkedSkills]);
 
   // Tab State: 'jobs' shows career board, 'guidance' shows Know Your Role Matrix
   const [activeTab, setActiveTab] = useState<'jobs' | 'guidance'>('jobs');
