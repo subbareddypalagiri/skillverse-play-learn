@@ -123,8 +123,8 @@ const mapReel = async (reel, viewerId) => {
           isFollowing: Boolean(isFollowingCreator)
         }
       : null,
-    isLiked: viewerId ? (reel.likedBy || []).some(id => id.toString() === viewerId.toString()) : false,
-    isSaved: viewerId ? (reel.savedBy || []).some(id => id.toString() === viewerId.toString()) : false
+    isLiked: viewerId ? (reel.likedBy || []).some(id => id && (id._id || id).toString() === viewerId.toString()) : false,
+    isSaved: viewerId ? (reel.savedBy || []).some(id => id && (id._id || id).toString() === viewerId.toString()) : false
   };
 };
 
@@ -289,7 +289,7 @@ const getReelForInteraction = async (reelId) => {
 export const toggleLikeReel = async (req, res, next) => {
   try {
     const reel = await getReelForInteraction(req.params.id);
-    const likedIndex = reel.likedBy.findIndex((id) => id.toString() === req.userId.toString());
+    const likedIndex = reel.likedBy.findIndex((id) => id && (id._id || id).toString() === req.userId.toString());
 
     let liked;
     if (likedIndex >= 0) {
@@ -321,7 +321,7 @@ export const toggleLikeReel = async (req, res, next) => {
 export const toggleSaveReel = async (req, res, next) => {
   try {
     const reel = await getReelForInteraction(req.params.id);
-    const savedIndex = reel.savedBy.findIndex((id) => id.toString() === req.userId.toString());
+    const savedIndex = reel.savedBy.findIndex((id) => id && (id._id || id).toString() === req.userId.toString());
 
     let saved;
     if (savedIndex >= 0) {
@@ -444,7 +444,7 @@ export const toggleFollowCreator = async (req, res, next) => {
       throw new NotFoundError('Reel not found');
     }
 
-    const creatorId = reel.userId.toString();
+    const creatorId = (reel.userId._id || reel.userId).toString();
 
     if (creatorId === req.userId.toString()) {
       throw new AuthorizationError('You cannot follow yourself');
@@ -489,7 +489,7 @@ export const deleteReel = async (req, res, next) => {
     let deleted = false;
     const reel = await Reel.findById(req.params.id);
     if (reel && !reel.isDeleted) {
-      if (reel.userId.toString() !== req.userId.toString() && req.user?.role !== 'admin') {
+      if ((!reel.userId || (reel.userId._id || reel.userId).toString() !== req.userId.toString()) && req.user?.role !== 'admin') {
         throw new AuthorizationError('Not authorized to delete this reel');
       }
       reel.isDeleted = true;
@@ -505,7 +505,7 @@ export const deleteReel = async (req, res, next) => {
 
     const post = await Post.findById(req.params.id);
     if (post && !post.isDeleted) {
-      if (post.userId.toString() !== req.userId.toString() && req.user?.role !== 'admin') {
+      if ((!post.userId || (post.userId._id || post.userId).toString() !== req.userId.toString()) && req.user?.role !== 'admin') {
         throw new AuthorizationError('Not authorized to delete this post');
       }
       post.isDeleted = true;
