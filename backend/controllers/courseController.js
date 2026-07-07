@@ -146,7 +146,7 @@ export const updateCourse = async (req, res, next) => {
     }
 
     // Authorization check
-    if ((!course.ownerId || (course.ownerId._id || course.ownerId).toString() !== req.userId.toString()) && req.user?.role !== 'admin') {
+    if (course.ownerId.toString() !== req.userId && req.user.role !== 'admin') {
       throw new AuthorizationError('Not authorized to update this course');
     }
 
@@ -175,7 +175,7 @@ export const deleteCourse = async (req, res, next) => {
       throw new NotFoundError('Course not found');
     }
 
-    if ((!course.ownerId || (course.ownerId._id || course.ownerId).toString() !== req.userId.toString()) && req.user?.role !== 'admin') {
+    if (course.ownerId.toString() !== req.userId && req.user.role !== 'admin') {
       throw new AuthorizationError('Not authorized to delete this course');
     }
 

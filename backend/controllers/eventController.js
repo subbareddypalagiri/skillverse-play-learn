@@ -107,7 +107,7 @@ export const updateEvent = async (req, res, next) => {
     const event = await Event.findById(req.params.id);
     if (!event) throw new NotFoundError('Event not found');
 
-    if (req.user?.role !== 'admin' && (!event.organizerId || (event.organizerId._id || event.organizerId).toString() !== req.userId.toString())) {
+    if (req.user.role !== 'admin' && event.organizerId.toString() !== req.userId.toString()) {
       throw new ValidationError('You can only edit your own events');
     }
 

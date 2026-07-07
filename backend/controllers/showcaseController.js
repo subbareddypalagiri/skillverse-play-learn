@@ -22,7 +22,7 @@ const upsertShowcase = async (userId, platformData) => {
 export const getShowcase = async (req, res) => {
   try {
     const isValidHexId = req.params.userId && /^[0-9a-fA-F]{24}$/.test(req.params.userId);
-    const userId = isValidHexId ? req.params.userId : (req.userId || req.user?._id);
+    const userId = isValidHexId ? req.params.userId : req.user._id;
     let showcase = await Showcase.findOne({ userId });
     if (!showcase) showcase = await Showcase.create({ userId });
     res.status(200).json({ success: true, data: showcase });
@@ -33,7 +33,7 @@ export const getShowcase = async (req, res) => {
 
 const connectWithFetcher = (platform) => async (req, res) => {
   try {
-    const userId = req.userId || req.user?._id;
+    const userId = req.user._id;
     const parsed = parsePlatformInput(platform, req.body.username || req.body.profileUrl || req.body.userId || req.body.websiteUrl, req.body);
     if (!parsed) {
       return res.status(400).json({ success: false, message: 'Invalid input — enter username or profile URL' });
@@ -63,7 +63,7 @@ export const connectGithub = async (req, res) => {
     const parsed = parsePlatformInput('github', username);
     if (!parsed?.username) return res.status(400).json({ success: false, message: 'GitHub username is required' });
     const github = await fetchGithubProfile(parsed.username);
-    const showcase = await upsertShowcase((req.userId || req.user?._id), { github });
+    const showcase = await upsertShowcase(req.user._id, { github });
     res.status(200).json({ success: true, message: 'GitHub connected', data: showcase });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message || 'Failed to connect GitHub' });
@@ -80,7 +80,7 @@ export const connectLinkedIn = async (req, res) => {
       headline: parsed.headline || req.body.headline || '',
       lastSynced: new Date(),
     };
-    const showcase = await upsertShowcase((req.userId || req.user?._id), { linkedin });
+    const showcase = await upsertShowcase(req.user._id, { linkedin });
     res.status(200).json({ success: true, message: 'LinkedIn connected', data: showcase });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to connect LinkedIn' });
@@ -92,7 +92,7 @@ export const connectLeetCode = async (req, res) => {
     const parsed = parsePlatformInput('leetcode', req.body.username);
     if (!parsed?.username) return res.status(400).json({ success: false, message: 'LeetCode username is required' });
     const leetcode = await fetchLeetCodeProfile(parsed.username);
-    const showcase = await upsertShowcase((req.userId || req.user?._id), { leetcode });
+    const showcase = await upsertShowcase(req.user._id, { leetcode });
     res.status(200).json({ success: true, message: 'LeetCode connected', data: showcase });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message || 'Failed to connect LeetCode' });
@@ -118,7 +118,7 @@ export const connectPortfolio = async (req, res) => {
       title: parsed.title || '',
       description: parsed.description || '',
     };
-    const showcase = await upsertShowcase((req.userId || req.user?._id), { portfolio });
+    const showcase = await upsertShowcase(req.user._id, { portfolio });
     res.status(200).json({ success: true, message: 'Portfolio connected', data: showcase });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Failed to connect portfolio' });
@@ -132,7 +132,7 @@ export const disconnectPlatform = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid platform' });
     }
     const showcase = await Showcase.findOneAndUpdate(
-      { userId: (req.userId || req.user?._id) },
+      { userId: req.user._id },
       { $set: { [`${platform}.connected`]: false } },
       { new: true }
     );
@@ -145,7 +145,7 @@ export const disconnectPlatform = async (req, res) => {
 export const refreshPlatform = async (req, res) => {
   try {
     const { platform } = req.params;
-    const showcase = await Showcase.findOne({ userId: (req.userId || req.user?._id) });
+    const showcase = await Showcase.findOne({ userId: req.user._id });
     if (!showcase?.[platform]?.connected) {
       return res.status(400).json({ success: false, message: 'Platform not connected' });
     }
@@ -166,7 +166,7 @@ export const refreshPlatform = async (req, res) => {
     }
 
     const refreshed = await fetcher(parsed);
-    const updated = await upsertShowcase((req.userId || req.user?._id), { [platform]: refreshed });
+    const updated = await upsertShowcase(req.user._id, { [platform]: refreshed });
     res.status(200).json({ success: true, message: `${platform} refreshed`, data: updated });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message || 'Failed to refresh' });
@@ -175,7 +175,7 @@ export const refreshPlatform = async (req, res) => {
 
 export const updateVisibility = async (req, res) => {
   try {
-    const userId = req.userId || req.user?._id;
+    const userId = req.user._id;
     const current = await Showcase.findOne({ userId });
     const visibility = { ...(current?.visibility?.toObject?.() || current?.visibility || {}), ...req.body };
     const showcase = await Showcase.findOneAndUpdate(
@@ -191,7 +191,7 @@ export const updateVisibility = async (req, res) => {
 
 export const getShowcaseStats = async (req, res) => {
   try {
-    const showcase = await Showcase.findOne({ userId: (req.userId || req.user?._id) });
+    const showcase = await Showcase.findOne({ userId: req.user._id });
     if (!showcase) {
       return res.status(200).json({ success: true, data: { connected: 0, total: ALL_PLATFORMS.length, score: 0 } });
     }

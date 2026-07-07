@@ -117,7 +117,7 @@ export const endLiveRoom = async (req, res, next) => {
       throw new NotFoundError('Live room not found');
     }
 
-    if ((!room.hostId || (room.hostId._id || room.hostId).toString() !== req.userId.toString()) && req.user?.role !== 'admin') {
+    if (room.hostId.toString() !== req.userId && req.user.role !== 'admin') {
       throw new AuthorizationError('Not authorized to end this stream');
     }
 

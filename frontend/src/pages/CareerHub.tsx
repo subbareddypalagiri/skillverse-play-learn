@@ -43,6 +43,30 @@ const CareerHub = () => {
     } catch {}
   }, [checkedSkills]);
 
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+
+  const handleAnalyzeGap = async () => {
+    if (!selectedRole) return;
+    setAnalyzing(true);
+    try {
+      const custom = getRoleCustomData(selectedRole, selectedBranch);
+      const checkedList = custom.checklist.filter((_, idx) => checkedSkills[`check_${selectedBranch}_${selectedRole.title}_${idx}`]).map(item => item.label);
+      
+      const res = await apiClient.post('/ai-tools/analyze-career-gap', {
+        targetRole: selectedRole.title,
+        checkedSkills: checkedList
+      });
+      if (res.data?.success) {
+        setAiAnalysis(res.data.data);
+      }
+    } catch (err) {
+      console.error("AI Analysis failed:", err);
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   // Tab State: 'jobs' shows career board, 'guidance' shows Know Your Role Matrix
   const [activeTab, setActiveTab] = useState<'jobs' | 'guidance'>('jobs');
 
@@ -530,6 +554,111 @@ const CareerHub = () => {
                             );
                           })}
                         </div>
+
+                        {/* AI Career Gap Analyzer Banner */}
+                        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-violet-600/15 via-indigo-600/15 to-purple-600/15 border border-violet-500/30">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center shadow-md shadow-violet-600/30">
+                              <Sparkles className="w-5 h-5 animate-pulse" />
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-bold text-foreground">AI Career Gap & Tool Analyzer</h4>
+                              <p className="text-xs text-muted-foreground">Get instant AI recommendations & tools from our database to master your missing skills.</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={handleAnalyzeGap}
+                            disabled={analyzing}
+                            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-violet-600/25 flex items-center justify-center gap-2 transition disabled:opacity-50"
+                          >
+                            {analyzing ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" /> Analyzing Gap...
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="w-4 h-4" /> Analyze My Career Gap
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {/* AI Analysis Result Card */}
+                        {aiAnalysis && (
+                          <div className="mt-6 p-6 rounded-3xl bg-slate-900/90 border border-violet-500/40 shadow-2xl space-y-6 animate-reveal-up">
+                            <div className="flex items-center justify-between border-b border-border/40 pb-4">
+                              <div className="flex items-center gap-2">
+                                <span className="px-3 py-1 rounded-full text-xs font-bold bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                                  AI Readiness Report
+                                </span>
+                                <h4 className="text-lg font-bold text-white">{aiAnalysis.targetRole}</h4>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-xs text-muted-foreground">AI Match Score</span>
+                                <div className="text-xl font-black text-emerald-400">{aiAnalysis.readinessScore}%</div>
+                              </div>
+                            </div>
+
+                            {/* Skills Breakdown */}
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                                <h5 className="text-xs font-bold text-emerald-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                  <CheckCircle2 className="w-4 h-4" /> Matched Strengths ({aiAnalysis.skills.matchedEssential.length + aiAnalysis.skills.matchedAdvanced.length})
+                                </h5>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {[...aiAnalysis.skills.matchedEssential, ...aiAnalysis.skills.matchedAdvanced].map((s: string, idx: number) => (
+                                    <span key={idx} className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-200 text-xs font-medium">
+                                      {s}
+                                    </span>
+                                  ))}
+                                  {[...aiAnalysis.skills.matchedEssential, ...aiAnalysis.skills.matchedAdvanced].length === 0 && (
+                                    <span className="text-xs text-muted-foreground">No strengths checked yet. Check items above!</span>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                                <h5 className="text-xs font-bold text-amber-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                  <Target className="w-4 h-4" /> Priority Skill Gaps ({aiAnalysis.skills.missingEssential.length + aiAnalysis.skills.missingAdvanced.length})
+                                </h5>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {[...aiAnalysis.skills.missingEssential, ...aiAnalysis.skills.missingAdvanced].map((s: string, idx: number) => (
+                                    <span key={idx} className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-200 text-xs font-medium">
+                                      {s}
+                                    </span>
+                                  ))}
+                                  {[...aiAnalysis.skills.missingEssential, ...aiAnalysis.skills.missingAdvanced].length === 0 && (
+                                    <span className="text-xs text-emerald-400 font-bold">You have mastered all core skills! 🎉</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Recommended AI Tools */}
+                            {aiAnalysis.recommendedTools?.length > 0 && (
+                              <div>
+                                <h5 className="text-xs font-bold text-violet-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                                  <Zap className="w-4 h-4 text-amber-400 fill-amber-400" /> Recommended AI Tools to Master These Gaps
+                                </h5>
+                                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                  {aiAnalysis.recommendedTools.map((tool: any, idx: number) => (
+                                    <a key={idx} href={tool.link || '#'} target="_blank" rel="noreferrer"
+                                      className="p-3 rounded-xl bg-surface/80 border border-border/50 hover:border-violet-500/50 transition flex flex-col justify-between group">
+                                      <div>
+                                        <div className="flex items-center justify-between mb-1">
+                                          <span className="text-xs font-bold text-white group-hover:text-violet-400 transition">{tool.name}</span>
+                                          <ExternalLink className="w-3 h-3 text-muted-foreground group-hover:text-violet-400" />
+                                        </div>
+                                        <p className="text-[11px] text-muted-foreground line-clamp-2">{tool.description}</p>
+                                      </div>
+                                      <span className="mt-2 text-[10px] font-semibold text-violet-400 uppercase">{tool.category}</span>
+                                    </a>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
 
                       {/* SECTION 7: 90-Day Execution Roadmap to Interview Mastery */}

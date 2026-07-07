@@ -191,7 +191,7 @@ export const getPost = async (req, res, next) => {
 export const toggleLikePost = async (req, res, next) => {
   try {
     const post = await getPostForInteraction(req.params.id);
-    const likedIndex = post.likedBy.findIndex(id => id && (id._id || id).toString() === req.userId.toString());
+    const likedIndex = post.likedBy.findIndex(id => id.toString() === req.userId.toString());
 
     let liked;
     if (likedIndex >= 0) {
@@ -222,7 +222,7 @@ export const toggleLikePost = async (req, res, next) => {
 export const toggleSavePost = async (req, res, next) => {
   try {
     const post = await getPostForInteraction(req.params.id);
-    const savedIndex = post.savedBy.findIndex(id => id && (id._id || id).toString() === req.userId.toString());
+    const savedIndex = post.savedBy.findIndex(id => id.toString() === req.userId.toString());
 
     let saved;
     if (savedIndex >= 0) {
@@ -329,7 +329,7 @@ export const deletePost = async (req, res, next) => {
     let deleted = false;
     const post = await Post.findById(req.params.id);
     if (post && !post.isDeleted) {
-      if ((!post.userId || (post.userId._id || post.userId).toString() !== req.userId.toString()) && req.user?.role !== 'admin') {
+      if (post.userId.toString() !== req.userId.toString() && req.user?.role !== 'admin') {
         throw new AuthorizationError('Not authorized to delete this post');
       }
       post.isDeleted = true;
@@ -344,7 +344,7 @@ export const deletePost = async (req, res, next) => {
 
     const reel = await Reel.findById(req.params.id);
     if (reel && !reel.isDeleted) {
-      if ((!reel.userId || (reel.userId._id || reel.userId).toString() !== req.userId.toString()) && req.user?.role !== 'admin') {
+      if (reel.userId.toString() !== req.userId.toString() && req.user?.role !== 'admin') {
         throw new AuthorizationError('Not authorized to delete this reel');
       }
       reel.isDeleted = true;
@@ -448,8 +448,8 @@ const mapPost = (post, viewerId) => {
         ? { _id: c.userId._id, name: c.userId.name, avatar: c.userId.avatar }
         : null
     })),
-    isLiked: viewerId ? (post.likedBy || []).some(id => id && (id._id || id).toString() === viewerId.toString()) : false,
-    isSaved: viewerId ? (post.savedBy || []).some(id => id && (id._id || id).toString() === viewerId.toString()) : false,
+    isLiked: viewerId ? (post.likedBy || []).some(id => id.toString() === viewerId.toString()) : false,
+    isSaved: viewerId ? (post.savedBy || []).some(id => id.toString() === viewerId.toString()) : false,
     isPinned: post.isPinned || false
   };
 };
