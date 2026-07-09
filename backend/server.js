@@ -33,8 +33,8 @@ const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:3000,http:
   .split(',')
   .map(o => o.trim());
 
-// Allow all Vercel deployment URLs automatically
-const vercelPreviewPattern = /^https:\/\/.*\.vercel\.app$/;
+// Allow deployment platforms (Vercel, FireCMS, Railway, Netlify, Render, Localhost) automatically
+const deploymentPattern = /^https?:\/\/.*(\.vercel\.app|\.firecms\.co|\.railway\.app|\.netlify\.app|\.onrender\.com|localhost:\d+)$/;
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -43,8 +43,8 @@ app.use(cors({
       callback(null, true);
     } else if (allowedOrigins.includes(origin)) {
       callback(null, true);
-    } else if (vercelPreviewPattern.test(origin)) {
-      // Allow all Vercel deployments
+    } else if (deploymentPattern.test(origin)) {
+      // Allow deployment previews and production sites
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
