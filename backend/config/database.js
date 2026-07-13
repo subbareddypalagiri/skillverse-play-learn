@@ -1,47 +1,69 @@
 import mongoose from 'mongoose';
 import logger from './logger.js';
 
+// Global cache for Serverless environments (Vercel / AWS Lambda)
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
 const connectDB = async () => {
   try {
-    const mongoUri = process.env.MONGODB_URI;
+    const mongoUri = process.env.MONGODB_URI || process.env.MONGODB_LOCAL;
 
     if (!mongoUri) {
-      throw new Error('MONGODB_URI is not defined in environment variables');
+      logger.error('MONGODB_URI is not defined in environment variables');
+      if (process.env.VERCEL === '1') return null;
+      throw new Error('MONGODB_URI is not defined');
     }
 
-    logger.info('Connecting to MongoDB...');
+    // Return cached connection if already open
+    if (cached.conn && mongoose.connection.readyState === 1) {
+      return cached.conn;
+    }
 
-    const conn = await mongoose.connect(mongoUri, {
-      retryWrites: true,
-      w: 'majority',
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      maxPoolSize: 100, // High concurrency for 100+ classroom students
-      minPoolSize: 10,
-    });
+    if (!cached.promise) {
+      logger.info('Connecting to MongoDB...');
+      const opts = {
+        retryWrites: true,
+        w: 'majority',
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+        // Serverless optimized connection pool
+        maxPoolSize: process.env.VERCEL === '1' ? 10 : 100,
+        minPoolSize: process.env.VERCEL === '1' ? 1 : 10,
+      };
 
-    logger.info(`MongoDB connected successfully with pool size 100`);
-
-    // Self-healing event listeners for runtime resilience
-    mongoose.connection.on('error', (err) => {
-      logger.error(`MongoDB runtime connection error: ${err.message}`);
-    });
-
-    mongoose.connection.on('disconnected', () => {
-      logger.warn('MongoDB disconnected! Auto-reconnecting...');
-    });
-
-    // Enable query logging in development
-    if (process.env.NODE_ENV === 'development') {
-      mongoose.set('debug', (collectionName, methodName, ...args) => {
-        logger.debug(`${collectionName}.${methodName}`, JSON.stringify(args, null, 2));
+      cached.promise = mongoose.connect(mongoUri, opts).then((mongooseInstance) => {
+        logger.info(`MongoDB connected successfully (` + (process.env.VERCEL === '1' ? 'Serverless Cached Pool' : 'Standard Pool') + `)`);
+        return mongooseInstance;
       });
     }
 
-    return conn;
+    cached.conn = await cached.promise;
+
+    // Self-healing event listeners for runtime resilience
+    if (!mongoose.connection._hasListeners) {
+      mongoose.connection._hasListeners = true;
+      mongoose.connection.on('error', (err) => {
+        logger.error(`MongoDB runtime connection error: ${err.message}`);
+      });
+
+      mongoose.connection.on('disconnected', () => {
+        logger.warn('MongoDB disconnected!');
+        cached.conn = null;
+        cached.promise = null;
+      });
+    }
+
+    return cached.conn;
   } catch (error) {
+    cached.promise = null;
     logger.error(`MongoDB Connection Error: ${error.message}`);
-    process.exit(1);
+    if (process.env.VERCEL !== '1') {
+      process.exit(1);
+    }
+    return null;
   }
 };
 

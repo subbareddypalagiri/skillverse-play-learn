@@ -146,6 +146,18 @@ import startAIToolsScheduler from './workers/aiToolsSync.worker.js';
 const isServerless = !!process.env.VERCEL;
 const uploadsDirectory = path.resolve(isServerless ? '/tmp' : process.cwd(), 'uploads');
 
+// Ensure DB connection is awaited before any API route executes in Serverless / Vercel mode
+app.use('/api/v1', async (req, res, next) => {
+  if (process.env.VERCEL === '1' || !mongoose.connection || mongoose.connection.readyState !== 1) {
+    try {
+      await connectDB();
+    } catch (err) {
+      logger.error('API Middleware DB Auto-connect error:', err.message);
+    }
+  }
+  next();
+});
+
 // API Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/courses', courseRoutes);
