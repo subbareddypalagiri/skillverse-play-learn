@@ -28,9 +28,13 @@ export const getUploadSignature = async (req, res, next) => {
     cloudName = cloudName.toLowerCase();
 
     if (!apiSecret || !cloudName || !apiKey) {
+      const missingKeys = [];
+      if (!cloudName) missingKeys.push('CLOUDINARY_CLOUD_NAME');
+      if (!apiKey) missingKeys.push('CLOUDINARY_API_KEY');
+      if (!apiSecret) missingKeys.push('CLOUDINARY_API_SECRET');
       return res.status(400).json({
         success: false,
-        message: 'Cloudinary is not configured in backend environment variables (CLOUDINARY_URL or API keys missing)'
+        message: `CLOUDINARY_ERROR: Missing keys: [ ${missingKeys.join(', ')} ] inside Backend Project (${process.env.VERCEL_URL || '8px7'}). Ensure they are checked for Production in Vercel!`
       });
     }
 
