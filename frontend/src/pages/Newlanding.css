@@ -9,6 +9,24 @@
   background-size: 60px 60px;
 }
 
+@keyframes infiniteGridScroll {
+  0% { transform: translateY(0) translateX(0); }
+  100% { transform: translateY(60px) translateX(60px); }
+}
+
+@keyframes infiniteGridScrollReverse {
+  0% { transform: translateY(0) translateX(0); }
+  100% { transform: translateY(-120px) translateX(-120px); }
+}
+
+.infinite-grid-scroll {
+  animation: infiniteGridScroll 20s linear infinite;
+}
+
+.infinite-grid-scroll-reverse {
+  animation: infiniteGridScrollReverse 35s linear infinite;
+}
+
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 

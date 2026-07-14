@@ -5,6 +5,7 @@ import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import Navbar from '../components/Navbar'; 
 import apiClient from '@/lib/apiClient';
 import { Users, BookOpen, Award, Building } from 'lucide-react';
+import InteractiveInfiniteGrid from '../components/layout/InteractiveInfiniteGrid';
 
 import './Newlanding.css';
 
@@ -240,7 +241,8 @@ const NewLanding: React.FC = () => {
       {/* TOP NAVBAR */}
       <Navbar />
 
-      <div className="grid-bg fixed inset-0 opacity-25 pointer-events-none z-0"></div>
+      {/* Futuristic Cursor-Responsive Glowing & Infinite Scrolling Grid Background */}
+      <InteractiveInfiniteGrid />
 
       {/* LEFT SIDE NAV */}
       <nav id="side-nav" style={{
