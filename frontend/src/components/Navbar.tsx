@@ -28,7 +28,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const isLoggedIn = !!user;
   const isHomePage = location.pathname === "/";
-  const isLightNav = !isHomePage;
+  const isLightNav = false; // Always use dark premium navbar on all pages
 
   useEffect(() => {
     const handleScroll = () => {
