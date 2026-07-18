@@ -4,6 +4,7 @@ import {
   getEvent,
   createEvent,
   updateEvent,
+  deleteEvent,
   registerForEvent,
   getMyRegistrations
 } from '../controllers/eventController.js';
@@ -29,5 +30,6 @@ router.get('/:id', optionalAuthenticate, getEvent);
 router.post('/:id/register', authenticate, registerForEvent);
 router.post('/', authenticate, authorize('admin', 'campus_ambassador'), createEvent);
 router.patch('/:id', authenticate, authorize('admin', 'campus_ambassador'), updateEvent);
+router.delete('/:id', authenticate, authorize('admin', 'campus_ambassador'), deleteEvent);
 
 export default router;

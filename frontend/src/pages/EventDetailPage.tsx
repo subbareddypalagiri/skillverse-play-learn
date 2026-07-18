@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/PageLayout';
-import { fetchEventById, registerForEvent, isTourCategory } from '@/lib/eventsApi';
+import { fetchEventById, registerForEvent, isTourCategory, cancelEvent, deleteEvent } from '@/lib/eventsApi';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   ArrowLeft, Calendar, MapPin, Clock, Users, CheckCircle, Loader2,
-  Bus, Utensils, User, Backpack, Route, Globe, Monitor, Building2, Shield
+  Bus, Utensils, User, Backpack, Route, Globe, Monitor, Building2, Shield,
+  Trash2, XCircle, Edit
 } from 'lucide-react';
 
 const categoryColors: Record<string, string> = {
@@ -77,6 +78,28 @@ const EventDetailPage = () => {
     }
   };
 
+  const handleCancel = async () => {
+    if (!window.confirm('Are you sure you want to cancel this event? Students will see it as cancelled.')) return;
+    try {
+      await cancelEvent(id!);
+      setEvent((prev: any) => ({ ...prev, isCancelled: true }));
+      alert('Event has been marked as cancelled.');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to cancel event');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this event? This action cannot be undone.')) return;
+    try {
+      await deleteEvent(id!);
+      alert('Event deleted successfully.');
+      navigate('/events');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to delete event');
+    }
+  };
+
   if (loading) {
     return (
       <PageLayout>
@@ -104,6 +127,8 @@ const EventDetailPage = () => {
   const spotsLeft = (event.maxAttendees || event.capacity || 0) - (event.attendees || event.registeredCount || 0);
   const catColor = categoryColors[event.category] || 'bg-primary/10 text-primary border-primary/20';
 
+  const isCreator = user && (user.role === 'admin' || (event.organizer && event.organizer._id === user._id));
+
   return (
     <PageLayout>
       <div className="max-w-3xl mx-auto">
@@ -127,7 +152,30 @@ const EventDetailPage = () => {
               <span className="text-[10px] font-medium px-2.5 py-1 rounded-full bg-border/50 text-muted-foreground flex items-center gap-1">
                 <Building2 className="w-2.5 h-2.5" /> {event.location || event.campusLocation}
               </span>
+              {event.isCancelled && (
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-red-500/20 text-red-500 border border-red-500/30 flex items-center gap-1">
+                  <XCircle className="w-3 h-3" /> CANCELLED
+                </span>
+              )}
             </div>
+
+            {isCreator && (
+              <div className="flex flex-wrap gap-2 mb-4 p-3 rounded-xl border border-primary/20 bg-primary/5">
+                <p className="text-xs font-semibold text-primary w-full mb-1 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5"/> Creator Controls</p>
+                {/* Edit Button (Placeholder for Future Update Form modal) */}
+                <button onClick={() => alert('Edit feature opening soon!')} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-foreground transition-colors">
+                  <Edit className="w-3.5 h-3.5" /> Edit
+                </button>
+                {!event.isCancelled && (
+                  <button onClick={handleCancel} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 transition-colors">
+                    <XCircle className="w-3.5 h-3.5" /> Cancel Event
+                  </button>
+                )}
+                <button onClick={handleDelete} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-colors ml-auto">
+                  <Trash2 className="w-3.5 h-3.5" /> Delete Event
+                </button>
+              </div>
+            )}
 
             <h1 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: 'Sora, sans-serif' }}>
               {event.title}

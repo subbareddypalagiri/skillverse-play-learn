@@ -77,5 +77,20 @@ export const fetchMyRegistrations = async () => {
   return response.data.data.registrations as EventItem[];
 };
 
+export const updateEvent = async (id: string, payload: Record<string, unknown>) => {
+  const response = await apiClient.patch(`/events/${id}`, payload);
+  return response.data;
+};
+
+export const cancelEvent = async (id: string) => {
+  const response = await apiClient.patch(`/events/${id}`, { isCancelled: true });
+  return response.data;
+};
+
+export const deleteEvent = async (id: string) => {
+  const response = await apiClient.delete(`/events/${id}`);
+  return response.data;
+};
+
 export const isTourCategory = (category: string) =>
   category === 'fun-tours' || category === 'industrial-tours';

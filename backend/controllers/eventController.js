@@ -123,6 +123,28 @@ export const updateEvent = async (req, res, next) => {
   }
 };
 
+export const deleteEvent = async (req, res, next) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) throw new NotFoundError('Event not found');
+
+    if (req.user.role !== 'admin' && event.organizerId.toString() !== req.userId.toString()) {
+      throw new ValidationError('You can only delete your own events');
+    }
+
+    // Soft delete
+    event.isDeleted = true;
+    event.isActive = false;
+    event.deletedAt = new Date();
+    event.updatedBy = req.userId;
+    await event.save();
+
+    return successResponse(res, 200, 'Event deleted successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const registerForEvent = async (req, res, next) => {
   try {
     const event = await Event.findById(req.params.id);
