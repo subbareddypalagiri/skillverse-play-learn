@@ -18,7 +18,7 @@ const formatEvent = (event, organizer = null) => {
     location: e.campusLocation || 'In Campus',
     attendees: e.registeredCount || 0,
     maxAttendees: e.capacity || 0,
-    organizer: organizer ? { name: organizer.name, collegeName: organizer.collegeName } : null,
+    organizer: organizer ? { _id: organizer._id, name: organizer.name, collegeName: organizer.collegeName } : null,
     isTour: ['fun-tours', 'industrial-tours'].includes(e.category),
   };
 };

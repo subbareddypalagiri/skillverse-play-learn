@@ -41,6 +41,7 @@ const Events = () => {
 
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
+  const [showMyEvents, setShowMyEvents] = useState(false);
   const [events, setEvents] = useState<any[]>([]);
   const [registeredIds, setRegisteredIds] = useState<Set<string>>(() => {
     try {
@@ -247,6 +248,17 @@ const Events = () => {
               {label}
             </button>
           ))}
+          {user && (
+            <button onClick={() => setShowMyEvents(!showMyEvents)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-xl border transition-all duration-200 ml-2 ${
+                showMyEvents
+                  ? 'bg-amber-500/20 text-amber-500 border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
+                  : 'border-amber-500/20 text-amber-500 hover:border-amber-500/40 hover:bg-amber-500/10'
+              }`}>
+              <Shield className="w-3.5 h-3.5 inline-block mr-1.5 -mt-0.5" />
+              {showMyEvents ? 'Showing Hosted by Me' : 'My Hosted Events'}
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-2 pt-3 border-t border-border/30">
           <span className="text-xs text-muted-foreground mr-1">Location:</span>
@@ -285,8 +297,10 @@ const Events = () => {
       )}
 
       {!loading && !error && (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
-          {events.map((event, i) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {events
+          .filter(event => showMyEvents ? event.organizer?._id === user?._id || event.organizer?.id === user?._id || event.organizerId === user?._id : true)
+          .map((event, idx) => {
             const typeColor = typeColors[event.type] || typeColors.default;
             const eventId = event._id || event.id;
             const isReg = registeredIds.has(eventId);
@@ -296,7 +310,7 @@ const Events = () => {
               <div key={eventId}
                 onClick={() => navigate(`/events/${eventId}`)}
                 className="group relative rounded-2xl border border-border/50 hover:border-primary/30 overflow-hidden card-lift transition-all duration-300 cursor-pointer animate-reveal-up"
-                style={{ background: 'rgba(255,255,255,0.02)', animationDelay: `${i * 0.05}s` }}>
+                style={{ background: 'rgba(255,255,255,0.02)', animationDelay: `${idx * 0.05}s` }}>
                 <div className={`h-1 ${isTour ? 'bg-gradient-to-r from-emerald-500 to-cyan-500' : 'bg-gradient-to-r from-violet-500/50 to-indigo-500/50'}`} />
 
                 <div className="relative z-10 p-5">
