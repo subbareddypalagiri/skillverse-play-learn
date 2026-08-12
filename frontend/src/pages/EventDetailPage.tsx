@@ -6,9 +6,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   ArrowLeft, Calendar, MapPin, Clock, Users, CheckCircle, Loader2,
   Bus, Utensils, User, Backpack, Route, Globe, Monitor, Building2, Shield,
-  Trash2, XCircle, Edit, MessageCircle
+  Trash2, XCircle, Edit, MessageCircle, Train, Car
 } from 'lucide-react';
 import { EventChat } from '@/components/EventChat';
+import AmbassadorEventForm from '@/components/AmbassadorEventForm';
 
 const categoryColors: Record<string, string> = {
   cultural: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
@@ -28,9 +29,10 @@ const EventDetailPage = () => {
   const [registering, setRegistering] = useState(false);
   const [registered, setRegistered] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadEventDetails = () => {
     if (!id) return;
     fetchEventById(id)
       .then(data => {
@@ -49,6 +51,10 @@ const EventDetailPage = () => {
       })
       .catch(() => setError('Event not found'))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadEventDetails();
   }, [id]);
 
   const handleJoin = async () => {
@@ -164,8 +170,8 @@ const EventDetailPage = () => {
             {isCreator && (
               <div className="flex flex-wrap gap-2 mb-4 p-3 rounded-xl border border-primary/20 bg-primary/5">
                 <p className="text-xs font-semibold text-primary w-full mb-1 flex items-center gap-1.5"><Shield className="w-3.5 h-3.5"/> Creator Controls</p>
-                {/* Edit Button (Placeholder for Future Update Form modal) */}
-                <button onClick={() => alert('Edit feature opening soon!')} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-foreground transition-colors">
+                {/* Edit Button */}
+                <button onClick={() => setShowEditModal(true)} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-foreground transition-colors">
                   <Edit className="w-3.5 h-3.5" /> Edit
                 </button>
                 {!event.isCancelled && (
@@ -301,15 +307,62 @@ const EventDetailPage = () => {
             {tour.bus && (
               <div className="rounded-2xl border border-border/50 p-5" style={{ background: 'rgba(255,255,255,0.02)' }}>
                 <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                  <Bus className="w-4 h-4 text-blue-400" /> Bus & Transport
+                  {tour.bus.transportType === 'train' ? (
+                    <Train className="w-4 h-4 text-sky-400" />
+                  ) : tour.bus.transportType === 'auto' ? (
+                    <Car className="w-4 h-4 text-yellow-400" />
+                  ) : (
+                    <Bus className="w-4 h-4 text-blue-400" />
+                  )}
+                  {tour.bus.transportType === 'train' ? 'Train Details' : tour.bus.transportType === 'auto' ? 'Auto / Cab Details' : 'Bus & Transport'}
                 </h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  {tour.bus.busNumber && <div><p className="text-[10px] text-muted-foreground uppercase">Bus No.</p><p className="font-medium">{tour.bus.busNumber}</p></div>}
-                  {tour.bus.pickupPoint && <div><p className="text-[10px] text-muted-foreground uppercase">Pickup</p><p className="font-medium">{tour.bus.pickupPoint}</p></div>}
-                  {tour.bus.departureTime && <div><p className="text-[10px] text-muted-foreground uppercase">Departure</p><p className="font-medium">{tour.bus.departureTime}</p></div>}
-                  {tour.bus.returnTime && <div><p className="text-[10px] text-muted-foreground uppercase">Return</p><p className="font-medium">{tour.bus.returnTime}</p></div>}
-                  {tour.bus.driverName && <div><p className="text-[10px] text-muted-foreground uppercase">Driver</p><p className="font-medium">{tour.bus.driverName}</p></div>}
-                  {tour.bus.driverContact && <div><p className="text-[10px] text-muted-foreground uppercase">Contact</p><p className="font-medium text-primary">{tour.bus.driverContact}</p></div>}
+                  {tour.bus.busNumber && (
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase">
+                        {tour.bus.transportType === 'train' ? 'Train No.' : tour.bus.transportType === 'auto' ? 'Cab/Auto No.' : 'Bus No.'}
+                      </p>
+                      <p className="font-medium">{tour.bus.busNumber}</p>
+                    </div>
+                  )}
+                  {tour.bus.pickupPoint && (
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase">
+                        {tour.bus.transportType === 'train' ? 'Station' : 'Pickup'}
+                      </p>
+                      <p className="font-medium">{tour.bus.pickupPoint}</p>
+                    </div>
+                  )}
+                  {tour.bus.departureTime && (
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase">Departure</p>
+                      <p className="font-medium">{tour.bus.departureTime}</p>
+                    </div>
+                  )}
+                  {tour.bus.returnTime && (
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase">
+                        {tour.bus.transportType === 'train' ? 'Arrival' : 'Return'}
+                      </p>
+                      <p className="font-medium">{tour.bus.returnTime}</p>
+                    </div>
+                  )}
+                  {tour.bus.driverName && (
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase">
+                        {tour.bus.transportType === 'train' ? 'Coach / Seat' : 'Driver'}
+                      </p>
+                      <p className="font-medium">{tour.bus.driverName}</p>
+                    </div>
+                  )}
+                  {tour.bus.driverContact && (
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase">
+                        {tour.bus.transportType === 'train' ? 'Ticket/PNR' : 'Contact'}
+                      </p>
+                      <p className="font-medium text-primary">{tour.bus.driverContact}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -344,6 +397,16 @@ const EventDetailPage = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Event Modal */}
+      {showEditModal && event && (
+        <AmbassadorEventForm
+          open={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={loadEventDetails}
+          eventToEdit={event}
+        />
+      )}
     </PageLayout>
   );
 };

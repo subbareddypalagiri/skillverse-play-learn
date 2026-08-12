@@ -5,6 +5,7 @@ const tourDetailsSchema = new mongoose.Schema({
   food: { meals: String, snacks: String, dietaryOptions: String },
   planner: { name: String, organization: String, contact: String },
   bus: {
+    transportType: { type: String, default: 'bus' },
     busNumber: String,
     pickupPoint: String,
     departureTime: String,

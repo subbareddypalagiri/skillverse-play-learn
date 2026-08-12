@@ -1,25 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { createEvent, isTourCategory } from '@/lib/eventsApi';
+import { createEvent, updateEvent, isTourCategory } from '@/lib/eventsApi';
 import { useAuth } from '@/contexts/AuthContext';
-import { Plus, Bus, MapPin, Utensils, User, CheckCircle } from 'lucide-react';
+import { Plus, Bus, MapPin, Utensils, User, CheckCircle, Train, Car } from 'lucide-react';
 
 interface AmbassadorEventFormProps {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  eventToEdit?: any; // Added optional eventToEdit prop for editing events
 }
 
 const emptyTour = {
   destinations: [{ name: '', description: '', arrivalTime: '' }],
   food: { meals: '', snacks: '', dietaryOptions: '' },
   planner: { name: '', organization: '', contact: '' },
-  bus: { busNumber: '', pickupPoint: '', departureTime: '', returnTime: '', driverName: '', driverContact: '', capacity: 0 },
+  bus: { transportType: 'bus', busNumber: '', pickupPoint: '', departureTime: '', returnTime: '', driverName: '', driverContact: '', capacity: 0 },
   itinerary: '',
   thingsToCarry: ['']
 };
 
-export default function AmbassadorEventForm({ open, onClose, onSuccess }: AmbassadorEventFormProps) {
+export default function AmbassadorEventForm({ open, onClose, onSuccess, eventToEdit }: AmbassadorEventFormProps) {
   const { user } = useAuth();
   const [creating, setCreating] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -40,6 +41,69 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
     collegeName: user?.collegeName || '',
     tourDetails: emptyTour
   });
+
+  useEffect(() => {
+    if (eventToEdit) {
+      const eventDate = eventToEdit.startDate ? new Date(eventToEdit.startDate) : null;
+      // Format to YYYY-MM-DD local time format
+      const formattedDate = eventDate ? new Date(eventDate.getTime() - (eventDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0] : '';
+      const formattedTime = eventDate ? eventDate.toTimeString().split(' ')[0].slice(0, 5) : '';
+
+      setForm({
+        title: eventToEdit.title || '',
+        description: eventToEdit.description || '',
+        category: eventToEdit.category || 'technical',
+        customCategory: '',
+        campusLocation: eventToEdit.campusLocation || 'In Campus',
+        mode: eventToEdit.mode || 'offline',
+        eventLink: eventToEdit.eventLink || '',
+        eventType: eventToEdit.eventType || 'workshop',
+        date: formattedDate,
+        time: formattedTime,
+        venue: eventToEdit.venue || '',
+        duration: eventToEdit.duration || '',
+        capacity: String(eventToEdit.capacity || 100),
+        collegeName: eventToEdit.collegeName || user?.collegeName || '',
+        tourDetails: eventToEdit.tourDetails ? {
+          destinations: eventToEdit.tourDetails.destinations?.length > 0 
+            ? eventToEdit.tourDetails.destinations 
+            : [{ name: '', description: '', arrivalTime: '' }],
+          food: eventToEdit.tourDetails.food || { meals: '', snacks: '', dietaryOptions: '' },
+          planner: eventToEdit.tourDetails.planner || { name: '', organization: '', contact: '' },
+          bus: eventToEdit.tourDetails.bus ? {
+            transportType: eventToEdit.tourDetails.bus.transportType || 'bus',
+            busNumber: eventToEdit.tourDetails.bus.busNumber || '',
+            pickupPoint: eventToEdit.tourDetails.bus.pickupPoint || '',
+            departureTime: eventToEdit.tourDetails.bus.departureTime || '',
+            returnTime: eventToEdit.tourDetails.bus.returnTime || '',
+            driverName: eventToEdit.tourDetails.bus.driverName || '',
+            driverContact: eventToEdit.tourDetails.bus.driverContact || '',
+            capacity: eventToEdit.tourDetails.bus.capacity || 0
+          } : { transportType: 'bus', busNumber: '', pickupPoint: '', departureTime: '', returnTime: '', driverName: '', driverContact: '', capacity: 0 },
+          itinerary: eventToEdit.tourDetails.itinerary || '',
+          thingsToCarry: eventToEdit.tourDetails.thingsToCarry || ['']
+        } : emptyTour
+      });
+    } else {
+      setForm({
+        title: '',
+        description: '',
+        category: 'technical',
+        customCategory: '',
+        campusLocation: 'In Campus',
+        mode: 'offline',
+        eventLink: '',
+        eventType: 'workshop',
+        date: '',
+        time: '',
+        venue: '',
+        duration: '',
+        capacity: '100',
+        collegeName: user?.collegeName || '',
+        tourDetails: emptyTour
+      });
+    }
+  }, [eventToEdit, open, user]);
 
   const showTourFields = isTourCategory(form.category);
 
@@ -80,16 +144,22 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
         };
       }
 
-      await createEvent(payload);
+      if (eventToEdit) {
+        await updateEvent(eventToEdit._id, payload);
+      } else {
+        await createEvent(payload);
+      }
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
         onClose();
         onSuccess();
-        setForm({ ...form, title: '', description: '', date: '', time: '', venue: '', duration: '', tourDetails: emptyTour });
+        if (!eventToEdit) {
+          setForm({ ...form, title: '', description: '', date: '', time: '', venue: '', duration: '', tourDetails: emptyTour });
+        }
       }, 1800);
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to create event');
+      alert(err.response?.data?.message || 'Failed to submit event');
     } finally {
       setCreating(false);
     }
@@ -104,9 +174,9 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-white flex items-center gap-2" style={{ fontFamily: 'Sora, sans-serif' }}>
             <Plus className="w-5 h-5 text-primary" />
-            {success ? 'Event Published!' : 'Plan a New Event'}
+            {success ? 'Event Saved!' : eventToEdit ? 'Edit Event Details' : 'Plan a New Event'}
           </DialogTitle>
-          <p className="text-xs text-zinc-400">Campus Ambassador Portal — {user?.collegeName || 'Your College'}</p>
+          <p className="text-xs text-zinc-400">Campus Ambassador Portal — {form.collegeName || 'Your College'}</p>
         </DialogHeader>
 
         {success ? (
@@ -258,15 +328,54 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
                   </div>
                 </div>
 
-                <div className="rounded-lg border border-border/40 p-3 space-y-2">
-                  <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1"><Bus className="w-3 h-3" /> Bus Details</label>
+                <div className="rounded-lg border border-border/40 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
+                      {form.tourDetails.bus.transportType === 'train' ? <Train className="w-3.5 h-3.5 text-sky-400" /> : form.tourDetails.bus.transportType === 'auto' ? <Car className="w-3.5 h-3.5 text-yellow-400" /> : <Bus className="w-3.5 h-3.5 text-blue-400" />}
+                      Transport Details
+                    </label>
+                    <select 
+                      value={form.tourDetails.bus.transportType} 
+                      onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, transportType: e.target.value } } })}
+                      className="px-2 py-1 rounded bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 focus:outline-none"
+                    >
+                      <option value="bus">Bus</option>
+                      <option value="train">Train</option>
+                      <option value="auto">Auto / Cab</option>
+                    </select>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-2">
-                    <input className={inputClass} placeholder="Bus number" value={form.tourDetails.bus.busNumber} onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, busNumber: e.target.value } } })} />
-                    <input className={inputClass} placeholder="Pickup point" value={form.tourDetails.bus.pickupPoint} onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, pickupPoint: e.target.value } } })} />
-                    <input className={inputClass} placeholder="Departure time" value={form.tourDetails.bus.departureTime} onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, departureTime: e.target.value } } })} />
-                    <input className={inputClass} placeholder="Return time" value={form.tourDetails.bus.returnTime} onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, returnTime: e.target.value } } })} />
-                    <input className={inputClass} placeholder="Driver name" value={form.tourDetails.bus.driverName} onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, driverName: e.target.value } } })} />
-                    <input className={inputClass} placeholder="Driver contact" value={form.tourDetails.bus.driverContact} onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, driverContact: e.target.value } } })} />
+                    <input className={inputClass} 
+                      placeholder={form.tourDetails.bus.transportType === 'train' ? "Train Number / Name" : form.tourDetails.bus.transportType === 'auto' ? "Auto / Cab Number" : "Bus number"} 
+                      value={form.tourDetails.bus.busNumber} 
+                      onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, busNumber: e.target.value } } })} 
+                    />
+                    <input className={inputClass} 
+                      placeholder={form.tourDetails.bus.transportType === 'train' ? "Station / Platform" : "Pickup point"} 
+                      value={form.tourDetails.bus.pickupPoint} 
+                      onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, pickupPoint: e.target.value } } })} 
+                    />
+                    <input className={inputClass} 
+                      placeholder="Departure time" 
+                      value={form.tourDetails.bus.departureTime} 
+                      onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, departureTime: e.target.value } } })} 
+                    />
+                    <input className={inputClass} 
+                      placeholder={form.tourDetails.bus.transportType === 'train' ? "Arrival time" : "Return time"} 
+                      value={form.tourDetails.bus.returnTime} 
+                      onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, returnTime: e.target.value } } })} 
+                    />
+                    <input className={inputClass} 
+                      placeholder={form.tourDetails.bus.transportType === 'train' ? "Coach / Seat Info" : "Driver name"} 
+                      value={form.tourDetails.bus.driverName} 
+                      onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, driverName: e.target.value } } })} 
+                    />
+                    <input className={inputClass} 
+                      placeholder={form.tourDetails.bus.transportType === 'train' ? "PNR / Ticket Info" : "Driver contact"} 
+                      value={form.tourDetails.bus.driverContact} 
+                      onChange={e => setForm({ ...form, tourDetails: { ...form.tourDetails, bus: { ...form.tourDetails.bus, driverContact: e.target.value } } })} 
+                    />
                   </div>
                 </div>
 
@@ -281,7 +390,7 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess }: Ambass
               <button type="button" onClick={onClose} disabled={creating} className="flex-1 py-2.5 rounded-lg text-sm border border-border/50 text-muted-foreground">Cancel</button>
               <button type="submit" disabled={creating} className="flex-1 py-2.5 rounded-lg text-sm font-semibold text-white disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg,#7c3aed,#6366f1)' }}>
-                {creating ? 'Publishing...' : 'Publish Event'}
+                {creating ? (eventToEdit ? 'Saving...' : 'Publishing...') : (eventToEdit ? 'Save Changes' : 'Publish Event')}
               </button>
             </div>
           </form>
