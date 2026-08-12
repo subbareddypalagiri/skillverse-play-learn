@@ -4,7 +4,7 @@ import { X, ExternalLink, Maximize2, CheckCircle, Trophy, AlertCircle, Eye, Cloc
 import { useState, useRef, useEffect } from "react";
 import { useVideoProgress } from "@/contexts/VideoProgressContext";
 import { Progress } from "@/components/ui/progress";
-import ReactPlayer from 'react-player';
+import ReactPlayer from 'react-player/youtube';
 
 interface VideoPlayerWithTrackingProps {
   isOpen: boolean;
