@@ -4,6 +4,7 @@ import { X, ExternalLink, Maximize2, CheckCircle, Trophy, AlertCircle, Eye, Cloc
 import { useState, useRef, useEffect } from "react";
 import { useVideoProgress } from "@/contexts/VideoProgressContext";
 import { Progress } from "@/components/ui/progress";
+import ReactPlayer from 'react-player';
 
 interface VideoPlayerWithTrackingProps {
   isOpen: boolean;
@@ -256,15 +257,20 @@ const VideoPlayerWithTracking = ({
           )}
 
           {platform === "YouTube" && embedUrl ? (
-            <iframe
-              ref={iframeRef}
-              src={embedUrl}
-              className="absolute top-0 left-0 w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              title={videoTitle}
-              style={{ border: 'none' }}
-            />
+            <div className="absolute top-0 left-0 w-full h-full">
+              <ReactPlayer
+                url={originalUrl}
+                width="100%"
+                height="100%"
+                controls={true}
+                playing={true}
+                config={{
+                  youtube: {
+                    playerVars: { showinfo: 1 }
+                  }
+                }}
+              />
+            </div>
           ) : platform === "NPTEL" ? (
             <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-white bg-gradient-to-br from-blue-900 to-purple-900">
               <div className="text-center p-8">
