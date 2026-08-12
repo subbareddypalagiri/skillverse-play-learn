@@ -116,7 +116,7 @@ const Courses = () => {
       description: "Master AWS, Azure, and GCP fundamentals",
       resources: {
         videos: [
-          { title: "AWS Full Course", url: "https://www.youtube.com/watch?v=ulprqHHWlng", platform: "YouTube", videoId: "ulprqHHWlng" },
+          { title: "AWS Full Course", url: "https://www.youtube.com/watch?v=SOTamWGuqXs", platform: "YouTube", videoId: "SOTamWGuqXs" },
           { title: "Azure Fundamentals", url: "https://www.youtube.com/watch?v=NKEFWyqJ5XA", platform: "YouTube", videoId: "NKEFWyqJ5XA" },
           { title: "GCP Complete Course", url: "https://www.youtube.com/watch?v=jpno8FSqpc8", platform: "YouTube", videoId: "jpno8FSqpc8" }
         ],
@@ -896,7 +896,7 @@ const Courses = () => {
       icon: GraduationCap,
       resources: {
         videos: [
-          { title: "GATE Data Structures & Algorithms Full Course", url: "https://www.youtube.com/watch?v=RBSGkl9jlOE", platform: "YouTube", videoId: "RBSGkl9jlOE" },
+          { title: "GATE Data Structures & Algorithms Full Course", url: "https://www.youtube.com/watch?v=xLetJpcclHg", platform: "YouTube", videoId: "xLetJpcclHg" },
           { title: "GATE DBMS & SQL Complete Masterclass", url: "https://www.youtube.com/watch?v=HXV3zeQKqGY", platform: "YouTube", videoId: "HXV3zeQKqGY" },
           { title: "GATE Algorithms Masterclass - IIT Prep", url: "https://www.youtube.com/watch?v=8hly31xKli0", platform: "YouTube", videoId: "8hly31xKli0" },
           { title: "GATE Operating Systems Complete Course", url: "https://www.youtube.com/watch?v=vBURTt97EkA", platform: "YouTube", videoId: "vBURTt97EkA" },

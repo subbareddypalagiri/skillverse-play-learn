@@ -105,7 +105,7 @@ const seedMassiveData = async () => {
         ratingCount: 870,
         resources: {
           videos: [
-            { title: "AWS Full Course", url: "https://www.youtube.com/watch?v=ulprqHHWlng", platform: "YouTube", videoId: "ulprqHHWlng" },
+            { title: "AWS Full Course", url: "https://www.youtube.com/watch?v=SOTamWGuqXs", platform: "YouTube", videoId: "SOTamWGuqXs" },
             { title: "Azure Fundamentals", url: "https://www.youtube.com/watch?v=NKEFWyqJ5XA", platform: "YouTube", videoId: "NKEFWyqJ5XA" },
             { title: "GCP Complete Course", url: "https://www.youtube.com/watch?v=jpno8FSqpc8", platform: "YouTube", videoId: "jpno8FSqpc8" }
           ],
