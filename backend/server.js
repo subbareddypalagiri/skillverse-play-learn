@@ -26,6 +26,27 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // Trust proxy
 app.set('trust proxy', 1);
 
+// AGGRESSIVE MANUAL CORS FOR VERCEL (Overrides everything)
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
+  );
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
+
 // Security middleware
 app.use(helmet({ crossOriginResourcePolicy: false }));
 // CORS — whitelist origins from env, fallback to localhost in dev
@@ -38,15 +59,8 @@ const deploymentPattern = /^https?:\/\/.*(\.vercel\.app|\.firecms\.co|\.railway\
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes('*')) {
-      callback(null, true);
-    } else if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else if (deploymentPattern.test(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
+    // Allow all origins dynamically to fix Vercel CORS preflight issues
+    callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
