@@ -94,3 +94,13 @@ export const deleteEvent = async (id: string) => {
 
 export const isTourCategory = (category: string) =>
   category === 'fun-tours' || category === 'industrial-tours';
+
+export const fetchEventMessages = async (eventId: string) => {
+  const response = await apiClient.get(`/events/${eventId}/messages`);
+  return response.data.data.messages;
+};
+
+export const sendEventMessage = async (eventId: string, text: string) => {
+  const response = await apiClient.post(`/events/${eventId}/messages`, { text });
+  return response.data.data.message;
+};

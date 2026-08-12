@@ -13,6 +13,7 @@ import {
   getMyAmbassadorApplication,
   reviewAmbassadorApplication
 } from '../controllers/ambassadorController.js';
+import { getEventMessages, sendEventMessage } from '../controllers/eventChatController.js';
 import { authenticate, authorize, optionalAuthenticate } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -26,6 +27,10 @@ router.get('/ambassador/my-application', authenticate, getMyAmbassadorApplicatio
 router.put('/ambassador/applications/:id/review', authenticate, reviewAmbassadorApplication);
 
 router.get('/:id', optionalAuthenticate, getEvent);
+
+// Chat Routes
+router.get('/:id/messages', authenticate, getEventMessages);
+router.post('/:id/messages', authenticate, sendEventMessage);
 
 router.post('/:id/register', authenticate, registerForEvent);
 router.post('/', authenticate, authorize('admin', 'campus_ambassador'), createEvent);

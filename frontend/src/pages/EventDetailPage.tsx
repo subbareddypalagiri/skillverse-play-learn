@@ -6,8 +6,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   ArrowLeft, Calendar, MapPin, Clock, Users, CheckCircle, Loader2,
   Bus, Utensils, User, Backpack, Route, Globe, Monitor, Building2, Shield,
-  Trash2, XCircle, Edit
+  Trash2, XCircle, Edit, MessageCircle
 } from 'lucide-react';
+import { EventChat } from '@/components/EventChat';
 
 const categoryColors: Record<string, string> = {
   cultural: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
@@ -26,6 +27,7 @@ const EventDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
   const [registered, setRegistered] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -206,10 +208,21 @@ const EventDetailPage = () => {
             )}
 
             {registered ? (
-              <div className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm font-semibold text-emerald-400">You're registered!</span>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  <span className="text-sm font-semibold text-emerald-400">You're registered!</span>
+                </div>
+                <button onClick={() => setShowChat(!showChat)}
+                  className="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-zinc-800 hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2 border border-white/5">
+                  <MessageCircle className="w-4 h-4 text-emerald-400" /> {showChat ? 'Close Trip Chat' : 'Open Trip Chat'}
+                </button>
               </div>
+            ) : isCreator && !event.isCancelled ? (
+              <button onClick={() => setShowChat(!showChat)}
+                  className="w-full py-3.5 rounded-xl text-sm font-semibold text-white bg-zinc-800 hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2 border border-white/5">
+                  <MessageCircle className="w-4 h-4 text-emerald-400" /> {showChat ? 'Close Creator Chat' : 'Open Event Chat (Creator)'}
+              </button>
             ) : (
               <button onClick={handleJoin} disabled={registering || spotsLeft <= 0}
                 className="w-full py-3.5 rounded-xl text-sm font-semibold text-white disabled:opacity-50 transition-all hover:shadow-[0_0_15px_rgba(124,58,237,0.3)]"
@@ -219,6 +232,11 @@ const EventDetailPage = () => {
             )}
           </div>
         </div>
+
+        {/* Floating Chat Window */}
+        {showChat && (user && (registered || isCreator)) && (
+          <EventChat eventId={id!} onClose={() => setShowChat(false)} />
+        )}
 
         {/* Tour Journey */}
         {isTour && tour && (
