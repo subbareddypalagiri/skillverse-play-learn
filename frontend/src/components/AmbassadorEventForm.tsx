@@ -39,7 +39,8 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess, eventToE
     duration: '',
     capacity: '100',
     collegeName: user?.collegeName || '',
-    tourDetails: emptyTour
+    tourDetails: emptyTour,
+    customFields: [] as { label: string; value: string }[]
   });
 
   useEffect(() => {
@@ -82,7 +83,8 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess, eventToE
           } : { transportType: 'bus', busNumber: '', pickupPoint: '', departureTime: '', returnTime: '', driverName: '', driverContact: '', capacity: 0 },
           itinerary: eventToEdit.tourDetails.itinerary || '',
           thingsToCarry: eventToEdit.tourDetails.thingsToCarry || ['']
-        } : emptyTour
+        } : emptyTour,
+        customFields: eventToEdit.customFields || []
       });
     } else {
       setForm({
@@ -100,7 +102,8 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess, eventToE
         duration: '',
         capacity: '100',
         collegeName: user?.collegeName || '',
-        tourDetails: emptyTour
+        tourDetails: emptyTour,
+        customFields: []
       });
     }
   }, [eventToEdit, open, user]);
@@ -132,7 +135,8 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess, eventToE
         endDate: new Date(startDate.getTime() + 3 * 60 * 60 * 1000),
         capacity: parseInt(form.capacity),
         collegeName: form.collegeName,
-        visibility: 'public'
+        visibility: 'public',
+        customFields: (form.customFields || []).filter(f => f.label.trim() && f.value.trim())
       };
 
       if (showTourFields) {
@@ -155,7 +159,7 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess, eventToE
         onClose();
         onSuccess();
         if (!eventToEdit) {
-          setForm({ ...form, title: '', description: '', date: '', time: '', venue: '', duration: '', tourDetails: emptyTour });
+          setForm({ ...form, title: '', description: '', date: '', time: '', venue: '', duration: '', tourDetails: emptyTour, customFields: [] });
         }
       }, 1800);
     } catch (err: any) {
@@ -385,6 +389,62 @@ export default function AmbassadorEventForm({ open, onClose, onSuccess, eventToE
                 </div>
               </div>
             )}
+
+            {/* Dynamic Custom Fields Builder */}
+            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-zinc-400">Custom Event Details (On the fly)</label>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, customFields: [...(form.customFields || []), { label: '', value: '' }] })}
+                  className="text-xs text-violet-400 hover:underline"
+                >
+                  + Add Custom Field
+                </button>
+              </div>
+
+              {(form.customFields || []).length > 0 && (
+                <div className="space-y-2">
+                  {(form.customFields || []).map((field, i) => (
+                    <div key={i} className="flex gap-2 items-center">
+                      <input
+                        className={inputClass}
+                        placeholder="Label (e.g. Dress Code)"
+                        value={field.label}
+                        onChange={e => {
+                          const updated = [...form.customFields];
+                          updated[i] = { ...updated[i], label: e.target.value };
+                          setForm({ ...form, customFields: updated });
+                        }}
+                        required
+                      />
+                      <span className="text-zinc-600">:</span>
+                      <input
+                        className={inputClass}
+                        placeholder="Detail (e.g. White T-shirt)"
+                        value={field.value}
+                        onChange={e => {
+                          const updated = [...form.customFields];
+                          updated[i] = { ...updated[i], value: e.target.value };
+                          setForm({ ...form, customFields: updated });
+                        }}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = form.customFields.filter((_, idx) => idx !== i);
+                          setForm({ ...form, customFields: updated });
+                        }}
+                        className="text-xs text-red-500 hover:text-red-400 px-2 py-1 rounded shrink-0"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className="flex gap-3 pt-2">
               <button type="button" onClick={onClose} disabled={creating} className="flex-1 py-2.5 rounded-lg text-sm border border-border/50 text-muted-foreground">Cancel</button>

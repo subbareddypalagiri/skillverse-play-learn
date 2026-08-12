@@ -396,6 +396,23 @@ const EventDetailPage = () => {
             <p className="text-sm text-muted-foreground">Duration: <span className="text-foreground">{event.duration}</span></p>
           </div>
         )}
+
+        {/* Dynamic Custom Fields Display */}
+        {event.customFields && event.customFields.length > 0 && (
+          <div className="rounded-2xl border border-border/50 p-5 mb-6 animate-reveal-up" style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Shield className="w-4 h-4 text-violet-400" /> Additional Details
+            </h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              {event.customFields.map((field: any, i: number) => (
+                <div key={i} className="border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                  <p className="text-[10px] text-muted-foreground uppercase">{field.label}</p>
+                  <p className="font-medium mt-0.5 text-zinc-100">{field.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Edit Event Modal */}

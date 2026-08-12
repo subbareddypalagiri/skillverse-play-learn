@@ -85,6 +85,7 @@ const eventSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   updatedAt: { type: Date, default: Date.now },
+  customFields: [{ label: String, value: String }],
   version: { type: Number, default: 1 }
 }, { timestamps: true });
 
