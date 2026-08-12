@@ -285,7 +285,7 @@ const VideoPlayerWithTracking = ({
                   width="100%"
                   height="100%"
                   controls={true}
-                  playing={true}
+                  playing={isOpen}
                   onError={() => setHasError(true)}
                   config={{
                     youtube: {
