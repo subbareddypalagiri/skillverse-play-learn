@@ -36,22 +36,25 @@ const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:3000,http:
 // Allow deployment platforms (Vercel, FireCMS, Railway, Netlify, Render, Localhost) automatically
 const deploymentPattern = /^https?:\/\/.*(\.vercel\.app|\.firecms\.co|\.railway\.app|\.netlify\.app|\.onrender\.com|localhost:\d+)$/;
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, server-to-server) or wildcard *
     if (!origin || allowedOrigins.includes('*')) {
       callback(null, true);
     } else if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else if (deploymentPattern.test(origin)) {
-      // Allow deployment previews and production sites
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
-}));
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'Accept']
+};
+
+app.options('*', cors(corsOptions)); // MUST be before app.use(cors()) for preflight
+app.use(cors(corsOptions));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
