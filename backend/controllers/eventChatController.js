@@ -2,7 +2,7 @@ import EventMessage from '../models/EventMessage.js';
 import Event from '../models/Event.js';
 import EventRegistration from '../models/EventRegistration.js';
 import { successResponse } from '../utils/responseHandler.js';
-import { NotFoundError, ValidationError, ForbiddenError } from '../utils/errorHandler.js';
+import { NotFoundError, ValidationError, AuthorizationError } from '../utils/errorHandler.js';
 
 // Helper to verify if user is allowed to access this event's chat
 const verifyChatAccess = async (eventId, userId, userRole) => {
@@ -25,7 +25,7 @@ const verifyChatAccess = async (eventId, userId, userRole) => {
   });
 
   if (!reg) {
-    throw new ForbiddenError('Only registered users can access this chat. No fake access!');
+    throw new AuthorizationError('Only registered users can access this chat. No fake access!');
   }
   
   return true;
