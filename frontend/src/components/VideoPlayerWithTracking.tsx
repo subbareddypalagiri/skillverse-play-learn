@@ -4,7 +4,6 @@ import { X, ExternalLink, Maximize2, CheckCircle, Trophy, AlertCircle, Eye, Cloc
 import { useState, useRef, useEffect } from "react";
 import { useVideoProgress } from "@/contexts/VideoProgressContext";
 import { Progress } from "@/components/ui/progress";
-import ReactPlayer from 'react-player';
 
 interface VideoPlayerWithTrackingProps {
   isOpen: boolean;
@@ -42,11 +41,6 @@ const VideoPlayerWithTracking = ({
   const [skipAttempts, setSkipAttempts] = useState(0); // Detect skip attempts
   const [isPlayerFocused, setIsPlayerFocused] = useState(true); // Check if video is in focus
   const [warningMessage, setWarningMessage] = useState(""); // Show warnings
-  const [hasError, setHasError] = useState(false);
-
-  useEffect(() => {
-    setHasError(false);
-  }, [videoId]);
   
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -262,39 +256,15 @@ const VideoPlayerWithTracking = ({
           )}
 
           {platform === "YouTube" && embedUrl ? (
-            <div className="absolute top-0 left-0 w-full h-full">
-              {hasError ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/90 text-center p-6 border border-white/10 rounded-lg">
-                  <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mb-4 border border-red-500/20">
-                    <AlertCircle className="w-8 h-8 text-red-500" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Video Temporarily Offline</h3>
-                  <p className="text-sm text-zinc-400 max-w-md mb-6">
-                    This video is private, deleted, or has embedding restricted by the owner. You can still watch it directly on YouTube!
-                  </p>
-                  <Button 
-                    onClick={() => window.open(originalUrl || `https://www.youtube.com/watch?v=${videoId}`, '_blank')}
-                    className="bg-violet-600 hover:bg-violet-500 text-white font-semibold px-6 py-2.5 rounded-full flex items-center gap-2"
-                  >
-                    <ExternalLink className="w-4 h-4" /> Watch on YouTube
-                  </Button>
-                </div>
-              ) : (
-                <ReactPlayer
-                  url={originalUrl || `https://www.youtube.com/watch?v=${videoId}`}
-                  width="100%"
-                  height="100%"
-                  controls={true}
-                  playing={isOpen}
-                  onError={() => setHasError(true)}
-                  config={{
-                    youtube: {
-                      playerVars: { showinfo: 1, rel: 0 }
-                    }
-                  }}
-                />
-              )}
-            </div>
+            <iframe
+              ref={iframeRef}
+              src={embedUrl}
+              className="absolute top-0 left-0 w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              title={videoTitle}
+              style={{ border: 'none' }}
+            />
           ) : platform === "NPTEL" ? (
             <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-white bg-gradient-to-br from-blue-900 to-purple-900">
               <div className="text-center p-8">
