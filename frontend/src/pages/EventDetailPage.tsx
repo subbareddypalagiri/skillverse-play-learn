@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/PageLayout';
-import { fetchEventById, registerForEvent, isTourCategory, cancelEvent, deleteEvent } from '@/lib/eventsApi';
+import { fetchEventById, registerForEvent, isTourCategory, cancelEvent, deleteEvent, fetchEventRegistrants } from '@/lib/eventsApi';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   ArrowLeft, Calendar, MapPin, Clock, Users, CheckCircle, Loader2,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { EventChat } from '@/components/EventChat';
 import AmbassadorEventForm from '@/components/AmbassadorEventForm';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 const categoryColors: Record<string, string> = {
   cultural: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
@@ -30,7 +31,23 @@ const EventDetailPage = () => {
   const [registered, setRegistered] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showRegistrantsModal, setShowRegistrantsModal] = useState(false);
+  const [loadingRegistrants, setLoadingRegistrants] = useState(false);
+  const [registrants, setRegistrants] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const handleViewRegistrants = async () => {
+    setShowRegistrantsModal(true);
+    setLoadingRegistrants(true);
+    try {
+      const data = await fetchEventRegistrants(id!);
+      setRegistrants(data || []);
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to fetch registrants');
+    } finally {
+      setLoadingRegistrants(false);
+    }
+  };
 
   const loadEventDetails = () => {
     if (!id) return;
@@ -173,6 +190,10 @@ const EventDetailPage = () => {
                 {/* Edit Button */}
                 <button onClick={() => setShowEditModal(true)} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-foreground transition-colors">
                   <Edit className="w-3.5 h-3.5" /> Edit
+                </button>
+                {/* View Registrations Button */}
+                <button onClick={handleViewRegistrants} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 text-violet-400 border border-violet-500/20 transition-colors">
+                  <Users className="w-3.5 h-3.5" /> View Registrations
                 </button>
                 {!event.isCancelled && (
                   <button onClick={handleCancel} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border border-orange-500/20 transition-colors">
@@ -414,6 +435,60 @@ const EventDetailPage = () => {
           </div>
         )}
       </div>
+
+      {/* Registrants Modal */}
+      {showRegistrantsModal && (
+        <Dialog open={showRegistrantsModal} onOpenChange={setShowRegistrantsModal}>
+          <DialogContent className="max-w-md w-full bg-zinc-950/95 backdrop-blur-xl border border-white/10 text-white rounded-2xl p-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+              <DialogTitle className="text-lg font-bold flex items-center gap-2">
+                <Users className="w-5 h-5 text-violet-400" />
+                Registered Attendees ({event?.attendees || 0})
+              </DialogTitle>
+            </div>
+
+            {loadingRegistrants ? (
+              <div className="flex flex-col items-center justify-center py-10 gap-3">
+                <Loader2 className="w-8 h-8 text-violet-400 animate-spin" />
+                <p className="text-xs text-zinc-400">Fetching registrants list...</p>
+              </div>
+            ) : registrants.length === 0 ? (
+              <div className="text-center py-8 text-zinc-400 text-sm">
+                No one has registered for this event yet.
+              </div>
+            ) : (
+              <div className="max-h-[300px] overflow-y-auto space-y-3 pr-1">
+                {registrants.map((item: any, i: number) => (
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div className="w-8 h-8 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center font-bold text-violet-400 uppercase text-sm shrink-0">
+                      {item.user?.name ? item.user.name[0] : '?'}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold truncate text-zinc-100">{item.user?.name || 'Unknown User'}</p>
+                      <p className="text-[11px] text-zinc-400 truncate">{item.user?.email || 'No email'}</p>
+                      {item.user?.collegeName && (
+                        <p className="text-[10px] text-violet-300 truncate mt-0.5">{item.user.collegeName}</p>
+                      )}
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-[9px] text-zinc-400">Joined</p>
+                      <p className="text-[10px] font-medium text-zinc-300 mt-0.5">
+                        {new Date(item.registeredAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-6 pt-4 border-t border-white/10 flex justify-end">
+              <button onClick={() => setShowRegistrantsModal(false)} className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs font-semibold transition-colors">
+                Close
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Edit Event Modal */}
       {showEditModal && event && (

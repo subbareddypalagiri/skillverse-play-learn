@@ -6,7 +6,8 @@ import {
   updateEvent,
   deleteEvent,
   registerForEvent,
-  getMyRegistrations
+  getMyRegistrations,
+  getEventRegistrants
 } from '../controllers/eventController.js';
 import {
   submitAmbassadorApplication,
@@ -27,6 +28,8 @@ router.get('/ambassador/my-application', authenticate, getMyAmbassadorApplicatio
 router.put('/ambassador/applications/:id/review', authenticate, reviewAmbassadorApplication);
 
 router.get('/:id', optionalAuthenticate, getEvent);
+
+router.get('/:id/registrants', authenticate, getEventRegistrants);
 
 // Chat Routes
 router.get('/:id/messages', authenticate, getEventMessages);

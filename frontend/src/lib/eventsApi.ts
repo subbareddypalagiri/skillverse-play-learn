@@ -104,3 +104,8 @@ export const sendEventMessage = async (eventId: string, text: string) => {
   const response = await apiClient.post(`/events/${eventId}/messages`, { text });
   return response.data.data.message;
 };
+
+export const fetchEventRegistrants = async (eventId: string) => {
+  const response = await apiClient.get(`/events/${eventId}/registrants`);
+  return response.data.data.registrants;
+};

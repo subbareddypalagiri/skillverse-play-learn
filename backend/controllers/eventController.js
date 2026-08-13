@@ -2,7 +2,7 @@ import Event from '../models/Event.js';
 import EventRegistration from '../models/EventRegistration.js';
 import User from '../models/User.js';
 import { successResponse, paginatedResponse } from '../utils/responseHandler.js';
-import { NotFoundError, ValidationError, ConflictError } from '../utils/errorHandler.js';
+import { NotFoundError, ValidationError, ConflictError, AuthorizationError } from '../utils/errorHandler.js';
 import logger from '../config/logger.js';
 
 const formatEvent = (event, organizer = null) => {
@@ -204,6 +204,35 @@ export const getMyRegistrations = async (req, res, next) => {
       .map(r => formatEvent(r.eventId));
 
     return successResponse(res, 200, 'My registrations fetched', { registrations: events });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getEventRegistrants = async (req, res, next) => {
+  try {
+    const event = await Event.findById(req.params.id);
+    if (!event) throw new NotFoundError('Event not found');
+
+    // Only Admin or the Event Organizer can view the attendee list
+    if (req.user.role !== 'admin' && event.organizerId.toString() !== req.userId.toString()) {
+      throw new AuthorizationError('Access denied: Only the event creator can view registrants');
+    }
+
+    const registrants = await EventRegistration.find({
+      eventId: req.params.id,
+      status: 'registered'
+    })
+      .populate('userId', 'name email collegeName avatar')
+      .sort('-registeredAt');
+
+    const formatted = registrants.map(r => ({
+      registrationId: r._id,
+      registeredAt: r.registeredAt,
+      user: r.userId
+    }));
+
+    return successResponse(res, 200, 'Event registrants fetched successfully', { registrants: formatted });
   } catch (error) {
     next(error);
   }
