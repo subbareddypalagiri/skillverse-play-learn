@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import apiClient from '@/lib/apiClient';
+import { useAuth } from './AuthContext';
 
 interface Course {
+  _id?: string;
+  id?: string;
   title: string;
   instructor: string;
   duration: string;
@@ -39,6 +42,7 @@ interface CourseProviderProps {
 }
 
 export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
+  const { token } = useAuth();
   const [enrolledCourses, setEnrolledCourses] = useState<Course[]>((() => {
     try {
       const saved = localStorage.getItem('enrolledCourses');
@@ -57,12 +61,12 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
   }, [enrolledCourses]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     if (token) {
       apiClient.get('/courses/my-enrollments')
         .then(res => {
           if (res.data?.data?.enrollments) {
             const backendCourses = res.data.data.enrollments.map((e: any) => ({
+              _id: e.courseId?._id || e.courseId?.id,
               title: e.courseId?.title || 'Enrolled Course',
               instructor: e.courseId?.ownerId?.name || 'Instructor',
               duration: e.courseId?.duration || '12 weeks',
@@ -86,8 +90,10 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({ children }) => {
           }
         })
         .catch(() => {});
+    } else {
+      setEnrolledCourses([]);
     }
-  }, []);
+  }, [token]);
 
   const addCourse = (courseData: Omit<Course, 'enrolledDate' | 'progress' | 'completedLessons' | 'totalLessons' | 'nextLesson' | 'lastAccessed'>) => {
     setEnrolledCourses(prev => {
