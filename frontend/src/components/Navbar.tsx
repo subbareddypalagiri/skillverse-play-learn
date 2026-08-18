@@ -428,22 +428,39 @@ const Navbar = () => {
 
           <div className={cn("mt-6 pt-4 border-t", isLightNav ? "border-[#dddbe8]" : "border-[#ffffff06]")}>
             {isLoggedIn && user ? (
-              <div className="flex items-center gap-3 px-3.5 py-3">
-                <Link to="/profile" onClick={closeMobile} className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 flex items-center justify-center text-[14px] font-semibold text-white shadow-[0_0_16px_rgba(139,92,246,0.4)] flex-shrink-0">
-                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
-                  </div>
-                  <div className="min-w-0">
-                    <p className={cn(
-                      "text-[14px] font-semibold tracking-[-0.01em] truncate",
-                      isLightNav ? "text-[#2d3354]" : "text-white"
-                    )}>{user.name}</p>
-                    <p className={cn(
-                      "text-[12px] truncate",
-                      isLightNav ? "text-[#636FA4]/60" : "text-[#71717a]"
-                    )}>{user.email}</p>
-                  </div>
-                </Link>
+              <div className="flex flex-col gap-3 px-3.5 py-3">
+                <div className="flex items-center justify-between gap-3 w-full">
+                  <Link to="/profile" onClick={closeMobile} className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 via-fuchsia-500 to-pink-500 flex items-center justify-center text-[14px] font-semibold text-white shadow-[0_0_16px_rgba(139,92,246,0.4)] flex-shrink-0">
+                      {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className={cn(
+                        "text-[14px] font-semibold tracking-[-0.01em] truncate text-left",
+                        isLightNav ? "text-[#2d3354]" : "text-white"
+                      )}>{user.name}</p>
+                      <p className={cn(
+                        "text-[12px] truncate text-left",
+                        isLightNav ? "text-[#636FA4]/60" : "text-[#71717a]"
+                      )}>{user.email}</p>
+                    </div>
+                  </Link>
+                  {user.role === 'admin' && (
+                    <Link
+                      to="/admin"
+                      onClick={closeMobile}
+                      className="px-2.5 py-1 rounded-full text-[10px] font-semibold border border-red-500/30 text-red-500 hover:bg-red-500/5 transition-all shrink-0"
+                    >
+                      Admin
+                    </Link>
+                  )}
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-2.5 mt-2 rounded-xl text-center text-xs font-semibold border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 transition-colors"
+                >
+                  Logout
+                </button>
               </div>
             ) : (
               <Link

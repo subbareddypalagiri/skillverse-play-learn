@@ -157,7 +157,7 @@ export const EventChat: React.FC<EventChatProps> = ({ eventId, onClose, isFullSc
 
   // Floating window style for overlay
   return (
-    <div className="fixed bottom-6 right-6 w-[350px] h-[500px] z-50 shadow-2xl animate-reveal-up">
+    <div className="fixed bottom-4 right-4 left-4 sm:left-auto w-auto sm:w-[350px] h-[480px] sm:h-[500px] z-50 shadow-2xl animate-reveal-up">
       {chatBody}
     </div>
   );

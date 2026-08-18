@@ -173,12 +173,20 @@ const NewLanding: React.FC = () => {
   }, []);
 
   // Dynamic Platform Stats State
+  const [isMobile, setIsMobile] = React.useState(false);
   const [stats, setStats] = React.useState({
     learners: 0,
     courses: 0,
     successRate: 100,
     partners: 12
   });
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -245,9 +253,9 @@ const NewLanding: React.FC = () => {
       <InteractiveInfiniteGrid />
 
       {/* LEFT SIDE NAV */}
-      <nav id="side-nav" style={{
+      <nav id="side-nav" className="hidden lg:flex" style={{
         position: 'fixed', left: 0, top: 0, zIndex: 40, height: '100vh', width: '80px',
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        flexDirection: 'column', justifyContent: 'center',
         borderRight: '1px solid rgba(61,61,61,.25)',
         background: 'rgba(20,20,20,.88)', backdropFilter: 'blur(12px)'
       }}>
@@ -336,9 +344,9 @@ const NewLanding: React.FC = () => {
             </div>
           </div>
 
-          <div id="bento" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(3, 180px)', gap: '16px' }}>
+          <div id="bento" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" style={{ gridTemplateRows: isMobile ? 'auto' : 'repeat(3, 180px)' }}>
             {features.map((f, i) => (
-              <article key={i} className="feat-card" style={{ gridColumn: f.col, gridRow: f.row, opacity: 0, transform: 'translateY(2rem)', transition: `opacity .6s ease ${i * 0.08}s, transform .6s ease ${i * 0.08}s, border-color .4s` }}>
+              <article key={i} className="feat-card" style={{ gridColumn: isMobile ? 'auto' : f.col, gridRow: isMobile ? 'auto' : f.row, opacity: 0, transform: 'translateY(2rem)', transition: `opacity .6s ease ${i * 0.08}s, transform .6s ease ${i * 0.08}s, border-color .4s` }}>
                 <div className="fc-corner"></div>
                 <div style={{ position: 'relative', zIndex: 1 }}>
                   <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '9px', letterSpacing: '.15em', textTransform: 'uppercase', color: '#6b6b6b' }}>{f.label}</span>
@@ -352,7 +360,7 @@ const NewLanding: React.FC = () => {
             ))}
           </div>
 
-          <div id="stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginTop: '16px' }}>
+          <div id="stats" className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             {statsData.map((s, i) => {
               let IconComponent = Users;
               if (s.iconName === 'BookOpen') IconComponent = BookOpen;
@@ -360,7 +368,7 @@ const NewLanding: React.FC = () => {
               if (s.iconName === 'Building') IconComponent = Building;
 
               return (
-                <div key={i} className="stat-card fade-up" style={{ transitionDelay: `${i * 0.1}s` }}>
+                <div key={i} className="stat-card border border-border/40 p-4 rounded-xl backdrop-blur-sm fade-up" style={{ background: 'rgba(255,255,255,0.01)', transitionDelay: `${i * 0.1}s` }}>
                   <div style={{ marginBottom: '.75rem', color: '#c77b3f' }}>
                     <IconComponent className="w-5 h-5" />
                   </div>
@@ -400,13 +408,13 @@ const NewLanding: React.FC = () => {
             <div className="fade-up"><span className="sec-label">04 / About</span></div>
             <div className="fade-up" style={{ transitionDelay: '.1s' }}><h2 className="sec-title">CREDITS</h2></div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3rem' }}>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
             {colophons.map((c, i) => (
               <div key={i} className="fade-up" style={{ transitionDelay: `${i * 0.08}s` }}>
-                <span className="colo-head">{c.head}</span>
+                <span className="colo-head" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '10px', letterSpacing: '.15em', textTransform: 'uppercase', color: '#c77b3f', display: 'block', marginBottom: '1.5rem' }}>{c.head}</span>
                 <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', padding: 0 }}>
                   {c.items.map((it, idx) => (
-                    <li key={idx} className="colo-item">{it}</li>
+                    <li key={idx} className="colo-item" style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '11px', color: '#6b6b6b' }}>{it}</li>
                   ))}
                 </ul>
               </div>
