@@ -51,26 +51,8 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
-      try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
-          const res = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
-          if (res.data.success) {
-            const { accessToken, refreshToken: newRefresh } = res.data.data.tokens;
-            localStorage.setItem('token', accessToken);
-            if (newRefresh) localStorage.setItem('refreshToken', newRefresh);
-            apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-            return apiClient(originalRequest);
-          }
-        }
-      } catch {
-        // Refresh failed — fall through to clear session
-      }
-
-      // Refresh failed or no refresh token — clear session
+      // Clear local session data
       localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       localStorage.removeItem('enrolledCourses');
       localStorage.removeItem('enrolledExams');
@@ -81,7 +63,6 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('socialPosts');
       localStorage.removeItem('userProfile');
       delete apiClient.defaults.headers.common['Authorization'];
-      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
