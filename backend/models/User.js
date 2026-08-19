@@ -18,9 +18,15 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
+    required: false,
     minlength: [8, 'Password must be at least 8 characters'],
     select: false
+  },
+  clerkId: {
+    type: String,
+    unique: true,
+    sparse: true,
+    index: true
   },
   role: {
     type: String,
@@ -107,7 +113,7 @@ userSchema.index({ isDeleted: 1, createdAt: -1 });
 
 // Hash password before saving
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.password || !this.isModified('password')) return next();
   
   try {
     const salt = await bcrypt.genSalt(parseInt(process.env.BCRYPT_ROUNDS) || 12);
@@ -128,6 +134,7 @@ userSchema.pre(['find', 'findOne', 'findOneAndUpdate', 'updateOne', 'updateMany'
 
 // Methods
 userSchema.methods.comparePassword = async function (candidatePassword) {
+  if (!this.password) return false;
   return await bcrypt.compare(candidatePassword, this.password);
 };
 

@@ -5,7 +5,8 @@ import {
   getMe, 
   updateMe,
   refreshToken,
-  logout
+  logout,
+  syncUser
 } from '../controllers/authController.js';
 import { authenticate } from '../middleware/auth.js';
 import { validateUserRegistration, validateUserLogin } from '../middleware/validation.js';
@@ -21,6 +22,7 @@ router.post('/refresh', refreshToken);
 // Private routes
 router.use(authenticate);
 router.get('/me', getMe);
+router.post('/sync', syncUser);
 router.patch('/me', updateMe);
 router.post('/logout', logout);
 

@@ -9,9 +9,28 @@ const apiClient = axios.create({
   },
 });
 
+let tokenGetter: (() => Promise<string | null>) | null = null;
+
+export const setTokenGetter = (getter: () => Promise<string | null>) => {
+  tokenGetter = getter;
+};
+
 // Add token to requests
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+apiClient.interceptors.request.use(async (config) => {
+  let token = localStorage.getItem('token');
+  
+  if (tokenGetter) {
+    try {
+      const freshToken = await tokenGetter();
+      if (freshToken) {
+        token = freshToken;
+        localStorage.setItem('token', freshToken);
+      }
+    } catch (err) {
+      console.error('Error fetching fresh Clerk token:', err);
+    }
+  }
+
   if (token && token !== 'undefined' && token !== 'null') {
     config.headers.Authorization = `Bearer ${token}`;
   }

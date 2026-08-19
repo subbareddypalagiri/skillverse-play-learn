@@ -192,3 +192,16 @@ export const logout = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * @desc    Sync user profile from authentication token
+ * @route   POST /api/v1/auth/sync
+ * @access  Private
+ */
+export const syncUser = async (req, res, next) => {
+  try {
+    return successResponse(res, 200, 'User synchronized successfully', { user: req.user });
+  } catch (error) {
+    next(error);
+  }
+};

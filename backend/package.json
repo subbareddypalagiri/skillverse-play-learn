@@ -42,6 +42,7 @@
   "author": "Skillverse Team",
   "license": "ISC",
   "dependencies": {
+    "@clerk/backend": "^3.16.8",
     "axios": "^1.13.6",
     "bcryptjs": "^2.4.3",
     "bull": "^4.11.4",

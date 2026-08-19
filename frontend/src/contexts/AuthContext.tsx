@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { apiClient } from '@/lib/apiClient';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { apiClient, setTokenGetter } from '@/lib/apiClient';
+import { useAuth as useClerkAuth, useUser as useClerkUser } from '@clerk/clerk-react';
 
 interface User {
   _id: string;
@@ -23,20 +24,66 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { isSignedIn, getToken, signOut } = useClerkAuth();
+  const { user: clerkUser } = useClerkUser();
+
+  // Register token getter for axios request interceptor
+  useEffect(() => {
+    setTokenGetter(() => getToken());
+  }, [getToken]);
+
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const logout = useCallback(async () => {
-    try {
-      await apiClient.post('/auth/logout');
-    } catch (err) {
-      // Ignore logout API errors — we clear local state regardless
-    } finally {
-      setToken(null);
+  // Sync session with backend
+  const syncUserSession = useCallback(async () => {
+    if (!isSignedIn) {
       setUser(null);
+      setToken(null);
       localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const clerkToken = await getToken();
+      if (clerkToken) {
+        setToken(clerkToken);
+        localStorage.setItem('token', clerkToken);
+
+        // Set authorization header temporarily for the sync request
+        apiClient.defaults.headers.common['Authorization'] = `Bearer ${clerkToken}`;
+
+        const response = await apiClient.post('/auth/sync');
+        if (response.data.success && response.data.data.user) {
+          const mongoUser = response.data.data.user;
+          setUser(mongoUser);
+          localStorage.setItem('user', JSON.stringify(mongoUser));
+        }
+      }
+    } catch (err) {
+      console.error('Error syncing Clerk user with backend:', err);
+      setUser(null);
+      setToken(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [isSignedIn, getToken]);
+
+  useEffect(() => {
+    syncUserSession();
+  }, [isSignedIn, clerkUser, syncUserSession]);
+
+  const logout = useCallback(async () => {
+    setLoading(true);
+    try {
+      await signOut();
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('enrolledCourses');
       localStorage.removeItem('enrolledExams');
@@ -47,90 +94,40 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.removeItem('socialPosts');
       localStorage.removeItem('userProfile');
       delete apiClient.defaults.headers.common['Authorization'];
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setLoading(false);
     }
+  }, [signOut]);
+
+  // Stub login to avoid compile errors on existing files that import it
+  const login = useCallback((newToken: string, userData: User) => {
+    setToken(newToken);
+    setUser(userData);
+    localStorage.setItem('token', newToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
   }, []);
 
-  const refreshAccessToken = useCallback(async (): Promise<boolean> => {
-    try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) return false;
+  const checkAuth = useCallback(async () => {
+    await syncUserSession();
+  }, [syncUserSession]);
 
-      const response = await apiClient.post('/auth/refresh', { refreshToken });
-      if (response.data.success) {
-        const { accessToken, refreshToken: newRefreshToken } = response.data.data.tokens;
-        setToken(accessToken);
-        localStorage.setItem('token', accessToken);
-        if (newRefreshToken) {
-          localStorage.setItem('refreshToken', newRefreshToken);
-        }
-        apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+  const refreshAccessToken = useCallback(async () => {
+    try {
+      const clerkToken = await getToken({ skipCache: true });
+      if (clerkToken) {
+        setToken(clerkToken);
+        localStorage.setItem('token', clerkToken);
+        apiClient.defaults.headers.common['Authorization'] = `Bearer ${clerkToken}`;
         return true;
       }
       return false;
     } catch {
       return false;
     }
-  }, []);
-
-  const checkAuth = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await apiClient.get('/auth/me');
-      if (response.data.success) {
-        setUser(response.data.data.user);
-        localStorage.setItem('user', JSON.stringify(response.data.data.user));
-      }
-    } catch {
-      // Token invalid/expired — try refresh
-      const refreshed = await refreshAccessToken();
-      if (!refreshed) {
-        await logout();
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [logout, refreshAccessToken]);
-
-  // Restore auth state on mount and validate with server
-  useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-
-    if (savedToken && savedUser) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-        setToken(savedToken);
-        setUser(parsedUser);
-        apiClient.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
-      } catch {
-        // Corrupted localStorage data — clear it
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-      }
-    }
-    setLoading(false);
-  }, []);
-
-  // Validate token with server after initial restore
-  useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    if (savedToken) {
-      checkAuth();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const login = (newToken: string, userData: User, refreshToken?: string) => {
-    setToken(newToken);
-    setUser(userData);
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('user', JSON.stringify(userData));
-    if (refreshToken) {
-      localStorage.setItem('refreshToken', refreshToken);
-    }
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-  };
+  }, [getToken]);
 
   return (
     <AuthContext.Provider value={{ user, token, loading, login, logout, checkAuth, refreshAccessToken }}>

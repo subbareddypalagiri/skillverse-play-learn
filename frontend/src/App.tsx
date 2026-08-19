@@ -10,6 +10,9 @@ import { ClubProvider } from "./contexts/ClubContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { ClerkProvider } from "@clerk/clerk-react";
+
+const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "";
 
 // 👇 Patha Home badulu kotha NewLanding ni import chesthunnam
 import Newlanding from "./pages/Newlanding"; 
@@ -51,53 +54,55 @@ const PublicOnlyRoute = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <ThemeProvider>
-        <AuthProvider>
-        <CourseProvider>
-          <VideoProgressProvider>
-            <SocialProvider>
-              <ClubProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-                <Routes>
-                  {/* 👇 Ikkada Home element theesesi NewLanding pettam */}
-                  <Route path="/" element={<Newlanding />} />
-                  
-                  <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
-                  <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
-                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                  <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
-                  <Route path="/admin" element={<ProtectedRoute><AdminConsole /></ProtectedRoute>} />
-                  <Route path="/live-rooms" element={<ProtectedRoute><LiveRooms /></ProtectedRoute>} />
-                  <Route path="/live-rooms/create" element={<ProtectedRoute><CreateLiveRoom /></ProtectedRoute>} />
-                  <Route path="/live-rooms/:id" element={<ProtectedRoute><LiveStreamView /></ProtectedRoute>} />
-                  <Route path="/vibe" element={<ProtectedRoute><VibeTabs /></ProtectedRoute>} />
-                  <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />
-                  <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
-                  <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
-                  <Route path="/events/:id" element={<ProtectedRoute><EventDetailPage /></ProtectedRoute>} />
-                  <Route path="/career" element={<ProtectedRoute><CareerHub /></ProtectedRoute>} />
-                  <Route path="/sync" element={<ProtectedRoute><Sync /></ProtectedRoute>} />
-                  <Route path="/apply-mentor" element={<ProtectedRoute><ApplyMentor /></ProtectedRoute>} />
-                  <Route path="/apply-alumni-expert" element={<ProtectedRoute><ApplyAlumniExpert /></ProtectedRoute>} />
-                  <Route path="/apply-alumni" element={<ProtectedRoute><ApplyAlumni /></ProtectedRoute>} />
-                  <Route path="/clubs/:id" element={<ProtectedRoute><ClubPage /></ProtectedRoute>} />
-                  <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                  <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
-                  <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-                <FloatingChatbot />
-              </BrowserRouter>
-            </ClubProvider>
-            </SocialProvider>
-          </VideoProgressProvider>
-        </CourseProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </TooltipProvider>
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+      <TooltipProvider>
+        <ThemeProvider>
+          <AuthProvider>
+          <CourseProvider>
+            <VideoProgressProvider>
+              <SocialProvider>
+                <ClubProvider>
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                  <Routes>
+                    {/* 👇 Ikkada Home element theesesi NewLanding pettam */}
+                    <Route path="/" element={<Newlanding />} />
+                    
+                    <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+                    <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
+                    <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                    <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
+                    <Route path="/admin" element={<ProtectedRoute><AdminConsole /></ProtectedRoute>} />
+                    <Route path="/live-rooms" element={<ProtectedRoute><LiveRooms /></ProtectedRoute>} />
+                    <Route path="/live-rooms/create" element={<ProtectedRoute><CreateLiveRoom /></ProtectedRoute>} />
+                    <Route path="/live-rooms/:id" element={<ProtectedRoute><LiveStreamView /></ProtectedRoute>} />
+                    <Route path="/vibe" element={<ProtectedRoute><VibeTabs /></ProtectedRoute>} />
+                    <Route path="/ai-tools" element={<ProtectedRoute><AITools /></ProtectedRoute>} />
+                    <Route path="/ai-assistant" element={<ProtectedRoute><AIAssistant /></ProtectedRoute>} />
+                    <Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
+                    <Route path="/events/:id" element={<ProtectedRoute><EventDetailPage /></ProtectedRoute>} />
+                    <Route path="/career" element={<ProtectedRoute><CareerHub /></ProtectedRoute>} />
+                    <Route path="/sync" element={<ProtectedRoute><Sync /></ProtectedRoute>} />
+                    <Route path="/apply-mentor" element={<ProtectedRoute><ApplyMentor /></ProtectedRoute>} />
+                    <Route path="/apply-alumni-expert" element={<ProtectedRoute><ApplyAlumniExpert /></ProtectedRoute>} />
+                    <Route path="/apply-alumni" element={<ProtectedRoute><ApplyAlumni /></ProtectedRoute>} />
+                    <Route path="/clubs/:id" element={<ProtectedRoute><ClubPage /></ProtectedRoute>} />
+                    <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                    <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
+                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                  <FloatingChatbot />
+                  </BrowserRouter>
+                </ClubProvider>
+              </SocialProvider>
+            </VideoProgressProvider>
+          </CourseProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </TooltipProvider>
+    </ClerkProvider>
   </QueryClientProvider>
 );
 

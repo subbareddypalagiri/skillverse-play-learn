@@ -1,23 +1,44 @@
 import logger from '../config/logger.js';
 import { extractTokenFromHeader, verifyToken, checkPermission } from '../utils/auth.js';
 import { AuthenticationError, AuthorizationError, NotFoundError } from '../utils/errorHandler.js';
+import { clerkClient, getOrCreateClerkUser } from '../utils/clerk.js';
 
 export const authenticate = async (req, res, next) => {
   try {
-    const token = extractTokenFromHeader(req.get('authorization'));
-    const decoded = verifyToken(token);
-    
-    // Fetch user from database
-    const User = (await import('../models/User.js')).default;
-    const user = await User.findById(decoded.userId).lean();
-    
-    if (!user) {
-      throw new AuthenticationError('User not found');
+    const authHeader = req.get('authorization');
+    const token = extractTokenFromHeader(authHeader);
+
+    let userId;
+    let user;
+
+    // 1. Try custom token verification first (for testing/seeds/fallback)
+    try {
+      const decoded = verifyToken(token);
+      if (decoded && decoded.userId) {
+        userId = decoded.userId;
+        const User = (await import('../models/User.js')).default;
+        user = await User.findById(userId).lean();
+        if (!user) {
+          throw new AuthenticationError('User not found');
+        }
+      }
+    } catch (customError) {
+      // 2. If custom verification fails, attempt Clerk token verification
+      try {
+        const decoded = await clerkClient.verifyToken(token);
+        const clerkUserId = decoded.sub;
+        
+        // Sync/get MongoDB user
+        user = await getOrCreateClerkUser(clerkUserId);
+        userId = user._id;
+      } catch (clerkError) {
+        logger.error(`Auth failed. Custom: ${customError.message}. Clerk: ${clerkError.message}`);
+        throw new AuthenticationError('Invalid or expired token');
+      }
     }
-    
-    // Attach user to request
+
     req.user = user;
-    req.userId = user._id;
+    req.userId = userId;
     
     logger.debug(`User authenticated: ${user.email}`);
     next();
@@ -32,13 +53,30 @@ export const optionalAuthenticate = async (req, res, next) => {
     if (!authHeader) return next();
 
     const token = extractTokenFromHeader(authHeader);
-    const decoded = verifyToken(token);
-    const User = (await import('../models/User.js')).default;
-    const user = await User.findById(decoded.userId).lean();
+    let userId;
+    let user;
+
+    try {
+      const decoded = verifyToken(token);
+      if (decoded && decoded.userId) {
+        userId = decoded.userId;
+        const User = (await import('../models/User.js')).default;
+        user = await User.findById(userId).lean();
+      }
+    } catch {
+      try {
+        const decoded = await clerkClient.verifyToken(token);
+        const clerkUserId = decoded.sub;
+        user = await getOrCreateClerkUser(clerkUserId);
+        userId = user._id;
+      } catch {
+        // Ignore both errors for optional authentication
+      }
+    }
 
     if (user) {
       req.user = user;
-      req.userId = user._id;
+      req.userId = userId;
     }
     next();
   } catch {
