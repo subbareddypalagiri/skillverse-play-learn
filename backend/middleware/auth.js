@@ -1,7 +1,8 @@
 import logger from '../config/logger.js';
 import { extractTokenFromHeader, verifyToken, checkPermission } from '../utils/auth.js';
 import { AuthenticationError, AuthorizationError, NotFoundError } from '../utils/errorHandler.js';
-import { clerkClient, getOrCreateClerkUser } from '../utils/clerk.js';
+import { getOrCreateClerkUser } from '../utils/clerk.js';
+import { verifyToken as verifyClerkToken } from '@clerk/backend';
 
 export const authenticate = async (req, res, next) => {
   try {
@@ -25,7 +26,9 @@ export const authenticate = async (req, res, next) => {
     } catch (customError) {
       // 2. If custom verification fails, attempt Clerk token verification
       try {
-        const decoded = await clerkClient.verifyToken(token);
+        const decoded = await verifyClerkToken(token, {
+          secretKey: process.env.CLERK_SECRET_KEY
+        });
         const clerkUserId = decoded.sub;
         
         // Sync/get MongoDB user
@@ -65,7 +68,9 @@ export const optionalAuthenticate = async (req, res, next) => {
       }
     } catch {
       try {
-        const decoded = await clerkClient.verifyToken(token);
+        const decoded = await verifyClerkToken(token, {
+          secretKey: process.env.CLERK_SECRET_KEY
+        });
         const clerkUserId = decoded.sub;
         user = await getOrCreateClerkUser(clerkUserId);
         userId = user._id;
