@@ -12,7 +12,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (!user && !localStorage.getItem('token')) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" replace />;
 
   return <>{children}</>;
 };

@@ -65,13 +65,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       }
     } catch (err) {
-      console.error('Error syncing Clerk user with backend:', err);
+      console.error('Error syncing Clerk user with backend, signing out:', err);
       setUser(null);
       setToken(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      try {
+        await signOut();
+      } catch (signOutErr) {
+        console.error('Error signing out of Clerk:', signOutErr);
+      }
     } finally {
       setLoading(false);
     }
-  }, [isSignedIn, getToken]);
+  }, [isSignedIn, getToken, signOut]);
 
   useEffect(() => {
     syncUserSession();
