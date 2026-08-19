@@ -124,21 +124,21 @@ const Signup = () => {
               appearance={{
                 variables: {
                   colorPrimary: "#7c3aed",
-                  colorBackground: "#18181b",
+                  colorBackground: "#09090b",
                   colorText: "#f4f4f5",
                   colorTextSecondary: "#a1a1aa",
-                  colorInputBackground: "#09090b",
+                  colorInputBackground: "#18181b",
                   colorInputText: "#f4f4f5",
-                  colorBorder: "rgba(255,255,255,0.1)",
+                  colorBorder: "rgba(255,255,255,0.08)",
                 },
                 elements: {
-                  card: "bg-[#18181b]/50 border border-white/10 rounded-2xl shadow-2xl p-6 backdrop-blur-xl w-full",
+                  card: "bg-zinc-950/90 border border-white/10 rounded-2xl shadow-2xl p-6 backdrop-blur-2xl w-full",
                   headerTitle: "text-2xl font-bold text-white",
                   headerSubtitle: "text-zinc-400",
-                  socialButtonsBlockButton: "border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors rounded-xl",
+                  socialButtonsBlockButton: "border border-white/10 bg-zinc-900 hover:bg-zinc-800 text-white transition-all rounded-xl py-2.5",
                   formFieldLabel: "text-xs font-semibold text-zinc-300 uppercase tracking-wider",
-                  formFieldInput: "bg-[#09090b] border border-white/10 text-white rounded-xl py-2.5 px-3.5 focus:border-violet-500 transition-colors w-full",
-                  formButtonPrimary: "w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg transition-all",
+                  formFieldInput: "bg-zinc-900 border border-white/10 text-white rounded-xl py-2.5 px-3.5 focus:border-violet-500 transition-colors w-full",
+                  formButtonPrimary: "w-full py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 shadow-lg shadow-violet-500/20 transition-all",
                   footerActionLink: "text-violet-400 hover:text-violet-300 transition-colors font-semibold"
                 }
               }}
