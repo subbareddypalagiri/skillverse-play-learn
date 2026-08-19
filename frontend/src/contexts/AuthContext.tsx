@@ -15,6 +15,8 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
+  isSignedIn: boolean;
+  isLoaded: boolean;
   login: (token: string, userData: User, refreshToken?: string) => void;
   logout: () => void;
   checkAuth: () => Promise<void>;
@@ -24,7 +26,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { isSignedIn, getToken, signOut } = useClerkAuth();
+  const { isLoaded, isSignedIn, getToken, signOut } = useClerkAuth();
   const { user: clerkUser } = useClerkUser();
 
   // Register token getter for axios request interceptor
@@ -137,7 +139,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [getToken]);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, checkAuth, refreshAccessToken }}>
+    <AuthContext.Provider value={{ user, token, loading, isSignedIn: isSignedIn || false, isLoaded: isLoaded || false, login, logout, checkAuth, refreshAccessToken }}>
       {children}
     </AuthContext.Provider>
   );

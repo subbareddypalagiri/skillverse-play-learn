@@ -46,9 +46,26 @@ const queryClient = new QueryClient();
 
 // Redirect already-logged-in users away from login/signup
 const PublicOnlyRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
-  // Only redirect if we're certain the user is logged in (not just loading)
-  if (!loading && user) return <Navigate to="/dashboard" replace />;
+  const { user, loading, isSignedIn, isLoaded } = useAuth();
+  
+  if (!isLoaded || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // If signed in on Clerk but backend user sync is pending, show loading (prevents loop)
+  if (isSignedIn && !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (user) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 };
 
