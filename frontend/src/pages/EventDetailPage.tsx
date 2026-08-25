@@ -232,7 +232,7 @@ const EventDetailPage = () => {
         <iframe
           key={url}
           src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&modestbranding=1&rel=0`}
-          className="w-full h-full border-0 min-h-[420px]"
+          className="w-full h-[450px] border-0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
@@ -248,22 +248,22 @@ const EventDetailPage = () => {
       const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
 
       return (
-        <div className="w-full h-full flex flex-col items-center justify-center bg-black relative p-3">
+        <div className="w-full flex flex-col items-center justify-center bg-black">
           <iframe
             key={url}
             src={previewUrl}
-            className="w-full flex-1 border-0 min-h-[360px] rounded-xl mb-3"
+            className="w-full h-[420px] border-0 rounded-t-xl bg-zinc-950"
             allow="autoplay; fullscreen"
             allowFullScreen
           />
-          <div className="flex flex-wrap items-center justify-center gap-3 w-full py-1 z-20">
+          <div className="flex flex-wrap items-center justify-center gap-3 w-full p-3 bg-zinc-900 border-t border-white/10">
             <a
               href={viewUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-lg transition-all"
             >
-              <ExternalLink className="w-4 h-4" /> Watch in Google Drive Player (HD)
+              <ExternalLink className="w-4 h-4" /> Open in Google Drive (Full Player)
             </a>
             <a
               href={downloadUrl}
@@ -272,7 +272,7 @@ const EventDetailPage = () => {
               download
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold border border-white/10 shadow-lg transition-all"
             >
-              <Download className="w-4 h-4" /> Download Video
+              <Download className="w-4 h-4" /> Direct Download
             </a>
           </div>
         </div>
@@ -782,17 +782,20 @@ const EventDetailPage = () => {
         />
       )}
 
-      {/* Media / Story Viewer Modal */}
+      {/* 100% Bulletproof Fullscreen Media Lightbox Modal */}
       {selectedMedia && (
-        <Dialog open={!!selectedMedia} onOpenChange={(open) => !open && setSelectedMedia(null)}>
-          <DialogContent className="sm:max-w-2xl w-full bg-zinc-950 border border-zinc-800 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh] relative shadow-2xl">
-            <DialogTitle className="sr-only">Media Viewer</DialogTitle>
-            <DialogDescription className="sr-only">View event media</DialogDescription>
-            
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 sm:p-6 animate-in fade-in duration-200"
+          onClick={() => setSelectedMedia(null)}
+        >
+          <div
+            className="relative w-full max-w-3xl bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
-            <div className="p-3 bg-zinc-900 border-b border-white/10 flex items-center justify-between z-30">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border border-white/20 flex items-center justify-center">
+            <div className="p-3.5 bg-zinc-900 border-b border-white/10 flex items-center justify-between flex-shrink-0 z-30">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border border-white/20 flex items-center justify-center flex-shrink-0">
                   {selectedMedia.userAvatar ? (
                     <img src={selectedMedia.userAvatar} alt="User" className="w-full h-full object-cover" />
                   ) : (
@@ -801,7 +804,7 @@ const EventDetailPage = () => {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-white">{selectedMedia.userName}</p>
-                  <p className="text-[9px] text-zinc-400">{new Date(selectedMedia.createdAt).toLocaleDateString()}</p>
+                  <p className="text-[10px] text-zinc-400">{new Date(selectedMedia.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
 
@@ -812,27 +815,34 @@ const EventDetailPage = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   download
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 text-xs font-semibold transition-all shadow-sm"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-semibold transition-all shadow-sm"
                 >
                   <Download className="w-3.5 h-3.5" /> Download
                 </a>
-                <button type="button" onClick={() => setSelectedMedia(null)}
-                  className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xs transition-colors">
+                <button
+                  type="button"
+                  onClick={() => setSelectedMedia(null)}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-sm transition-colors"
+                >
                   ✕
                 </button>
               </div>
             </div>
 
-            {/* Video / Embed Player OR Image */}
-            <div className="w-full flex-1 min-h-[420px] max-h-[75vh] flex items-center justify-center bg-black relative">
+            {/* Media Content */}
+            <div className="w-full flex-1 flex items-center justify-center bg-black overflow-y-auto relative">
               {selectedMedia.type === 'video' || isVideoUrl(selectedMedia.url) ? (
                 renderStoryMedia(selectedMedia.url)
               ) : (
-                <img src={formatPhotoUrl(selectedMedia.url)} alt="Memory" className="w-full h-full object-contain max-h-[75vh]" />
+                <img
+                  src={formatPhotoUrl(selectedMedia.url)}
+                  alt="Memory"
+                  className="w-full h-full object-contain max-h-[75vh]"
+                />
               )}
             </div>
-          </DialogContent>
-        </Dialog>
+          </div>
+        </div>
       )}
 
       {/* Upload Memory Modal */}
