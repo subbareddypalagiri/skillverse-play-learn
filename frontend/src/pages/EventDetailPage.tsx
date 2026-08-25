@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   ArrowLeft, Calendar, MapPin, Clock, Users, CheckCircle, Loader2,
   Bus, Utensils, User, Backpack, Route, Globe, Monitor, Building2, Shield,
-  Trash2, XCircle, Edit, MessageCircle, Train, Car, Camera, Video, Plus, Play, Image, UploadCloud, Download
+  Trash2, XCircle, Edit, MessageCircle, Train, Car, Camera, Video, Plus, Play, Image, UploadCloud, Download, ExternalLink
 } from 'lucide-react';
 import { EventChat } from '@/components/EventChat';
 import AmbassadorEventForm from '@/components/AmbassadorEventForm';
@@ -239,21 +239,42 @@ const EventDetailPage = () => {
       );
     }
 
-    // 2. Google Drive Link: Use direct HTML5 native video stream
+    // 2. Google Drive Link
     const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
     if (driveMatch) {
       const fileId = driveMatch[1];
-      const directStreamUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+      const viewUrl = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
+      const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
       return (
-        <div className="w-full h-full flex items-center justify-center bg-black relative">
-          <video
+        <div className="w-full h-full flex flex-col items-center justify-center bg-black relative p-3">
+          <iframe
             key={url}
-            src={directStreamUrl}
-            autoPlay
-            playsInline
-            controls
-            className="w-full h-full object-contain max-h-[75vh]"
+            src={previewUrl}
+            className="w-full flex-1 border-0 min-h-[360px] rounded-xl mb-3"
+            allow="autoplay; fullscreen"
+            allowFullScreen
           />
+          <div className="flex flex-wrap items-center justify-center gap-3 w-full py-1 z-20">
+            <a
+              href={viewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-lg transition-all"
+            >
+              <ExternalLink className="w-4 h-4" /> Watch in Google Drive Player (HD)
+            </a>
+            <a
+              href={downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-semibold border border-white/10 shadow-lg transition-all"
+            >
+              <Download className="w-4 h-4" /> Download Video
+            </a>
+          </div>
         </div>
       );
     }
