@@ -123,23 +123,52 @@ export const fetchEventRegistrants = async (eventId: string) => {
 };
 
 export const uploadTempFile = async (file: File): Promise<string> => {
-  const formData = new FormData();
-  formData.append('reqtype', 'fileupload');
-  formData.append('fileToUpload', file);
+  // 1. Attempt Direct Cloudinary Upload via Backend Signature (Bypasses Vercel limits completely)
+  try {
+    const sigResponse = await apiClient.get('/reels/upload-signature');
+    if (sigResponse.data?.success) {
+      const sigData = sigResponse.data;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('api_key', sigData.apiKey);
+      formData.append('timestamp', String(sigData.timestamp));
+      formData.append('signature', sigData.signature);
+      formData.append('folder', 'skillverse/memories');
 
-  const response = await fetch('https://corsproxy.io/?https://catbox.moe/user/api.php', {
-    method: 'POST',
-    body: formData
+      const uploadUrl = `https://api.cloudinary.com/v1_1/${sigData.cloudName}/auto/upload`;
+      const res = await fetch(uploadUrl, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        return result.secure_url;
+      } else {
+        console.warn('Cloudinary direct upload failed, trying fallback...', await res.text());
+      }
+    }
+  } catch (err) {
+    console.warn('Cloudinary config not available or failed:', err);
+  }
+
+  // 2. Fallback: Upload to our backend proxy (works on localhost, but has 4.5MB limit on Vercel)
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  if (!isLocal && file.size > 4.5 * 1024 * 1024) {
+    throw new Error('Vercel hosting limits direct uploads to 4.5MB. Please configure CLOUDINARY credentials in your Vercel Dashboard env variables to allow large video/photo uploads.');
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await apiClient.post('/events/upload-temp', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   });
 
-  if (!response.ok) {
-    throw new Error('Upload failed');
+  if (response.data?.success && response.data.data?.url) {
+    return response.data.data.url;
   }
 
-  const fileUrl = await response.text();
-  if (typeof fileUrl !== 'string' || !fileUrl.startsWith('http')) {
-    throw new Error('Invalid response from upload host');
-  }
-
-  return fileUrl.trim();
+  throw new Error('File upload failed. Ensure server is running or Cloudinary credentials are set.');
 };
