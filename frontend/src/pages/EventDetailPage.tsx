@@ -208,6 +208,53 @@ const EventDetailPage = () => {
     }
   };
 
+  const formatPhotoUrl = (url: string) => {
+    const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (driveMatch) {
+      return `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w1000`;
+    }
+    return url;
+  };
+
+  const renderStoryMedia = (url: string) => {
+    const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (driveMatch) {
+      const fileId = driveMatch[1];
+      return (
+        <iframe
+          key={url}
+          src={`https://drive.google.com/file/d/${fileId}/preview`}
+          className="w-full h-full border-0"
+          allow="autoplay"
+        />
+      );
+    }
+
+    const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([\w-]{11})/);
+    if (ytMatch) {
+      const videoId = ytMatch[1];
+      return (
+        <iframe
+          key={url}
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&modestbranding=1&rel=0`}
+          className="w-full h-full border-0"
+          allow="autoplay; encrypted-media"
+        />
+      );
+    }
+
+    return (
+      <video
+        key={url}
+        src={url}
+        autoPlay
+        playsInline
+        controls={false}
+        className="w-full h-full object-contain"
+      />
+    );
+  };
+
   if (loading) {
     return (
       <PageLayout>
@@ -412,7 +459,7 @@ const EventDetailPage = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {photosList.map((photo) => (
                         <div key={photo._id || photo.id} className="relative aspect-square rounded-xl overflow-hidden border border-border/40 bg-zinc-900 group">
-                          <img src={photo.url} alt="Trip memory" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <img src={formatPhotoUrl(photo.url)} alt="Trip memory" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
                             <p className="text-[10px] font-bold text-white truncate">{photo.userName}</p>
                             <p className="text-[8px] text-zinc-300 mt-0.5">{new Date(photo.createdAt).toLocaleDateString()}</p>
@@ -700,15 +747,14 @@ const EventDetailPage = () => {
 
             {/* Video Player */}
             <div className="w-full h-full flex items-center justify-center bg-black relative">
-              <video key={storiesList[activeStoryIndex].url} src={storiesList[activeStoryIndex].url} autoPlay playsInline controls={false}
-                className="w-full h-full object-contain" />
+              {renderStoryMedia(storiesList[activeStoryIndex].url)}
               
               {/* Left/Right Taps */}
-              <div className="absolute inset-y-0 left-0 w-1/3 cursor-pointer" onClick={(e) => {
+              <div className="absolute inset-y-0 left-0 w-1/3 cursor-pointer z-20" onClick={(e) => {
                 e.stopPropagation();
                 if (activeStoryIndex > 0) setActiveStoryIndex(prev => prev - 1);
               }} />
-              <div className="absolute inset-y-0 right-0 w-1/3 cursor-pointer" onClick={(e) => {
+              <div className="absolute inset-y-0 right-0 w-1/3 cursor-pointer z-20" onClick={(e) => {
                 e.stopPropagation();
                 if (activeStoryIndex < storiesList.length - 1) setActiveStoryIndex(prev => prev + 1);
                 else setShowStoryViewer(false);
