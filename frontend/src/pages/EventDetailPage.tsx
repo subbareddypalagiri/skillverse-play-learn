@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { EventChat } from '@/components/EventChat';
 import AmbassadorEventForm from '@/components/AmbassadorEventForm';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const categoryColors: Record<string, string> = {
   cultural: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
@@ -224,20 +224,7 @@ const EventDetailPage = () => {
   };
 
   const renderStoryMedia = (url: string) => {
-    const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-    if (driveMatch) {
-      const fileId = driveMatch[1];
-      return (
-        <iframe
-          key={url}
-          src={`https://drive.google.com/file/d/${fileId}/preview`}
-          className="w-full h-full border-0 min-h-[420px]"
-          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-          allowFullScreen
-        />
-      );
-    }
-
+    // 1. YouTube Link
     const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([\w-]{11})/);
     if (ytMatch) {
       const videoId = ytMatch[1];
@@ -246,9 +233,28 @@ const EventDetailPage = () => {
           key={url}
           src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&modestbranding=1&rel=0`}
           className="w-full h-full border-0 min-h-[420px]"
-          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />
+      );
+    }
+
+    // 2. Google Drive Link: Use direct HTML5 native video stream
+    const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (driveMatch) {
+      const fileId = driveMatch[1];
+      const directStreamUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      return (
+        <div className="w-full h-full flex items-center justify-center bg-black relative">
+          <video
+            key={url}
+            src={directStreamUrl}
+            autoPlay
+            playsInline
+            controls
+            className="w-full h-full object-contain max-h-[75vh]"
+          />
+        </div>
       );
     }
 
@@ -760,6 +766,7 @@ const EventDetailPage = () => {
         <Dialog open={!!selectedMedia} onOpenChange={(open) => !open && setSelectedMedia(null)}>
           <DialogContent className="sm:max-w-2xl w-full bg-zinc-950 border border-zinc-800 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh] relative shadow-2xl">
             <DialogTitle className="sr-only">Media Viewer</DialogTitle>
+            <DialogDescription className="sr-only">View event media</DialogDescription>
             
             {/* Header */}
             <div className="p-3 bg-zinc-900 border-b border-white/10 flex items-center justify-between z-30">
