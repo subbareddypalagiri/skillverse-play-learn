@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   ArrowLeft, Calendar, MapPin, Clock, Users, CheckCircle, Loader2,
   Bus, Utensils, User, Backpack, Route, Globe, Monitor, Building2, Shield,
-  Trash2, XCircle, Edit, MessageCircle, Train, Car, Camera, Video, Plus, Play, Image, UploadCloud
+  Trash2, XCircle, Edit, MessageCircle, Train, Car, Camera, Video, Plus, Play, Image, UploadCloud, Download
 } from 'lucide-react';
 import { EventChat } from '@/components/EventChat';
 import AmbassadorEventForm from '@/components/AmbassadorEventForm';
@@ -210,6 +210,15 @@ const EventDetailPage = () => {
     const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
     if (driveMatch) {
       return `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w1000`;
+    }
+    return url;
+  };
+
+  const getDirectDownloadUrl = (url: string) => {
+    if (!url) return '#';
+    const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (driveMatch) {
+      return `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`;
     }
     return url;
   };
@@ -478,9 +487,22 @@ const EventDetailPage = () => {
                                 </div>
                               </div>
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
-                              <p className="text-[10px] font-bold text-white truncate">{photo.userName}</p>
-                              <p className="text-[8px] text-zinc-300 mt-0.5">{new Date(photo.createdAt).toLocaleDateString()}</p>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex items-end justify-between">
+                              <div>
+                                <p className="text-[10px] font-bold text-white truncate">{photo.userName}</p>
+                                <p className="text-[8px] text-zinc-300 mt-0.5">{new Date(photo.createdAt).toLocaleDateString()}</p>
+                              </div>
+                              <a
+                                href={getDirectDownloadUrl(photo.url)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                download
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-1.5 rounded-lg bg-black/60 hover:bg-primary text-white text-xs transition-colors shadow-md flex items-center justify-center"
+                                title="Download"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                              </a>
                             </div>
                           </div>
                         );
@@ -755,11 +777,22 @@ const EventDetailPage = () => {
                 </div>
               </div>
 
-              {/* Close Button */}
-              <button type="button" onClick={() => setSelectedMedia(null)}
-                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xs transition-colors">
-                ✕
-              </button>
+              {/* Actions: Download & Close */}
+              <div className="flex items-center gap-2">
+                <a
+                  href={getDirectDownloadUrl(selectedMedia.url)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 text-xs font-semibold transition-all shadow-sm"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download
+                </a>
+                <button type="button" onClick={() => setSelectedMedia(null)}
+                  className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xs transition-colors">
+                  ✕
+                </button>
+              </div>
             </div>
 
             {/* Video / Embed Player OR Image */}
