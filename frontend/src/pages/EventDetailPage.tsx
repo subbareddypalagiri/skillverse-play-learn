@@ -39,6 +39,7 @@ const EventDetailPage = () => {
   // Memories & Stories State
   const [memories, setMemories] = useState<any[]>([]);
   const [loadingMemories, setLoadingMemories] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<any | null>(null);
   const [showStoryViewer, setShowStoryViewer] = useState(false);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -193,6 +194,16 @@ const EventDetailPage = () => {
     } catch (err: any) {
       alert(err.response?.data?.message || 'Failed to share memory');
     }
+  };
+
+  const isVideoUrl = (url: string) => {
+    if (!url) return false;
+    return (
+      url.includes('drive.google.com') ||
+      url.includes('youtube.com') ||
+      url.includes('youtu.be') ||
+      /\.(mp4|webm|ogg|mov|m4v)($|\?)/i.test(url)
+    );
   };
 
   const formatPhotoUrl = (url: string) => {
@@ -417,8 +428,8 @@ const EventDetailPage = () => {
                       <Video className="w-3.5 h-3.5 text-violet-400" /> Video Memories
                     </h3>
                     <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
-                      {storiesList.map((story, index) => (
-                        <div key={story._id || story.id} onClick={() => { setActiveStoryIndex(index); setShowStoryViewer(true); }}
+                      {storiesList.map((story) => (
+                        <div key={story._id || story.id} onClick={() => setSelectedMedia(story)}
                           className="flex flex-col items-center gap-1.5 cursor-pointer flex-shrink-0 group">
                           <div className="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-pink-500 via-purple-500 to-yellow-500 group-hover:scale-105 transition-transform duration-200">
                             <div className="w-full h-full rounded-full border-2 border-zinc-950 overflow-hidden bg-zinc-900 flex items-center justify-center relative">
@@ -439,22 +450,41 @@ const EventDetailPage = () => {
                   </div>
                 )}
 
-                {/* 2. Photo Gallery Grid */}
+                {/* 2. Photo & Media Gallery Grid */}
                 {photosList.length > 0 && (
                   <div>
                     <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1">
-                      <Image className="w-3.5 h-3.5 text-emerald-400" /> Shared Photos
+                      <Image className="w-3.5 h-3.5 text-emerald-400" /> Shared Photos & Videos
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {photosList.map((photo) => (
-                        <div key={photo._id || photo.id} className="relative aspect-square rounded-xl overflow-hidden border border-border/40 bg-zinc-900 group">
-                          <img src={formatPhotoUrl(photo.url)} alt="Trip memory" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
-                            <p className="text-[10px] font-bold text-white truncate">{photo.userName}</p>
-                            <p className="text-[8px] text-zinc-300 mt-0.5">{new Date(photo.createdAt).toLocaleDateString()}</p>
+                      {photosList.map((photo) => {
+                        const isVid = photo.type === 'video' || isVideoUrl(photo.url);
+                        return (
+                          <div
+                            key={photo._id || photo.id}
+                            onClick={() => setSelectedMedia(photo)}
+                            className="relative aspect-square rounded-xl overflow-hidden border border-border/40 bg-zinc-900 group cursor-pointer hover:border-primary/50 transition-all shadow-md"
+                          >
+                            <img
+                              src={formatPhotoUrl(photo.url)}
+                              alt="Trip memory"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            {/* Play button overlay if it's a video */}
+                            {isVid && (
+                              <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/10 transition-colors">
+                                <div className="w-10 h-10 rounded-full bg-black/70 border border-white/30 flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-transform">
+                                  <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+                                </div>
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
+                              <p className="text-[10px] font-bold text-white truncate">{photo.userName}</p>
+                              <p className="text-[8px] text-zinc-300 mt-0.5">{new Date(photo.createdAt).toLocaleDateString()}</p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -703,52 +733,42 @@ const EventDetailPage = () => {
         />
       )}
 
-      {/* Story Viewer Modal */}
-      {showStoryViewer && storiesList[activeStoryIndex] && (
-        <Dialog open={showStoryViewer} onOpenChange={setShowStoryViewer}>
-          <DialogContent className="sm:max-w-xl w-full bg-zinc-950 border border-zinc-800 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh] relative shadow-2xl">
-            <DialogTitle className="sr-only">Story Viewer</DialogTitle>
+      {/* Media / Story Viewer Modal */}
+      {selectedMedia && (
+        <Dialog open={!!selectedMedia} onOpenChange={(open) => !open && setSelectedMedia(null)}>
+          <DialogContent className="sm:max-w-2xl w-full bg-zinc-950 border border-zinc-800 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh] relative shadow-2xl">
+            <DialogTitle className="sr-only">Media Viewer</DialogTitle>
             
             {/* Header */}
             <div className="p-3 bg-zinc-900 border-b border-white/10 flex items-center justify-between z-30">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border border-white/20 flex items-center justify-center">
-                  {storiesList[activeStoryIndex].userAvatar ? (
-                    <img src={storiesList[activeStoryIndex].userAvatar} alt="User" className="w-full h-full object-cover" />
+                  {selectedMedia.userAvatar ? (
+                    <img src={selectedMedia.userAvatar} alt="User" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-xs font-bold text-white uppercase">{storiesList[activeStoryIndex].userName[0]}</span>
+                    <span className="text-xs font-bold text-white uppercase">{selectedMedia.userName?.[0] || 'U'}</span>
                   )}
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white">{storiesList[activeStoryIndex].userName}</p>
-                  <p className="text-[9px] text-zinc-400">{new Date(storiesList[activeStoryIndex].createdAt).toLocaleDateString()}</p>
+                  <p className="text-xs font-bold text-white">{selectedMedia.userName}</p>
+                  <p className="text-[9px] text-zinc-400">{new Date(selectedMedia.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
 
-              {/* Navigation and Close Controls */}
-              <div className="flex items-center gap-2">
-                {activeStoryIndex > 0 && (
-                  <button type="button" onClick={() => setActiveStoryIndex(prev => prev - 1)}
-                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-semibold text-white transition-colors">
-                    ← Prev
-                  </button>
-                )}
-                {activeStoryIndex < storiesList.length - 1 && (
-                  <button type="button" onClick={() => setActiveStoryIndex(prev => prev + 1)}
-                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-semibold text-white transition-colors">
-                    Next →
-                  </button>
-                )}
-                <button type="button" onClick={() => setShowStoryViewer(false)}
-                  className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xs transition-colors">
-                  ✕
-                </button>
-              </div>
+              {/* Close Button */}
+              <button type="button" onClick={() => setSelectedMedia(null)}
+                className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xs transition-colors">
+                ✕
+              </button>
             </div>
 
-            {/* Video / Embed Player (Interactive, user can play/pause/fullscreen) */}
+            {/* Video / Embed Player OR Image */}
             <div className="w-full flex-1 min-h-[420px] max-h-[75vh] flex items-center justify-center bg-black relative">
-              {renderStoryMedia(storiesList[activeStoryIndex].url)}
+              {selectedMedia.type === 'video' || isVideoUrl(selectedMedia.url) ? (
+                renderStoryMedia(selectedMedia.url)
+              ) : (
+                <img src={formatPhotoUrl(selectedMedia.url)} alt="Memory" className="w-full h-full object-contain max-h-[75vh]" />
+              )}
             </div>
           </DialogContent>
         </Dialog>
