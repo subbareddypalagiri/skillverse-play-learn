@@ -49,6 +49,18 @@ const StudentProfile = () => {
         hobbies: editData.hobbies.split(',').map(h => h.trim()).filter(Boolean),
         skills: editData.skills.split(',').map(s => s.trim()).filter(Boolean),
       });
+
+      // Synchronize cached user in localStorage as well
+      const cachedUser = localStorage.getItem('user');
+      if (cachedUser) {
+        try {
+          const parsed = JSON.parse(cachedUser);
+          parsed.name = editData.name;
+          parsed.bio = editData.bio;
+          localStorage.setItem('user', JSON.stringify(parsed));
+        } catch { }
+      }
+
       setShowEditDialog(false);
     } catch (e) { console.error(e); } finally { setIsSaving(false); }
   };
@@ -309,9 +321,9 @@ const StudentProfile = () => {
 
       {/* Edit Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="rounded-2xl max-w-md" style={{ background: 'hsl(230,25%,8%)', border: '1px solid hsl(230,20%,14%)' }}>
+        <DialogContent className="rounded-2xl max-w-md bg-zinc-950 border border-zinc-800 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-foreground" style={{ fontFamily: 'Sora, sans-serif' }}>Edit Profile</DialogTitle>
+            <DialogTitle className="text-white text-lg font-bold" style={{ fontFamily: 'Sora, sans-serif' }}>Edit Profile</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             {[
@@ -321,25 +333,25 @@ const StudentProfile = () => {
               { id: 'hobbies', label: 'Hobbies (comma-separated)', type: 'input', placeholder: 'Reading, Coding...' },
             ].map(({ id, label, type, placeholder }) => (
               <div key={id} className="space-y-1.5">
-                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</Label>
+                <Label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">{label}</Label>
                 {type === 'textarea' ? (
                   <Textarea
                     value={(editData as any)[id]}
                     onChange={e => setEditData({ ...editData, [id]: e.target.value })}
                     placeholder={placeholder}
-                    className="premium-input resize-none h-20" />
+                    className="w-full rounded-xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-800 text-white placeholder:text-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 resize-none h-20" />
                 ) : (
                   <Input
                     value={(editData as any)[id]}
                     onChange={e => setEditData({ ...editData, [id]: e.target.value })}
                     placeholder={placeholder}
-                    className="premium-input" />
+                    className="w-full rounded-xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-800 text-white placeholder:text-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500" />
                 )}
               </div>
             ))}
             <div className="flex gap-2 pt-2">
               <button onClick={() => setShowEditDialog(false)}
-                className="flex-1 py-2.5 rounded-xl text-sm font-medium text-muted-foreground border border-border/50 hover:border-border hover:text-foreground transition-all">
+                className="flex-1 py-2.5 rounded-xl text-sm font-medium text-zinc-400 border border-zinc-800 hover:border-zinc-700 hover:text-white transition-all">
                 Cancel
               </button>
               <button onClick={handleSave} disabled={isSaving}

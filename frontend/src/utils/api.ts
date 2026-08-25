@@ -107,12 +107,14 @@ export interface UserProfile {
   totalLikes?: number;
 }
 
+import apiClient from '@/lib/apiClient';
+
 /**
  * Get current user profile
  */
 export const getUserProfile = async (): Promise<UserProfile> => {
-  const response = await apiCall<{ user: UserProfile }>('/auth/me', 'GET');
-  return response.data?.user!;
+  const response = await apiClient.get('/auth/me');
+  return response.data?.data?.user;
 };
 
 /**
@@ -121,12 +123,8 @@ export const getUserProfile = async (): Promise<UserProfile> => {
 export const updateUserProfile = async (
   profileData: Partial<UserProfile>
 ): Promise<UserProfile> => {
-  const response = await apiCall<{ user: UserProfile }>(
-    '/auth/updatedetails',
-    'PUT',
-    profileData
-  );
-  return response.data?.user!;
+  const response = await apiClient.patch('/auth/me', profileData);
+  return response.data?.data?.user;
 };
 
 /**
