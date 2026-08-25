@@ -124,11 +124,22 @@ export const fetchEventRegistrants = async (eventId: string) => {
 
 export const uploadTempFile = async (file: File): Promise<string> => {
   const formData = new FormData();
-  formData.append('file', file);
-  const response = await apiClient.post('/events/upload-temp', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+  formData.append('reqtype', 'fileupload');
+  formData.append('fileToUpload', file);
+
+  const response = await fetch('https://corsproxy.io/?https://catbox.moe/user/api.php', {
+    method: 'POST',
+    body: formData
   });
-  return response.data.data.url;
+
+  if (!response.ok) {
+    throw new Error('Upload failed');
+  }
+
+  const fileUrl = await response.text();
+  if (typeof fileUrl !== 'string' || !fileUrl.startsWith('http')) {
+    throw new Error('Invalid response from upload host');
+  }
+
+  return fileUrl.trim();
 };
