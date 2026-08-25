@@ -1,6 +1,9 @@
+import fs from 'fs';
+import axios from 'axios';
 import Event from '../models/Event.js';
 import EventRegistration from '../models/EventRegistration.js';
 import User from '../models/User.js';
+import EventMemory from '../models/EventMemory.js';
 import { successResponse, paginatedResponse } from '../utils/responseHandler.js';
 import { NotFoundError, ValidationError, ConflictError, AuthorizationError } from '../utils/errorHandler.js';
 import logger from '../config/logger.js';
@@ -234,6 +237,81 @@ export const getEventRegistrants = async (req, res, next) => {
 
     return successResponse(res, 200, 'Event registrants fetched successfully', { registrants: formatted });
   } catch (error) {
+    next(error);
+  }
+};
+
+export const getEventMemories = async (req, res, next) => {
+  try {
+    const memories = await EventMemory.find({ eventId: req.params.id })
+      .sort('-createdAt')
+      .lean();
+    return successResponse(res, 200, 'Event memories fetched successfully', { memories });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addEventMemory = async (req, res, next) => {
+  try {
+    const { type, url } = req.body;
+    if (!type || !url) throw new ValidationError('Type and URL are required');
+
+    const memory = await EventMemory.create({
+      eventId: req.params.id,
+      userId: req.userId,
+      userName: req.user.name,
+      userAvatar: req.user.avatar || null,
+      type,
+      url
+    });
+
+    return successResponse(res, 201, 'Memory shared successfully', { memory });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const uploadMemoryFile = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      throw new ValidationError('No file uploaded');
+    }
+
+    const filePath = req.file.path;
+    const fileBuffer = fs.readFileSync(filePath);
+    const fileBlob = new Blob([fileBuffer], { type: req.file.mimetype });
+    
+    const formData = new FormData();
+    formData.append('reqtype', 'fileupload');
+    formData.append('fileToUpload', fileBlob, req.file.originalname);
+    
+    logger.info(`Proxying memory upload to Catbox.moe: ${req.file.filename}`);
+    
+    const response = await axios.post('https://catbox.moe/user/api.php', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    // Delete the temporary file from our local disk
+    fs.unlink(filePath, (err) => {
+      if (err) logger.error(`Failed to delete temp file ${filePath}:`, err);
+    });
+
+    const fileUrl = response.data;
+    if (typeof fileUrl !== 'string' || !fileUrl.startsWith('http')) {
+      throw new Error('Upload to Catbox returned an invalid response');
+    }
+
+    return successResponse(res, 200, 'File uploaded to public host successfully', { url: fileUrl });
+  } catch (error) {
+    // Delete the file if we have one and an error occurs
+    if (req.file && fs.existsSync(req.file.path)) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (err) {}
+    }
     next(error);
   }
 };

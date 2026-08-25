@@ -48,12 +48,24 @@ export const fetchEvents = async (params?: {
   category?: string;
   location?: string;
   limit?: number;
+  status?: string;
 }) => {
   const search = new URLSearchParams();
   if (params?.category && params.category !== 'all') search.append('category', params.category);
   if (params?.location && params.location !== 'all') search.append('location', params.location);
+  if (params?.status && params.status !== 'all') search.append('status', params.status);
   search.append('limit', String(params?.limit || 50));
   const response = await apiClient.get(`/events?${search}`);
+  return response.data;
+};
+
+export const fetchEventMemories = async (id: string) => {
+  const response = await apiClient.get(`/events/${id}/memories`);
+  return response.data.data.memories;
+};
+
+export const addEventMemory = async (id: string, payload: { type: 'video' | 'photo'; url: string }) => {
+  const response = await apiClient.post(`/events/${id}/memories`, payload);
   return response.data;
 };
 
@@ -108,4 +120,15 @@ export const sendEventMessage = async (eventId: string, text: string) => {
 export const fetchEventRegistrants = async (eventId: string) => {
   const response = await apiClient.get(`/events/${eventId}/registrants`);
   return response.data.data.registrants;
+};
+
+export const uploadTempFile = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await apiClient.post('/events/upload-temp', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+  return response.data.data.url;
 };

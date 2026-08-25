@@ -7,8 +7,12 @@ import {
   deleteEvent,
   registerForEvent,
   getMyRegistrations,
-  getEventRegistrants
+  getEventRegistrants,
+  getEventMemories,
+  addEventMemory,
+  uploadMemoryFile
 } from '../controllers/eventController.js';
+import { memoryUpload } from '../middleware/upload.js';
 import {
   submitAmbassadorApplication,
   getMyAmbassadorApplication,
@@ -34,6 +38,11 @@ router.get('/:id/registrants', authenticate, getEventRegistrants);
 // Chat Routes
 router.get('/:id/messages', authenticate, getEventMessages);
 router.post('/:id/messages', authenticate, sendEventMessage);
+
+// Memories Routes
+router.get('/:id/memories', optionalAuthenticate, getEventMemories);
+router.post('/:id/memories', authenticate, addEventMemory);
+router.post('/upload-temp', authenticate, memoryUpload.single('file'), uploadMemoryFile);
 
 router.post('/:id/register', authenticate, registerForEvent);
 router.post('/', authenticate, authorize('admin', 'campus_ambassador'), createEvent);

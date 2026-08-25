@@ -41,6 +41,7 @@ const Events = () => {
 
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLocation, setSelectedLocation] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("upcoming");
   const [showMyEvents, setShowMyEvents] = useState(false);
   const [events, setEvents] = useState<any[]>([]);
   const [registeredIds, setRegisteredIds] = useState<Set<string>>(() => {
@@ -82,7 +83,11 @@ const Events = () => {
     try {
       setLoading(true);
       setError(null);
-      const result = await fetchEvents({ category: selectedCategory, location: selectedLocation });
+      const result = await fetchEvents({
+        category: selectedCategory,
+        location: selectedLocation,
+        status: selectedStatus
+      });
       if (result.success) setEvents(result.data || []);
       else setError("Failed to load events");
     } catch (err: any) {
@@ -92,7 +97,7 @@ const Events = () => {
     }
   };
 
-  useEffect(() => { loadEvents(); }, [selectedCategory, selectedLocation]);
+  useEffect(() => { loadEvents(); }, [selectedCategory, selectedLocation, selectedStatus]);
 
   useEffect(() => {
     try {
@@ -237,6 +242,24 @@ const Events = () => {
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Filter Events</span>
         </div>
+        <div className="flex gap-2 mb-4 border-b border-border/20 pb-3">
+          <button onClick={() => setSelectedStatus("upcoming")}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all duration-200 border ${
+              selectedStatus === "upcoming"
+                ? 'bg-primary text-white border-primary shadow-[0_0_12px_rgba(124,58,237,0.3)]'
+                : 'border-border/50 text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5'
+            }`}>
+            Upcoming Events
+          </button>
+          <button onClick={() => setSelectedStatus("past")}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all duration-200 border ${
+              selectedStatus === "past"
+                ? 'bg-primary text-white border-primary shadow-[0_0_12px_rgba(124,58,237,0.3)]'
+                : 'border-border/50 text-muted-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/5'
+            }`}>
+            Completed Events
+          </button>
+        </div>
         <div className="flex flex-wrap gap-2 mb-3">
           {categories.map(({ value, label }) => (
             <button key={value} onClick={() => setSelectedCategory(value)}
@@ -369,6 +392,11 @@ const Events = () => {
                     {isTour && (
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400">
                         Tour
+                      </span>
+                    )}
+                    {new Date(event.endDate || event.startDate) < new Date() && (
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-zinc-500/10 text-zinc-400 border border-zinc-500/20">
+                        Completed
                       </span>
                     )}
                   </div>

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/PageLayout';
-import { fetchEventById, registerForEvent, isTourCategory, cancelEvent, deleteEvent, fetchEventRegistrants } from '@/lib/eventsApi';
+import { fetchEventById, registerForEvent, isTourCategory, cancelEvent, deleteEvent, fetchEventRegistrants, fetchEventMemories, addEventMemory, uploadTempFile } from '@/lib/eventsApi';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   ArrowLeft, Calendar, MapPin, Clock, Users, CheckCircle, Loader2,
   Bus, Utensils, User, Backpack, Route, Globe, Monitor, Building2, Shield,
-  Trash2, XCircle, Edit, MessageCircle, Train, Car
+  Trash2, XCircle, Edit, MessageCircle, Train, Car, Camera, Video, Plus, Play, Image, UploadCloud
 } from 'lucide-react';
 import { EventChat } from '@/components/EventChat';
 import AmbassadorEventForm from '@/components/AmbassadorEventForm';
@@ -35,6 +35,17 @@ const EventDetailPage = () => {
   const [loadingRegistrants, setLoadingRegistrants] = useState(false);
   const [registrants, setRegistrants] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // Memories & Stories State
+  const [memories, setMemories] = useState<any[]>([]);
+  const [loadingMemories, setLoadingMemories] = useState(false);
+  const [showStoryViewer, setShowStoryViewer] = useState(false);
+  const [activeStoryIndex, setActiveStoryIndex] = useState(0);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadType, setUploadType] = useState<'video' | 'photo'>('photo');
+  const [uploadUrl, setUploadUrl] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadingFile, setUploadingFile] = useState(false);
 
   const handleViewRegistrants = async () => {
     setShowRegistrantsModal(true);
@@ -70,9 +81,37 @@ const EventDetailPage = () => {
       .finally(() => setLoading(false));
   };
 
+  const isPast = event && new Date(event.endDate || event.startDate) < new Date();
+
   useEffect(() => {
     loadEventDetails();
   }, [id]);
+
+  useEffect(() => {
+    if (event && isPast) {
+      setLoadingMemories(true);
+      fetchEventMemories(id!)
+        .then(data => setMemories(data || []))
+        .catch(err => console.error('Error fetching memories:', err))
+        .finally(() => setLoadingMemories(false));
+    }
+  }, [event, id]);
+
+  const storiesList = memories.filter(m => m.type === 'video');
+  const photosList = memories.filter(m => m.type === 'photo');
+
+  useEffect(() => {
+    if (showStoryViewer && storiesList.length > 0) {
+      const interval = setTimeout(() => {
+        if (activeStoryIndex < storiesList.length - 1) {
+          setActiveStoryIndex(prev => prev + 1);
+        } else {
+          setShowStoryViewer(false);
+        }
+      }, 5000);
+      return () => clearTimeout(interval);
+    }
+  }, [showStoryViewer, activeStoryIndex, storiesList.length]);
 
   const handleJoin = async () => {
     if (!user) {
@@ -122,6 +161,50 @@ const EventDetailPage = () => {
       navigate('/events');
     } catch (err: any) {
       alert(err.response?.data?.message || 'Failed to delete event');
+    }
+  };
+
+  const handleShareMemory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      alert('Please login to share memories');
+      return;
+    }
+
+    let urlToSave = uploadUrl.trim();
+
+    if (selectedFile) {
+      setUploadingFile(true);
+      try {
+        const uploadedUrl = await uploadTempFile(selectedFile);
+        urlToSave = uploadedUrl;
+      } catch (err: any) {
+        alert(err.response?.data?.message || 'File upload failed');
+        setUploadingFile(false);
+        return;
+      } finally {
+        setUploadingFile(false);
+      }
+    }
+
+    if (!urlToSave) {
+      alert('Please select a file or enter a URL link');
+      return;
+    }
+
+    try {
+      const result = await addEventMemory(id!, { type: uploadType, url: urlToSave });
+      if (result.success) {
+        setMemories(prev => [result.data.memory, ...prev]);
+        setShowUploadModal(false);
+        setUploadUrl('');
+        setSelectedFile(null);
+        alert('Memory shared successfully!');
+      } else {
+        alert('Failed to share memory');
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to share memory');
     }
   };
 
@@ -259,6 +342,90 @@ const EventDetailPage = () => {
             )}
           </div>
         </div>
+
+        {/* Completed Event Memories Section */}
+        {isPast && (
+          <div className="rounded-2xl border border-border/50 p-6 mb-6 overflow-hidden animate-reveal-up"
+            style={{ background: 'rgba(255,255,255,0.02)' }}>
+            
+            <div className="flex items-center justify-between mb-6 border-b border-border/20 pb-4">
+              <div>
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2" style={{ fontFamily: 'Sora, sans-serif' }}>
+                  <Camera className="w-5 h-5 text-violet-400" /> Event Memories & Stories
+                </h2>
+                <p className="text-xs text-muted-foreground mt-1">Instagram-style stories & shared photos from this trip</p>
+              </div>
+              {user && (
+                <button onClick={() => { setUploadUrl(''); setSelectedFile(null); setShowUploadModal(true); }}
+                  className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 rounded-xl transition-all hover:shadow-[0_0_12px_rgba(124,58,237,0.2)]">
+                  <Plus className="w-3.5 h-3.5" /> Share Memory
+                </button>
+              )}
+            </div>
+
+            {loadingMemories ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            ) : memories.length === 0 ? (
+              <div className="text-center py-8 border border-dashed border-border/50 rounded-xl">
+                <Image className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-45" />
+                <p className="text-xs text-muted-foreground">No memories shared yet. Be the first to share your trip moments!</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* 1. Instagram-Style Stories Carousel */}
+                {storiesList.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1">
+                      <Video className="w-3.5 h-3.5 text-violet-400" /> Video Memories
+                    </h3>
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
+                      {storiesList.map((story, index) => (
+                        <div key={story._id || story.id} onClick={() => { setActiveStoryIndex(index); setShowStoryViewer(true); }}
+                          className="flex flex-col items-center gap-1.5 cursor-pointer flex-shrink-0 group">
+                          <div className="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-pink-500 via-purple-500 to-yellow-500 group-hover:scale-105 transition-transform duration-200">
+                            <div className="w-full h-full rounded-full border-2 border-zinc-950 overflow-hidden bg-zinc-900 flex items-center justify-center relative">
+                              {story.userAvatar ? (
+                                <img src={story.userAvatar} alt={story.userName} className="w-full h-full object-cover" />
+                              ) : (
+                                <span className="text-xs font-bold text-white uppercase">{story.userName[0]}</span>
+                              )}
+                              <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Play className="w-4 h-4 text-white fill-white" />
+                              </div>
+                            </div>
+                          </div>
+                          <span className="text-[10px] text-muted-foreground max-w-[70px] truncate">{story.userName}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. Photo Gallery Grid */}
+                {photosList.length > 0 && (
+                  <div>
+                    <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1">
+                      <Image className="w-3.5 h-3.5 text-emerald-400" /> Shared Photos
+                    </h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {photosList.map((photo) => (
+                        <div key={photo._id || photo.id} className="relative aspect-square rounded-xl overflow-hidden border border-border/40 bg-zinc-900 group">
+                          <img src={photo.url} alt="Trip memory" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
+                            <p className="text-[10px] font-bold text-white truncate">{photo.userName}</p>
+                            <p className="text-[8px] text-zinc-300 mt-0.5">{new Date(photo.createdAt).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Floating Chat Window */}
         {showChat && (user && (registered || isCreator)) && (
@@ -498,6 +665,146 @@ const EventDetailPage = () => {
           onSuccess={loadEventDetails}
           eventToEdit={event}
         />
+      )}
+
+      {/* Story Viewer Modal */}
+      {showStoryViewer && storiesList[activeStoryIndex] && (
+        <Dialog open={showStoryViewer} onOpenChange={setShowStoryViewer}>
+          <DialogContent className="sm:max-w-md bg-zinc-950 border border-zinc-800 p-0 overflow-hidden rounded-2xl flex flex-col aspect-[9/16] max-h-[85vh] justify-between relative">
+            <DialogTitle className="sr-only">Story Viewer</DialogTitle>
+            {/* Progress Bar Header */}
+            <div className="absolute top-0 inset-x-0 p-3 z-50 bg-gradient-to-b from-black/80 to-transparent">
+              <div className="flex gap-1 mb-2">
+                {storiesList.map((_, i) => (
+                  <div key={i} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
+                    <div className={`h-full bg-white transition-all duration-5000 ease-linear ${
+                      i < activeStoryIndex ? 'w-full' : i === activeStoryIndex ? 'w-full' : 'w-0'
+                    }`} style={{ transitionDuration: i === activeStoryIndex ? '5s' : '0s' }} />
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-900 border border-white/20 flex items-center justify-center">
+                  {storiesList[activeStoryIndex].userAvatar ? (
+                    <img src={storiesList[activeStoryIndex].userAvatar} alt="User" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs font-bold text-white uppercase">{storiesList[activeStoryIndex].userName[0]}</span>
+                  )}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-white">{storiesList[activeStoryIndex].userName}</p>
+                  <p className="text-[9px] text-zinc-400">{new Date(storiesList[activeStoryIndex].createdAt).toLocaleDateString()}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Video Player */}
+            <div className="w-full h-full flex items-center justify-center bg-black relative">
+              <video key={storiesList[activeStoryIndex].url} src={storiesList[activeStoryIndex].url} autoPlay playsInline controls={false}
+                className="w-full h-full object-contain" />
+              
+              {/* Left/Right Taps */}
+              <div className="absolute inset-y-0 left-0 w-1/3 cursor-pointer" onClick={(e) => {
+                e.stopPropagation();
+                if (activeStoryIndex > 0) setActiveStoryIndex(prev => prev - 1);
+              }} />
+              <div className="absolute inset-y-0 right-0 w-1/3 cursor-pointer" onClick={(e) => {
+                e.stopPropagation();
+                if (activeStoryIndex < storiesList.length - 1) setActiveStoryIndex(prev => prev + 1);
+                else setShowStoryViewer(false);
+              }} />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Upload Memory Modal */}
+      {showUploadModal && (
+        <Dialog open={showUploadModal} onOpenChange={setShowUploadModal}>
+          <DialogContent className="sm:max-w-md bg-zinc-950 border border-zinc-900 p-6 rounded-2xl">
+            <DialogTitle className="text-lg font-bold text-white" style={{ fontFamily: 'Sora, sans-serif' }}>
+              Share Your Trip Memory
+            </DialogTitle>
+            <form onSubmit={handleShareMemory} className="space-y-4 mt-2">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-muted-foreground uppercase">Memory Type</label>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => { setUploadType('photo'); setSelectedFile(null); }}
+                    className={`flex-1 py-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                      uploadType === 'photo'
+                        ? 'bg-primary/20 text-primary border-primary/40'
+                        : 'border-zinc-800 text-muted-foreground hover:bg-zinc-900'
+                    }`}>
+                    <Image className="w-4 h-4" /> Trip Photo
+                  </button>
+                  <button type="button" onClick={() => { setUploadType('video'); setSelectedFile(null); }}
+                    className={`flex-1 py-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                      uploadType === 'video'
+                        ? 'bg-primary/20 text-primary border-primary/40'
+                        : 'border-zinc-800 text-muted-foreground hover:bg-zinc-900'
+                    }`}>
+                    <Video className="w-4 h-4" /> Video Story
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-muted-foreground uppercase">Upload File</label>
+                <div className="flex flex-col gap-2">
+                  <input type="file" accept={uploadType === 'video' ? 'video/*' : 'image/*'}
+                    onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                    disabled={uploadingFile}
+                    className="hidden" id="file-upload" />
+                  <label htmlFor="file-upload"
+                    className="border border-dashed border-zinc-800 hover:border-primary/50 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-900/50 transition-all">
+                    {uploadingFile ? (
+                      <>
+                        <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
+                        <span className="text-xs text-muted-foreground">Uploading to public host...</span>
+                      </>
+                    ) : selectedFile ? (
+                      <>
+                        <CheckCircle className="w-8 h-8 text-emerald-400 mb-2" />
+                        <span className="text-xs font-medium text-white max-w-[200px] truncate">{selectedFile.name}</span>
+                        <span className="text-[10px] text-muted-foreground mt-1">Click to change file</span>
+                      </>
+                    ) : (
+                      <>
+                        <UploadCloud className="w-8 h-8 text-zinc-500 mb-2" />
+                        <span className="text-xs font-medium text-zinc-400">Select {uploadType === 'video' ? 'video' : 'photo'} file</span>
+                        <span className="text-[10px] text-zinc-600 mt-1">Direct free upload, no cloud billing cost</span>
+                      </>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              <div className="relative flex py-2 items-center">
+                <div className="flex-grow border-t border-zinc-900"></div>
+                <span className="flex-shrink mx-4 text-zinc-600 text-[10px] font-bold uppercase">Or Paste Link</span>
+                <div className="flex-grow border-t border-zinc-900"></div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-muted-foreground uppercase">Direct URL Link</label>
+                <input type="url" placeholder="https://..." value={uploadUrl} onChange={(e) => setUploadUrl(e.target.value)}
+                  disabled={uploadingFile || !!selectedFile}
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-primary/50 disabled:opacity-50" />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button type="button" onClick={() => setShowUploadModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-zinc-800 text-xs font-semibold text-muted-foreground hover:bg-zinc-900 transition-colors">
+                  Cancel
+                </button>
+                <button type="submit" disabled={uploadingFile || (!selectedFile && !uploadUrl.trim())}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white transition-all bg-gradient-to-r from-violet-500 to-indigo-500 hover:from-violet-600 hover:to-indigo-600 disabled:opacity-50">
+                  Share
+                </button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       )}
     </PageLayout>
   );
