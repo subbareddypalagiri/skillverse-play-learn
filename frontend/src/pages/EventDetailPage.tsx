@@ -100,19 +100,6 @@ const EventDetailPage = () => {
   const storiesList = memories.filter(m => m.type === 'video');
   const photosList = memories.filter(m => m.type === 'photo');
 
-  useEffect(() => {
-    if (showStoryViewer && storiesList.length > 0) {
-      const interval = setTimeout(() => {
-        if (activeStoryIndex < storiesList.length - 1) {
-          setActiveStoryIndex(prev => prev + 1);
-        } else {
-          setShowStoryViewer(false);
-        }
-      }, 5000);
-      return () => clearTimeout(interval);
-    }
-  }, [showStoryViewer, activeStoryIndex, storiesList.length]);
-
   const handleJoin = async () => {
     if (!user) {
       navigate('/login?redirect=/events/' + id);
@@ -224,8 +211,9 @@ const EventDetailPage = () => {
         <iframe
           key={url}
           src={`https://drive.google.com/file/d/${fileId}/preview`}
-          className="w-full h-full border-0"
-          allow="autoplay"
+          className="w-full h-full border-0 min-h-[420px]"
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allowFullScreen
         />
       );
     }
@@ -236,9 +224,10 @@ const EventDetailPage = () => {
       return (
         <iframe
           key={url}
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&modestbranding=1&rel=0`}
-          className="w-full h-full border-0"
-          allow="autoplay; encrypted-media"
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&modestbranding=1&rel=0`}
+          className="w-full h-full border-0 min-h-[420px]"
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allowFullScreen
         />
       );
     }
@@ -249,8 +238,8 @@ const EventDetailPage = () => {
         src={url}
         autoPlay
         playsInline
-        controls={false}
-        className="w-full h-full object-contain"
+        controls
+        className="w-full h-full object-contain max-h-[75vh]"
       />
     );
   };
@@ -717,21 +706,13 @@ const EventDetailPage = () => {
       {/* Story Viewer Modal */}
       {showStoryViewer && storiesList[activeStoryIndex] && (
         <Dialog open={showStoryViewer} onOpenChange={setShowStoryViewer}>
-          <DialogContent className="sm:max-w-md bg-zinc-950 border border-zinc-800 p-0 overflow-hidden rounded-2xl flex flex-col aspect-[9/16] max-h-[85vh] justify-between relative">
+          <DialogContent className="sm:max-w-xl w-full bg-zinc-950 border border-zinc-800 p-0 overflow-hidden rounded-2xl flex flex-col max-h-[90vh] relative shadow-2xl">
             <DialogTitle className="sr-only">Story Viewer</DialogTitle>
-            {/* Progress Bar Header */}
-            <div className="absolute top-0 inset-x-0 p-3 z-50 bg-gradient-to-b from-black/80 to-transparent">
-              <div className="flex gap-1 mb-2">
-                {storiesList.map((_, i) => (
-                  <div key={i} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
-                    <div className={`h-full bg-white transition-all duration-5000 ease-linear ${
-                      i < activeStoryIndex ? 'w-full' : i === activeStoryIndex ? 'w-full' : 'w-0'
-                    }`} style={{ transitionDuration: i === activeStoryIndex ? '5s' : '0s' }} />
-                  </div>
-                ))}
-              </div>
+            
+            {/* Header */}
+            <div className="p-3 bg-zinc-900 border-b border-white/10 flex items-center justify-between z-30">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-900 border border-white/20 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border border-white/20 flex items-center justify-center">
                   {storiesList[activeStoryIndex].userAvatar ? (
                     <img src={storiesList[activeStoryIndex].userAvatar} alt="User" className="w-full h-full object-cover" />
                   ) : (
@@ -743,22 +724,31 @@ const EventDetailPage = () => {
                   <p className="text-[9px] text-zinc-400">{new Date(storiesList[activeStoryIndex].createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
+
+              {/* Navigation and Close Controls */}
+              <div className="flex items-center gap-2">
+                {activeStoryIndex > 0 && (
+                  <button type="button" onClick={() => setActiveStoryIndex(prev => prev - 1)}
+                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-semibold text-white transition-colors">
+                    ← Prev
+                  </button>
+                )}
+                {activeStoryIndex < storiesList.length - 1 && (
+                  <button type="button" onClick={() => setActiveStoryIndex(prev => prev + 1)}
+                    className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] font-semibold text-white transition-colors">
+                    Next →
+                  </button>
+                )}
+                <button type="button" onClick={() => setShowStoryViewer(false)}
+                  className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white text-xs transition-colors">
+                  ✕
+                </button>
+              </div>
             </div>
 
-            {/* Video Player */}
-            <div className="w-full h-full flex items-center justify-center bg-black relative">
+            {/* Video / Embed Player (Interactive, user can play/pause/fullscreen) */}
+            <div className="w-full flex-1 min-h-[420px] max-h-[75vh] flex items-center justify-center bg-black relative">
               {renderStoryMedia(storiesList[activeStoryIndex].url)}
-              
-              {/* Left/Right Taps */}
-              <div className="absolute inset-y-0 left-0 w-1/3 cursor-pointer z-20" onClick={(e) => {
-                e.stopPropagation();
-                if (activeStoryIndex > 0) setActiveStoryIndex(prev => prev - 1);
-              }} />
-              <div className="absolute inset-y-0 right-0 w-1/3 cursor-pointer z-20" onClick={(e) => {
-                e.stopPropagation();
-                if (activeStoryIndex < storiesList.length - 1) setActiveStoryIndex(prev => prev + 1);
-                else setShowStoryViewer(false);
-              }} />
             </div>
           </DialogContent>
         </Dialog>
