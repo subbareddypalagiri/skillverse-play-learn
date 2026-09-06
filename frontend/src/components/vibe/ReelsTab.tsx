@@ -119,7 +119,7 @@ const CenteredReel = ({
   const driveId = driveMatch ? driveMatch[1] : null;
 
   return (
-    <div className="relative w-full h-[calc(100vh-130px)] bg-zinc-950 snap-start snap-always flex-shrink-0 flex items-center justify-center">
+    <div className="relative w-full h-[calc(100vh-170px)] bg-zinc-950 snap-start snap-always flex-shrink-0 flex items-center justify-center">
       <div className="relative h-full w-full flex items-center justify-center px-4">
         <div 
           className="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
@@ -127,7 +127,7 @@ const CenteredReel = ({
             width: '100%',
             maxWidth: '380px',
             aspectRatio: '9/16',
-            maxHeight: 'calc(100vh - 150px)'
+            maxHeight: 'calc(100vh - 185px)'
           }}
         >
           {ytId ? (
@@ -413,7 +413,7 @@ export default function ReelsTab() {
     <>
       <div
         ref={containerRef}
-        className="h-[calc(100vh-130px)] w-full overflow-y-scroll snap-y snap-mandatory bg-zinc-950 scrollbar-none"
+        className="h-[calc(100vh-170px)] w-full overflow-y-scroll snap-y snap-mandatory bg-zinc-950 scrollbar-none"
         style={{ scrollSnapType: "y mandatory" }}
       >
         {reels.map((reel, index) => (
@@ -438,7 +438,7 @@ export default function ReelsTab() {
         ))}
 
         {feedQuery.isFetchingNextPage && (
-          <div className="h-[calc(100vh-130px)] w-full bg-zinc-950 flex items-center justify-center snap-start">
+          <div className="h-[calc(100vh-170px)] w-full bg-zinc-950 flex items-center justify-center snap-start">
             <Loader2 className="w-8 h-8 animate-spin text-violet-400" />
           </div>
         )}
