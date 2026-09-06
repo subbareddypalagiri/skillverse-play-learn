@@ -128,15 +128,30 @@ export const getMyReels = async (req, res, next) => {
       .populate('comments.userId', 'name avatar')
       .sort({ createdAt: -1 });
 
-    // Combine and map results
-    const combinedReels = [
-      ...postReels.map(post => mapPost(post, req.userId)),
-      ...reelModels.map(reel => mapReel(reel, req.userId))
-    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // Combine and map results (prioritize Reel models, then add Post models)
+    const rawReels = [
+      ...reelModels.map(reel => mapReel(reel, req.userId)),
+      ...postReels.map(post => mapPost(post, req.userId))
+    ];
+
+    // Deduplicate by normalized video URL or id
+    const seen = new Set();
+    const combinedReels = [];
+    for (const item of rawReels) {
+      const vUrl = (item.mediaUrls?.[0]?.url || item.videoUrl || '').trim();
+      const urlKey = vUrl ? vUrl.replace(/[?#].*$/, '').toLowerCase() : null;
+      const key = urlKey || item._id?.toString();
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        combinedReels.push(item);
+      }
+    }
+
+    combinedReels.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return successResponse(res, 200, 'My reels fetched successfully', { 
       reels: combinedReels,
-      _debug: { postCount: postReels.length, reelCount: reelModels.length }
+      _debug: { postCount: postReels.length, reelCount: reelModels.length, uniqueCount: combinedReels.length }
     });
   } catch (error) {
     next(error);

@@ -1,9 +1,9 @@
 import { useState, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { uploadReelVideo, createPost } from "@/lib/feedApi";
+import { uploadReelVideo } from "@/lib/feedApi";
 import { uploadReel, getCloudinarySignature, uploadReelDirect } from "@/lib/reelsApi";
 import axios from "axios";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Upload, Loader2, Play, Sparkles, Video, Link as LinkIcon, CloudUpload } from "lucide-react";
 
@@ -49,15 +49,7 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
         duration: duration || 30,
       });
 
-      const videoUrl = createdReel?.videoUrl || "/uploads/reels/default.mp4";
-
-      await createPost({
-        caption: data.caption || "New Reel",
-        mediaType: "video",
-        mediaUrls: [{ url: videoUrl }],
-        category: (data.postCategory || "general") as any,
-        tags: ["reel"],
-      });
+      return createdReel;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts-feed"] });
@@ -149,14 +141,6 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
           videoSize: 0
         });
 
-        await createPost({
-          caption: caption || "New Reel",
-          mediaType: "video",
-          mediaUrls: [{ url: formattedUrl }],
-          category: (category || "general") as any,
-          tags: ["reel"],
-        });
-
         setIsDirectUploading(false);
         queryClient.invalidateQueries({ queryKey: ["posts-feed"] });
         queryClient.invalidateQueries({ queryKey: ["/posts/feed"] });
@@ -234,14 +218,6 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
           videoSize: file.size
         });
 
-        await createPost({
-          caption: caption || "New Reel",
-          mediaType: "video",
-          mediaUrls: [{ url: finalVideoUrl }],
-          category: (category || "general") as any,
-          tags: ["reel"],
-        });
-
         setUploadProgress(100);
         setIsDirectUploading(false);
         queryClient.invalidateQueries({ queryKey: ["posts-feed"] });
@@ -261,10 +237,9 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
       setIsDirectUploading(false);
       const errMsg = error.response?.data?.message || error.response?.data?.error || error?.message || "Failed to upload reel.";
       if (errMsg.includes("CLOUDINARY_ERROR") || errMsg.includes("Cloudinary") || errMsg.includes("cloud_name")) {
-        alert("⚠️ Cloudinary Configuration Alert:\n" + errMsg.replace("CLOUDINARY_ERROR: ", "") + "\n\n💡 Don't worry! Auto-switching you to the 'Paste Video Link' tab where you can publish instantly with 0 size limits!");
-        setUploadMode('link');
+        alert("Upload error: " + errMsg);
       } else {
-        alert("⚠️ Upload Alert: " + errMsg + "\n\n💡 Tip: If file upload fails on Vercel/Railway, switch to the 'Paste Video Link' tab!");
+        alert(errMsg);
       }
       console.error("Upload failed:", error.response?.data || error);
     }
@@ -286,7 +261,7 @@ export const ReelUploadModal = ({ isOpen, onClose }: ReelUploadModalProps) => {
                 </div>
                 Create Your Reel
               </DialogTitle>
-              <p className="text-sm text-white/50 mt-1">Share your story with the Vibe community</p>
+              <DialogDescription className="text-sm text-white/50 mt-1">Share your story with the Vibe community</DialogDescription>
             </DialogHeader>
 
             {/* Upload Mode Tabs */}

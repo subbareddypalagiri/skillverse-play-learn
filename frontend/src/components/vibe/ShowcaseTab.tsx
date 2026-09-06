@@ -27,7 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { LucideIcon } from "lucide-react";
 
 type Category = "all" | "coding" | "competitive" | "professional" | "creative";
@@ -81,7 +81,7 @@ function StatPill({ label, value, color }: { label: string; value: string | numb
   return (
     <div className="text-center">
       <p className={`text-lg font-bold ${color}`}>{value}</p>
-      <p className="text-[10px] text-white/40 uppercase tracking-wider">{label}</p>
+      <p className="text-[10px] text-zinc-400 uppercase tracking-wider">{label}</p>
     </div>
   );
 }
@@ -90,7 +90,7 @@ function ConnectedStats({ platform, data }: { platform: PlatformConfig; data: Re
   switch (platform.id) {
     case "github":
       return (
-        <div className="grid grid-cols-4 gap-2 py-3 border-y border-white/10">
+        <div className="grid grid-cols-4 gap-2 py-3 border-y border-zinc-800 bg-zinc-950/40 rounded-lg px-2">
           <StatPill label="Repos" value={data.publicRepos as number} color="text-amber-400" />
           <StatPill label="Stars" value={data.totalStars as number} color="text-amber-400" />
           <StatPill label="Followers" value={data.followers as number} color="text-white/80" />
@@ -99,7 +99,7 @@ function ConnectedStats({ platform, data }: { platform: PlatformConfig; data: Re
       );
     case "leetcode":
       return (
-        <div className="grid grid-cols-4 gap-2 py-3 border-y border-white/10">
+        <div className="grid grid-cols-4 gap-2 py-3 border-y border-zinc-800 bg-zinc-950/40 rounded-lg px-2">
           <StatPill label="Solved" value={data.totalSolved as number} color="text-amber-400" />
           <StatPill label="Easy" value={data.easySolved as number} color="text-emerald-400" />
           <StatPill label="Medium" value={data.mediumSolved as number} color="text-amber-400" />
@@ -108,21 +108,21 @@ function ConnectedStats({ platform, data }: { platform: PlatformConfig; data: Re
       );
     case "codeforces":
       return (
-        <div className="grid grid-cols-2 gap-2 py-3 border-y border-white/10">
+        <div className="grid grid-cols-2 gap-2 py-3 border-y border-zinc-800 bg-zinc-950/40 rounded-lg px-2">
           <StatPill label="Rating" value={data.rating as number} color="text-blue-400" />
           <StatPill label="Max" value={data.maxRating as number} color="text-blue-300" />
         </div>
       );
     case "hackerrank":
       return (
-        <div className="grid grid-cols-2 gap-2 py-3 border-y border-white/10">
+        <div className="grid grid-cols-2 gap-2 py-3 border-y border-zinc-800 bg-zinc-950/40 rounded-lg px-2">
           <StatPill label="Badges" value={data.badges as number} color="text-emerald-400" />
           <StatPill label="Points" value={data.points as number} color="text-emerald-300" />
         </div>
       );
     case "stackoverflow":
       return (
-        <div className="grid grid-cols-2 gap-2 py-3 border-y border-white/10">
+        <div className="grid grid-cols-2 gap-2 py-3 border-y border-zinc-800 bg-zinc-950/40 rounded-lg px-2">
           <StatPill label="Rep" value={data.reputation as number} color="text-orange-400" />
           <StatPill label="Badges" value={data.badges as number} color="text-orange-300" />
         </div>
@@ -217,7 +217,7 @@ export default function ShowcaseTab() {
   return (
     <div className="max-w-6xl mx-auto px-4 pb-16">
       {/* Hero stats */}
-      <div className="mb-8 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+      <div className="mb-8 p-6 rounded-2xl bg-zinc-900/70 border border-zinc-800/80 backdrop-blur-md shadow-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -225,7 +225,7 @@ export default function ShowcaseTab() {
               <span className="text-sm font-medium text-amber-400/80">Achievement Hub</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">Your Showcase</h2>
-            <p className="text-white/50 text-sm max-w-md">
+            <p className="text-zinc-400 text-sm max-w-md">
               Link GitHub, LeetCode, CodeForces & more — paste a profile URL or username and we handle the rest
             </p>
           </div>
@@ -251,14 +251,14 @@ export default function ShowcaseTab() {
                   {connectedCount}/{PLATFORMS.length}
                 </span>
               </div>
-              <p className="text-xs text-white/40">Connected</p>
+              <p className="text-xs text-zinc-400">Connected</p>
             </div>
             {stats?.score !== undefined && (
               <div className="text-center px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
                 <p className="text-2xl font-bold text-amber-400 flex items-center gap-1 justify-center">
                   <Zap className="w-5 h-5" />{stats.score}
                 </p>
-                <p className="text-xs text-white/40">Impact Score</p>
+                <p className="text-xs text-zinc-400">Impact Score</p>
               </div>
             )}
           </div>
@@ -266,7 +266,7 @@ export default function ShowcaseTab() {
 
         {/* Connected quick links */}
         {connectedCount > 0 && (
-          <div className="flex flex-wrap gap-2 mt-5 pt-5 border-t border-white/10">
+          <div className="flex flex-wrap gap-2 mt-5 pt-5 border-t border-zinc-800">
             {PLATFORMS.filter((p) => showcase?.[p.id]?.connected).map((p) => {
               const d = showcase?.[p.id] as { profileUrl?: string; websiteUrl?: string; username?: string };
               const url = d?.profileUrl || d?.websiteUrl;
@@ -276,7 +276,7 @@ export default function ShowcaseTab() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-white/70 hover:text-amber-300 hover:border-amber-500/30 transition-all"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-800/60 border border-zinc-700/80 text-xs text-zinc-300 hover:text-amber-300 hover:border-amber-500/30 transition-all"
                 >
                   <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   {p.name}
@@ -304,13 +304,13 @@ export default function ShowcaseTab() {
               onClick={() => setCategory(cat.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap border transition-all ${
                 category === cat.id
-                  ? "bg-amber-500/15 border-amber-500/40 text-amber-300"
-                  : "bg-white/5 border-white/10 text-white/50 hover:text-white/80"
+                  ? "bg-violet-600/20 border-violet-500/50 text-violet-300 font-semibold shadow-sm"
+                  : "bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
               }`}
             >
               <Icon className="w-4 h-4" />
               {cat.label}
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/10">
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-zinc-800 text-zinc-300">
                 {connected}/{count}
               </span>
             </button>
@@ -332,8 +332,8 @@ export default function ShowcaseTab() {
               key={platform.id}
               className={`group rounded-2xl border overflow-hidden transition-all duration-300 hover:scale-[1.01] ${
                 isConnected
-                  ? "bg-white/[0.07] border-amber-500/25 shadow-lg shadow-amber-500/5"
-                  : "bg-white/[0.03] border-white/10 hover:border-white/20"
+                  ? "bg-zinc-900/90 border-violet-500/30 shadow-lg shadow-violet-500/5"
+                  : "bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700"
               }`}
             >
               <div className={`bg-gradient-to-r ${platform.gradient} p-4 flex items-center gap-3`}>
@@ -362,7 +362,7 @@ export default function ShowcaseTab() {
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-white truncate">{displayName || "Connected"}</p>
-                        {data.bio && <p className="text-xs text-white/40 line-clamp-1">{data.bio as string}</p>}
+                        {data.bio && <p className="text-xs text-zinc-400 line-clamp-1">{data.bio as string}</p>}
                         {platform.id === "codeforces" && data.rank && (
                           <p className="text-xs text-blue-400">{data.rank as string}</p>
                         )}
@@ -374,19 +374,19 @@ export default function ShowcaseTab() {
                     {platform.id === "github" && Array.isArray(data.topLanguages) && (data.topLanguages as string[]).length > 0 && (
                       <div className="flex flex-wrap gap-1.5">
                         {(data.topLanguages as string[]).map((lang) => (
-                          <span key={lang} className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white/60">{lang}</span>
+                          <span key={lang} className="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300">{lang}</span>
                         ))}
                       </div>
                     )}
 
                     <div className="flex gap-2 pt-1">
                       {profileUrl && (
-                        <Button size="sm" variant="outline" className="flex-1 border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs" onClick={() => window.open(profileUrl, "_blank")}>
+                        <Button size="sm" variant="outline" className="flex-1 border-zinc-800 bg-zinc-800/50 hover:bg-zinc-800 text-white text-xs" onClick={() => window.open(profileUrl, "_blank")}>
                           <ExternalLink className="w-3.5 h-3.5 mr-1" /> Visit
                         </Button>
                       )}
                       {platform.id !== "portfolio" && platform.id !== "linkedin" && (
-                        <Button size="sm" variant="outline" className="border-white/10 bg-white/5 hover:bg-white/10 text-white text-xs" onClick={() => refreshMutation.mutate(platform.id)} disabled={refreshMutation.isPending}>
+                        <Button size="sm" variant="outline" className="border-zinc-800 bg-zinc-800/50 hover:bg-zinc-800 text-white text-xs" onClick={() => refreshMutation.mutate(platform.id)} disabled={refreshMutation.isPending}>
                           <RefreshCw className={`w-3.5 h-3.5 ${refreshMutation.isPending ? "animate-spin" : ""}`} />
                         </Button>
                       )}
@@ -397,7 +397,7 @@ export default function ShowcaseTab() {
                   </div>
                 ) : (
                   <div className="text-center py-2">
-                    <p className="text-white/40 text-xs mb-4">{platform.hint}</p>
+                    <p className="text-zinc-400 text-xs mb-4">{platform.hint}</p>
                     <Dialog open={connecting === platform.id} onOpenChange={(open) => setConnecting(open ? platform.id : null)}>
                       <DialogTrigger asChild>
                         <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold">
@@ -405,12 +405,15 @@ export default function ShowcaseTab() {
                           <ChevronRight className="w-4 h-4 ml-1 opacity-60" />
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="bg-[#0a0a12] border-white/10 text-white max-w-md">
+                      <DialogContent className="bg-zinc-950 border border-zinc-800 text-white max-w-md">
                         <DialogHeader>
                           <DialogTitle className="flex items-center gap-2">
                             <Icon className="w-5 h-5 text-amber-400" />
                             Connect {platform.name}
                           </DialogTitle>
+                          <DialogDescription className="text-xs text-zinc-400">
+                            Enter your {platform.name} handle or profile link to connect.
+                          </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 pt-2">
                           <div>
@@ -418,16 +421,16 @@ export default function ShowcaseTab() {
                               placeholder={platform.placeholder}
                               value={inputs[platform.id] || ""}
                               onChange={(e) => setInputs({ ...inputs, [platform.id]: e.target.value })}
-                              className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
                             />
-                            <p className="text-[11px] text-white/30 mt-1.5">{platform.hint}</p>
+                            <p className="text-[11px] text-zinc-500 mt-1.5">{platform.hint}</p>
                           </div>
                           {platform.id === "linkedin" && (
                             <Input
                               placeholder="Headline (optional)"
                               value={headline}
                               onChange={(e) => setHeadline(e.target.value)}
-                              className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
                             />
                           )}
                           {platform.id === "portfolio" && (
@@ -435,7 +438,7 @@ export default function ShowcaseTab() {
                               placeholder="Site title (optional)"
                               value={portfolioTitle}
                               onChange={(e) => setPortfolioTitle(e.target.value)}
-                              className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500"
                             />
                           )}
                           <Button

@@ -111,29 +111,51 @@ const CenteredReel = ({
     }
   };
 
+  const isYouTube = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([\w-]{11})/.test(reel.videoUrl || "");
+  const ytMatch = (reel.videoUrl || "").match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([\w-]{11})/);
+  const ytId = ytMatch ? ytMatch[1] : null;
+
+  const driveMatch = (reel.videoUrl || "").match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || (reel.videoUrl || "").match(/id=([a-zA-Z0-9_-]+)/);
+  const driveId = driveMatch ? driveMatch[1] : null;
+
   return (
-    <div className="relative w-full h-screen bg-zinc-950 snap-start snap-always flex-shrink-0 flex items-center justify-center">
+    <div className="relative w-full h-[calc(100vh-130px)] bg-zinc-950 snap-start snap-always flex-shrink-0 flex items-center justify-center">
       <div className="relative h-full w-full flex items-center justify-center px-4">
         <div 
-          className="relative bg-black rounded-xl overflow-hidden shadow-2xl"
+          className="relative bg-black rounded-2xl overflow-hidden shadow-2xl border border-zinc-800"
           style={{ 
             width: '100%',
-            maxWidth: '400px',
+            maxWidth: '380px',
             aspectRatio: '9/16',
-            maxHeight: 'calc(100vh - 60px)'
+            maxHeight: 'calc(100vh - 150px)'
           }}
         >
-          <video
-            ref={videoRef}
-            src={resolveMediaUrl(reel.videoUrl)}
-            className="absolute inset-0 w-full h-full object-contain bg-black"
-            loop
-            playsInline
-            muted={isMuted}
-            onClick={togglePlayPause}
-          />
+          {ytId ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${ytId}?autoplay=${isActive ? 1 : 0}&mute=${isMuted ? 1 : 0}&loop=1&playlist=${ytId}&controls=0&modestbranding=1&rel=0`}
+              className="absolute inset-0 w-full h-full border-0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
+          ) : driveId ? (
+            <iframe
+              src={`https://drive.google.com/file/d/${driveId}/preview`}
+              className="absolute inset-0 w-full h-full border-0"
+              allow="autoplay"
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              src={resolveMediaUrl(reel.videoUrl)}
+              className="absolute inset-0 w-full h-full object-contain bg-black"
+              loop
+              playsInline
+              muted={isMuted}
+              onClick={togglePlayPause}
+            />
+          )}
 
-          {!isPlaying && isActive && (
+          {!isPlaying && isActive && !ytId && !driveId && (
             <div 
               className="absolute inset-0 flex items-center justify-center z-10"
               onClick={togglePlayPause}
@@ -144,34 +166,36 @@ const CenteredReel = ({
             </div>
           )}
 
-          <button
-            onClick={onToggleMute}
-            className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-black/80 transition-colors"
-          >
-            {isMuted ? (
-              <VolumeX className="w-4 h-4 text-white" />
-            ) : (
-              <Volume2 className="w-4 h-4 text-white" />
-            )}
-          </button>
+          {!ytId && !driveId && (
+            <button
+              onClick={onToggleMute}
+              className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-black/80 transition-colors"
+            >
+              {isMuted ? (
+                <VolumeX className="w-4 h-4 text-white" />
+              ) : (
+                <Volume2 className="w-4 h-4 text-white" />
+              )}
+            </button>
+          )}
 
-          <div className="absolute bottom-0 left-0 right-0 z-20 p-4 pb-6 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+          <div className="absolute bottom-0 left-0 right-0 z-20 p-4 pb-5 bg-gradient-to-t from-black/95 via-black/60 to-transparent">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-xs shadow-md">
                 {(reel.creator?.name || "U").charAt(0).toUpperCase()}
               </div>
-              <span className="text-white font-semibold text-sm">{reel.creator?.name || "Creator"}</span>
+              <span className="text-white font-semibold text-xs sm:text-sm truncate">{reel.creator?.name || "Creator"}</span>
             </div>
 
-            <h2 className="text-white font-bold text-base mb-1 line-clamp-1">{reel.title}</h2>
+            <h2 className="text-white font-bold text-sm sm:text-base mb-1 line-clamp-1">{reel.title}</h2>
 
             {reel.caption && (
-              <p className="text-white/80 text-sm line-clamp-2">{reel.caption}</p>
+              <p className="text-white/80 text-xs sm:text-sm line-clamp-2">{reel.caption}</p>
             )}
 
             {reel.category && (
               <div className="mt-2">
-                <span className="inline-block px-2.5 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs">
+                <span className="inline-block px-2.5 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-[10px] sm:text-xs">
                   #{reel.category}
                 </span>
               </div>
@@ -179,10 +203,11 @@ const CenteredReel = ({
           </div>
         </div>
 
-        <div className="absolute right-4 md:right-[calc(50%-260px)] bottom-1/3 z-20 flex flex-col items-center gap-5">
+        {/* Action icons */}
+        <div className="absolute right-3 sm:right-[calc(50%-240px)] bottom-8 z-20 flex flex-col items-center gap-4">
           <button onClick={onLike} className="flex flex-col items-center gap-1 group">
-            <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
-              reel.isLiked ? "bg-red-500" : "bg-zinc-800/80 group-hover:bg-zinc-700"
+            <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all ${
+              reel.isLiked ? "bg-red-500 shadow-lg shadow-red-500/30" : "bg-zinc-900/80 border border-zinc-700/60 group-hover:bg-zinc-800"
             }`}>
               <Heart className={`w-5 h-5 ${reel.isLiked ? "text-white fill-white" : "text-white"}`} />
             </div>
@@ -190,38 +215,34 @@ const CenteredReel = ({
           </button>
 
           <button onClick={onComment} className="flex flex-col items-center gap-1 group">
-            <div className="w-11 h-11 rounded-full bg-zinc-800/80 group-hover:bg-zinc-700 flex items-center justify-center transition-colors">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-zinc-900/80 border border-zinc-700/60 group-hover:bg-zinc-800 flex items-center justify-center transition-colors">
               <MessageCircle className="w-5 h-5 text-white" />
             </div>
             <span className="text-white/90 text-xs font-medium">{reel.stats?.comments || 0}</span>
           </button>
 
           <button onClick={onSave} className="flex flex-col items-center gap-1 group">
-            <div className={`w-11 h-11 rounded-full flex items-center justify-center transition-all ${
-              reel.isSaved ? "bg-yellow-500" : "bg-zinc-800/80 group-hover:bg-zinc-700"
+            <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center transition-all ${
+              reel.isSaved ? "bg-amber-500 shadow-lg shadow-amber-500/30" : "bg-zinc-900/80 border border-zinc-700/60 group-hover:bg-zinc-800"
             }`}>
               <Bookmark className={`w-5 h-5 ${reel.isSaved ? "text-white fill-white" : "text-white"}`} />
             </div>
           </button>
 
           <button onClick={onShare} className="flex flex-col items-center gap-1 group">
-            <div className="w-11 h-11 rounded-full bg-zinc-800/80 group-hover:bg-zinc-700 flex items-center justify-center transition-colors">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-zinc-900/80 border border-zinc-700/60 group-hover:bg-zinc-800 flex items-center justify-center transition-colors">
               <Share2 className="w-5 h-5 text-white" />
             </div>
           </button>
 
           {canDelete && (
-            <button onClick={onDelete} className="flex flex-col items-center gap-1 group mt-2">
-              <div className="w-11 h-11 rounded-full bg-red-500/20 group-hover:bg-red-500 flex items-center justify-center transition-all border border-red-500/30">
+            <button onClick={onDelete} className="flex flex-col items-center gap-1 group">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-red-500/20 group-hover:bg-red-500 flex items-center justify-center transition-all border border-red-500/30">
                 <Trash2 className="w-5 h-5 text-red-400 group-hover:text-white" />
               </div>
             </button>
           )}
         </div>
-      </div>
-
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-        <ChevronDown className="w-5 h-5 text-white/40" />
       </div>
     </div>
   );
@@ -282,7 +303,7 @@ export default function ReelsTab() {
 
     const handleScroll = () => {
       const scrollTop = container.scrollTop;
-      const reelHeight = window.innerHeight;
+      const reelHeight = container.clientHeight || window.innerHeight;
       const newIndex = Math.round(scrollTop / reelHeight);
       
       if (newIndex !== currentIndex && newIndex >= 0 && newIndex < reels.length) {
@@ -303,16 +324,18 @@ export default function ReelsTab() {
       const container = containerRef.current;
       if (!container) return;
 
+      const reelHeight = container.clientHeight || window.innerHeight;
+
       if (e.key === "ArrowUp" && currentIndex > 0) {
         e.preventDefault();
         container.scrollTo({
-          top: (currentIndex - 1) * window.innerHeight,
+          top: (currentIndex - 1) * reelHeight,
           behavior: "smooth"
         });
       } else if (e.key === "ArrowDown" && currentIndex < reels.length - 1) {
         e.preventDefault();
         container.scrollTo({
-          top: (currentIndex + 1) * window.innerHeight,
+          top: (currentIndex + 1) * reelHeight,
           behavior: "smooth"
         });
       }
@@ -371,17 +394,17 @@ export default function ReelsTab() {
 
   if (feedQuery.isLoading) {
     return (
-      <div className="h-screen w-full bg-zinc-950 flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-white/70" />
+      <div className="h-[calc(100vh-130px)] w-full bg-zinc-950 flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-violet-400" />
       </div>
     );
   }
 
   if (reels.length === 0) {
     return (
-      <div className="h-screen w-full bg-zinc-950 flex flex-col items-center justify-center text-white">
+      <div className="h-[calc(100vh-130px)] w-full bg-zinc-950 flex flex-col items-center justify-center text-white">
         <p className="text-xl font-semibold mb-2">No reels yet</p>
-        <p className="text-white/50">Be the first to create a reel!</p>
+        <p className="text-zinc-500 text-sm">Be the first to create a reel!</p>
       </div>
     );
   }
@@ -390,7 +413,7 @@ export default function ReelsTab() {
     <>
       <div
         ref={containerRef}
-        className="h-screen w-full overflow-y-scroll snap-y snap-mandatory bg-zinc-950"
+        className="h-[calc(100vh-130px)] w-full overflow-y-scroll snap-y snap-mandatory bg-zinc-950 scrollbar-none"
         style={{ scrollSnapType: "y mandatory" }}
       >
         {reels.map((reel, index) => (
@@ -415,41 +438,43 @@ export default function ReelsTab() {
         ))}
 
         {feedQuery.isFetchingNextPage && (
-          <div className="h-screen w-full bg-zinc-950 flex items-center justify-center snap-start">
-            <Loader2 className="w-8 h-8 animate-spin text-white/70" />
+          <div className="h-[calc(100vh-130px)] w-full bg-zinc-950 flex items-center justify-center snap-start">
+            <Loader2 className="w-8 h-8 animate-spin text-violet-400" />
           </div>
         )}
       </div>
 
-      <div className="fixed left-6 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-3">
+      <div className="fixed left-6 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col gap-3">
         <button
           onClick={() => {
+            const h = containerRef.current?.clientHeight || window.innerHeight;
             if (currentIndex > 0) {
               containerRef.current?.scrollTo({
-                top: (currentIndex - 1) * window.innerHeight,
+                top: (currentIndex - 1) * h,
                 behavior: "smooth"
               });
             }
           }}
           disabled={currentIndex === 0}
-          className="w-10 h-10 rounded-full bg-zinc-800/80 hover:bg-zinc-700 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-zinc-800/80 transition-colors"
+          className="w-10 h-10 rounded-full bg-zinc-900/80 border border-zinc-800 hover:bg-zinc-800 flex items-center justify-center disabled:opacity-25 transition-colors"
         >
           <ChevronUp className="w-5 h-5 text-white" />
         </button>
-        <div className="text-white/80 text-xs text-center bg-zinc-800/80 rounded-full px-2 py-1.5 font-medium">
+        <div className="text-zinc-400 text-[11px] text-center bg-zinc-900/80 border border-zinc-800 rounded-full px-2 py-1 font-mono">
           {currentIndex + 1}/{reels.length}
         </div>
         <button
           onClick={() => {
+            const h = containerRef.current?.clientHeight || window.innerHeight;
             if (currentIndex < reels.length - 1) {
               containerRef.current?.scrollTo({
-                top: (currentIndex + 1) * window.innerHeight,
+                top: (currentIndex + 1) * h,
                 behavior: "smooth"
               });
             }
           }}
           disabled={currentIndex === reels.length - 1}
-          className="w-10 h-10 rounded-full bg-zinc-800/80 hover:bg-zinc-700 flex items-center justify-center disabled:opacity-30 disabled:hover:bg-zinc-800/80 transition-colors"
+          className="w-10 h-10 rounded-full bg-zinc-900/80 border border-zinc-800 hover:bg-zinc-800 flex items-center justify-center disabled:opacity-25 transition-colors"
         >
           <ChevronDown className="w-5 h-5 text-white" />
         </button>

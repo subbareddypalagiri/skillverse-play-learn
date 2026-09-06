@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 const API_ORIGIN = (import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1").replace(/\/api\/v1\/?$/, "");
 
@@ -20,6 +20,17 @@ const resolveMediaUrl = (url: string) => {
   if (!url) return "";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
   return `${API_ORIGIN}${url.startsWith("/") ? url : `/${url}`}`;
+};
+
+const getReelVideoUrl = (reel: any) => {
+  return reel?.mediaUrls?.[0]?.url || reel?.videoUrl || "";
+};
+
+const getYouTubeId = (url: string) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[2].length === 11 ? match[2] : null;
 };
 
 const fetchMyReels = async () => {
@@ -40,6 +51,39 @@ interface MyReelsTabProps {
   onUploadClick?: () => void;
 }
 
+function ReelThumbnail({ reel, className = "w-24 h-24" }: { reel: any; className?: string }) {
+  const mediaUrl = getReelVideoUrl(reel);
+  const resolvedUrl = resolveMediaUrl(mediaUrl);
+  const ytId = getYouTubeId(mediaUrl);
+
+  return (
+    <div className={`${className} rounded-xl overflow-hidden bg-zinc-950 flex-shrink-0 relative border border-zinc-800`}>
+      {ytId ? (
+        <img
+          src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`}
+          alt=""
+          className="w-full h-full object-cover"
+        />
+      ) : resolvedUrl ? (
+        <video
+          src={resolvedUrl}
+          className="w-full h-full object-cover"
+          muted
+          playsInline
+          preload="metadata"
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-zinc-900">
+          <Play className="w-6 h-6 text-zinc-600" />
+        </div>
+      )}
+      <div className="absolute inset-0 flex items-center justify-center bg-black/25 pointer-events-none">
+        <Play className="w-5 h-5 text-white fill-white" />
+      </div>
+    </div>
+  );
+}
+
 export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
   const queryClient = useQueryClient();
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -57,7 +101,22 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
     },
   });
 
-  const reels = reelsQuery.data?.data?.reels || reelsQuery.data?.reels || [];
+  // Deduplicate reels by normalized URL or ID
+  const reels = useMemo(() => {
+    const rawReels: any[] = reelsQuery.data?.data?.reels || reelsQuery.data?.reels || [];
+    const seen = new Set<string>();
+    const unique: any[] = [];
+    for (const reel of rawReels) {
+      const vUrl = getReelVideoUrl(reel).trim();
+      const normKey = vUrl ? vUrl.replace(/[?#].*$/, '').toLowerCase() : null;
+      const key = normKey || reel._id;
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        unique.push(reel);
+      }
+    }
+    return unique;
+  }, [reelsQuery.data]);
 
   const totalStats = reels.reduce(
     (acc, reel) => ({
@@ -107,11 +166,11 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2">
+            <h2 className="text-2xl font-bold flex items-center gap-2 text-white">
               <BarChart3 className="w-6 h-6 text-amber-400" />
               Creator Analytics
             </h2>
-            <p className="text-white/40 text-sm mt-1">Track how your reels perform</p>
+            <p className="text-zinc-400 text-sm mt-1">Track how your reels perform</p>
           </div>
           {onUploadClick && (
             <button
@@ -127,15 +186,15 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
         {reels.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {[
-              { label: "Total Views", value: totalStats.views, icon: Eye, color: "text-blue-400", bg: "from-blue-500/10 to-blue-600/5" },
-              { label: "Total Likes", value: totalStats.likes, icon: Heart, color: "text-red-400", bg: "from-red-500/10 to-red-600/5" },
-              { label: "Comments", value: totalStats.comments, icon: MessageCircle, color: "text-cyan-400", bg: "from-cyan-500/10 to-cyan-600/5" },
-              { label: "Shares", value: totalStats.shares, icon: Share2, color: "text-green-400", bg: "from-green-500/10 to-green-600/5" },
-              { label: "Engagement", value: `${engagementRate}%`, icon: Target, color: "text-amber-400", bg: "from-amber-500/10 to-amber-600/5" },
+              { label: "Total Views", value: totalStats.views, icon: Eye, color: "text-blue-400" },
+              { label: "Total Likes", value: totalStats.likes, icon: Heart, color: "text-red-400" },
+              { label: "Comments", value: totalStats.comments, icon: MessageCircle, color: "text-cyan-400" },
+              { label: "Shares", value: totalStats.shares, icon: Share2, color: "text-green-400" },
+              { label: "Engagement", value: `${engagementRate}%`, icon: Target, color: "text-amber-400" },
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-2xl border border-zinc-800 bg-[#141417] p-4 shadow-xl"
+                className="rounded-2xl border border-zinc-800/80 bg-zinc-900/70 backdrop-blur-md p-4 shadow-xl"
               >
                 <stat.icon className={`w-4 h-4 ${stat.color} mb-2`} />
                 <div className={`text-2xl font-bold ${stat.color}`}>
@@ -146,7 +205,7 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 rounded-2xl border border-dashed border-zinc-800 bg-[#141417]">
+          <div className="text-center py-16 rounded-2xl border border-dashed border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
             <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
               <Play className="w-7 h-7 text-amber-400" />
             </div>
@@ -170,7 +229,7 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
       {/* Charts */}
       {reels.length > 1 && (
         <div className="grid md:grid-cols-2 gap-4 mb-8">
-          <div className="rounded-2xl border border-zinc-800 bg-[#141417] p-5 shadow-xl">
+          <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/70 backdrop-blur-md p-5 shadow-xl">
             <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-amber-400" />
               Per-Reel Performance
@@ -189,8 +248,8 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
           </div>
 
           {pieData.length > 0 && (
-            <div className="rounded-2xl border border-zinc-800 bg-[#141417] p-5 shadow-xl">
-              <h3 className="text-sm font-semibold text-white/70 mb-4 flex items-center gap-2">
+            <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/70 backdrop-blur-md p-5 shadow-xl">
+              <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-amber-400" />
                 Engagement Breakdown
               </h3>
@@ -229,23 +288,13 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
 
       {/* Top performer */}
       {topReel && (
-        <div className="mb-8 rounded-2xl border border-amber-500/30 bg-[#141417] p-5 shadow-2xl text-white">
+        <div className="mb-8 rounded-2xl border border-amber-500/30 bg-zinc-900/70 backdrop-blur-md p-5 shadow-2xl text-white">
           <div className="flex items-center gap-2 text-amber-400 mb-3">
             <Zap className="w-4 h-4" />
             <h3 className="font-semibold text-sm">Top Performer</h3>
           </div>
           <div className="flex gap-4">
-            <div className="w-20 h-20 rounded-xl overflow-hidden bg-black flex-shrink-0 border border-zinc-800">
-              {topReel.mediaUrls[0]?.url && (
-                <video
-                  src={resolveMediaUrl(topReel.mediaUrls[0].url)}
-                  className="w-full h-full object-cover"
-                  muted
-                  playsInline
-                  preload="metadata"
-                />
-              )}
-            </div>
+            <ReelThumbnail reel={topReel} className="w-20 h-20" />
             <div className="flex-1 min-w-0">
               <p className="text-white text-sm font-medium line-clamp-2">{topReel.caption || "Untitled Reel"}</p>
               <div className="flex gap-4 mt-2 text-sm">
@@ -275,25 +324,10 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
             {reels.map((reel) => (
               <div
                 key={reel._id}
-                className="rounded-2xl border border-zinc-800 bg-[#141417] overflow-hidden hover:border-amber-500/40 shadow-xl transition-all group text-white"
+                className="rounded-2xl border border-zinc-800/80 bg-zinc-900/70 backdrop-blur-md overflow-hidden hover:border-violet-500/40 shadow-xl transition-all group text-white"
               >
                 <div className="flex gap-4 p-4">
-                  <div className="w-24 h-24 rounded-xl overflow-hidden bg-black flex-shrink-0 relative border border-zinc-800">
-                    {reel.mediaUrls[0]?.url && (
-                      <>
-                        <video
-                          src={resolveMediaUrl(reel.mediaUrls[0].url)}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          muted
-                          playsInline
-                          preload="metadata"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
-                          <Play className="w-5 h-5 text-white fill-white" />
-                        </div>
-                      </>
-                    )}
-                  </div>
+                  <ReelThumbnail reel={reel} className="w-24 h-24" />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold line-clamp-2 mb-1 text-white">{reel.caption || "Untitled Reel"}</h4>
                     <p className="text-xs text-zinc-400 mb-3 font-medium">
@@ -306,7 +340,7 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
                         { val: reel.stats?.comments || 0, label: "Comments", color: "text-cyan-400" },
                         { val: reel.stats?.shares || 0, label: "Shares", color: "text-green-400" },
                       ].map((s) => (
-                        <div key={s.label} className="bg-zinc-800/80 rounded-lg px-2 py-1.5">
+                        <div key={s.label} className="bg-zinc-950/70 border border-zinc-800/60 rounded-lg px-2 py-1.5">
                           <div className={`font-bold ${s.color}`}>{s.val}</div>
                           <div className="text-zinc-400 font-medium">{s.label}</div>
                         </div>
@@ -329,20 +363,20 @@ export default function MyReelsTab({ onUploadClick }: MyReelsTabProps) {
       )}
 
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
-        <AlertDialogContent className="bg-[#0a0a14] border-white/10 text-white">
+        <AlertDialogContent className="bg-zinc-950 border-zinc-800 text-white">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Reel?</AlertDialogTitle>
-            <AlertDialogDescription className="text-white/50">
+            <AlertDialogDescription className="text-zinc-400">
               This action cannot be undone. Your reel will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex gap-3">
-            <AlertDialogCancel className="bg-white/5 text-white border-white/10 hover:bg-white/10">
+            <AlertDialogCancel className="bg-zinc-900 text-white border-zinc-800 hover:bg-zinc-800">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteId && deleteMutation.mutate(deleteId)}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
