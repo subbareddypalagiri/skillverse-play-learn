@@ -209,55 +209,6 @@ app.use(notFound);
 app.use(globalErrorHandler);
 
 // ============================================================
-// DATABASE INITIALIZATION
-// ============================================================
-
-const initializeApp = async () => {
-  try {
-    // Connect to MongoDB
-    await connectDB();
-
-    // Start Daily Scheduler Workers
-    startScheduler();
-    startAIToolsScheduler();
-
-    // Start Server
-    const server = app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT} in ${NODE_ENV} mode`);
-      logger.info(`API Documentation: http://localhost:${PORT}/api/docs`);
-      logger.info(`Health Check: http://localhost:${PORT}/health`);
-    });
-
-    // Graceful Shutdown
-    process.on('SIGTERM', () => {
-      logger.info('SIGTERM signal received: closing HTTP server');
-      server.close(() => {
-        logger.info('HTTP server closed');
-        mongoose.connection.close(false, () => {
-          logger.info('MongoDB connection closed');
-          process.exit(0);
-        });
-      });
-    });
-
-    process.on('SIGINT', () => {
-      logger.info('SIGINT signal received: closing HTTP server');
-      server.close(() => {
-        logger.info('HTTP server closed');
-        mongoose.connection.close(false, () => {
-          logger.info('MongoDB connection closed');
-          process.exit(0);
-        });
-      });
-    });
-
-  } catch (error) {
-    logger.error('Failed to initialize application:', error);
-    process.exit(1);
-  }
-};
-
-// ============================================================
 // START APPLICATION
 // ============================================================
 

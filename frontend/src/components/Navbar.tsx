@@ -14,6 +14,7 @@ const primaryNavigation = [
 
 const eventsDropdown = [
   { name: "Sync", path: "/sync" },
+  { name: "Clubs", path: "/clubs" },
   { name: "Achievements", path: "/achievements" },
 ];
 
@@ -63,7 +64,7 @@ const Navbar = () => {
   };
 
   const closeMobile = () => setMobileOpen(false);
-  const showNav = navVisible || mobileOpen;
+  const showNav = isHomePage ? (navVisible || mobileOpen) : true;
 
   return (
     <nav

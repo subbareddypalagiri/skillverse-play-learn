@@ -32,6 +32,7 @@ import Sync from "./pages/Sync";
 import ApplyMentor from "./pages/ApplyMentor";
 import ApplyAlumniExpert from "./pages/ApplyAlumniExpert";
 import ApplyAlumni from "./pages/ApplyAlumni";
+import Clubs from "./pages/Clubs";
 import ClubPage from "./pages/ClubPage";
 import AITools from "./pages/AITools";
 import AIAssistant from "./pages/AIAssistant";
@@ -104,6 +105,7 @@ const App = () => (
                     <Route path="/apply-mentor" element={<ProtectedRoute><ApplyMentor /></ProtectedRoute>} />
                     <Route path="/apply-alumni-expert" element={<ProtectedRoute><ApplyAlumniExpert /></ProtectedRoute>} />
                     <Route path="/apply-alumni" element={<ProtectedRoute><ApplyAlumni /></ProtectedRoute>} />
+                    <Route path="/clubs" element={<ProtectedRoute><Clubs /></ProtectedRoute>} />
                     <Route path="/clubs/:id" element={<ProtectedRoute><ClubPage /></ProtectedRoute>} />
                     <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                     <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
