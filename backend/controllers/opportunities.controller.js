@@ -1,38 +1,44 @@
 import {
   getOpportunities,
   getOpportunityById,
-  ingestOpportunities
+  ingestOpportunities,
+  subscribeAlerts
 } from '../services/opportunities.service.js';
+import { executeGovtPipeline } from '../agents/fetchGovtJobs.js';
 import { successResponse, paginatedResponse } from '../utils/responseHandler.js';
 import { NotFoundError, ValidationError } from '../utils/errorHandler.js';
 import logger from '../config/logger.js';
 
 // ============================================================
-// OPPORTUNITY CONTROLLER — HTTP → Service bridge
-// ============================================================
-// Follows the same async/await + next(error) pattern used by
-// the existing Risee controllers (jobController, courseController, etc.)
+// OPPORTUNITY CONTROLLER — HTTP → Service Bridge
 // ============================================================
 
 /**
  * @desc    List opportunities with filtering, search & pagination
  * @route   GET /api/opportunities
- * @query   type, location, search, page, limit
+ * @query   type, category, education, department, status, location, search, page, limit
  * @access  Public
  */
 export const listOpportunities = async (req, res, next) => {
   try {
-    const { type, location, search, page, limit } = req.query;
+    const { type, category, education, department, status, location, search, page, limit } = req.query;
 
     logger.info(`[OpportunitiesAPI] GET /opportunities`, {
-      query: { type, location, search, page, limit },
-      ip: req.ip,
-      userAgent: req.get('user-agent')
+      query: { type, category, education, department, status, location, search, page, limit },
+      ip: req.ip
     });
 
-    const result = await getOpportunities({ type, location, search, page, limit });
-
-    logger.info(`[OpportunitiesAPI] Response: ${result.totalResults} total results, page ${result.currentPage}, returning ${result.data.length} items`);
+    const result = await getOpportunities({
+      type,
+      category,
+      education,
+      department,
+      status,
+      location,
+      search,
+      page,
+      limit
+    });
 
     return paginatedResponse(res, 200, 'Opportunities fetched successfully', result.data, {
       page:  result.currentPage,
@@ -40,11 +46,7 @@ export const listOpportunities = async (req, res, next) => {
       total: result.totalResults
     });
   } catch (error) {
-    logger.error(`[OpportunitiesAPI] GET /opportunities FAILED`, {
-      error: error.message,
-      stack: error.stack,
-      query: req.query
-    });
+    logger.error(`[OpportunitiesAPI] GET /opportunities FAILED: ${error.message}`);
     next(error);
   }
 };
@@ -57,21 +59,14 @@ export const listOpportunities = async (req, res, next) => {
 export const showOpportunity = async (req, res, next) => {
   try {
     const { id } = req.params;
-    logger.info(`[OpportunitiesAPI] GET /opportunities/${id}`);
-
     const opportunity = await getOpportunityById(id);
 
     if (!opportunity) {
-      logger.warn(`[OpportunitiesAPI] Opportunity not found: ${id}`);
       throw new NotFoundError('Opportunity not found');
     }
 
-    logger.info(`[OpportunitiesAPI] Found opportunity: "${opportunity.title}" by ${opportunity.organization}`);
     return successResponse(res, 200, 'Opportunity details fetched', { opportunity });
   } catch (error) {
-    logger.error(`[OpportunitiesAPI] GET /opportunities/${req.params.id} FAILED`, {
-      error: error.message
-    });
     next(error);
   }
 };
@@ -80,9 +75,6 @@ export const showOpportunity = async (req, res, next) => {
  * @desc    Bulk-ingest opportunity records (JSON array in body)
  * @route   POST /api/opportunities/ingest
  * @access  Private (admin-only via middleware)
- *
- * Expected body:
- *   { "records": [ { title, organization, type, location, ... }, ... ] }
  */
 export const bulkIngest = async (req, res, next) => {
   try {
@@ -97,18 +89,61 @@ export const bulkIngest = async (req, res, next) => {
     }
 
     logger.info(`[OpportunitiesAPI] Ingestion started: ${records.length} records`);
-
     const result = await ingestOpportunities(records);
-
-    logger.info(`[OpportunitiesAPI] Ingestion complete`, {
-      inserted: result.inserted,
-      updated: result.updated,
-      failed: result.failed,
-      errors: result.errors?.length || 0
-    });
 
     return successResponse(res, 200, 'Ingestion complete', result);
   } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Subscribe to WhatsApp and Email recruitment alerts
+ * @route   POST /api/opportunities/alerts/subscribe
+ * @access  Public
+ */
+export const subscribeAlertsHandler = async (req, res, next) => {
+  try {
+    const { whatsapp, email, categories, userId } = req.body;
+
+    if (!whatsapp || whatsapp.trim().length < 10) {
+      throw new ValidationError('Please provide a valid 10-digit WhatsApp number');
+    }
+
+    const subscription = await subscribeAlerts({
+      whatsapp,
+      email,
+      categories,
+      userId: userId || req.user?.id
+    });
+
+    return successResponse(res, 201, 'Subscribed to recruitment alerts successfully', {
+      subscription: {
+        whatsapp: subscription.whatsapp,
+        email: subscription.email,
+        categories: subscription.categories,
+        active: subscription.active
+      }
+    });
+  } catch (error) {
+    logger.error(`[OpportunitiesAPI] Alert subscription failed: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * @desc    Trigger automated Government Job Sync & Auto-Expiry
+ * @route   POST /api/opportunities/sync-govt
+ * @access  Public / Admin
+ */
+export const syncGovtOpportunities = async (req, res, next) => {
+  try {
+    logger.info('[OpportunitiesAPI] Manual trigger: syncGovtOpportunities');
+    const result = await executeGovtPipeline();
+
+    return successResponse(res, 200, 'Government notifications synchronized successfully', result);
+  } catch (error) {
+    logger.error(`[OpportunitiesAPI] Govt sync failed: ${error.message}`);
     next(error);
   }
 };

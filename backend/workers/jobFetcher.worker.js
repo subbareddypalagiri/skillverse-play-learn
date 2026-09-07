@@ -9,6 +9,7 @@ import connectDB from '../config/database.js';
 // Core modules
 import { runFetchJobs } from '../agents/fetchAllJobs.js';
 import { runIngestion } from '../agents/opportunity.ingestion.agent.js';
+import { executeGovtPipeline } from '../agents/fetchGovtJobs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,11 +57,14 @@ export const executePipeline = async () => {
     logger.info(`[Scheduler] Step 3: Triggering ingestion for ${records.length} records...`);
     const ingestionResult = await runIngestion(records);
 
+    // 5. Trigger Government Notifications Sync Pipeline & Auto-Expiry
+    logger.info('[Scheduler] Step 4: Triggering Government recruitment sync & auto-expiry...');
+    const govtResult = await executeGovtPipeline();
+
     logger.info('\n======================================');
     logger.info('[Scheduler] Pipeline execution COMPLETE');
-    logger.info(`Inserted: ${ingestionResult.inserted}`);
-    logger.info(`Updated : ${ingestionResult.updated}`);
-    logger.info(`Failed  : ${ingestionResult.failed}`);
+    logger.info(`IT Jobs Ingested      : ${ingestionResult.inserted} inserted, ${ingestionResult.updated} updated`);
+    logger.info(`Govt Notices Ingested : ${govtResult.inserted} inserted, ${govtResult.updated} updated, ${govtResult.archived} archived`);
     logger.info('======================================\n');
 
   } catch (error) {

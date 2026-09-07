@@ -97,11 +97,69 @@ const typeColors: Record<string, string> = {
   });
   const [subscribedCategories, setSubscribedCategories] = useState<string[]>(['ap_state', 'central', 'banking']);
   const [alertSuccess, setAlertSuccess] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
+  const [liveGovtJobs, setLiveGovtJobs] = useState<GovtJobNotification[]>([]);
+  const [loadingGovt, setLoadingGovt] = useState(false);
+
+  const fetchGovtOpportunities = async () => {
+    try {
+      setLoadingGovt(true);
+      const res = await apiClient.get('/opportunities?type=govt&limit=200');
+      if (res.data?.success && Array.isArray(res.data?.data) && res.data.data.length > 0) {
+        const normalized: GovtJobNotification[] = res.data.data.map((item: any) => ({
+          id: item._id || item.id || `govt-${Math.random()}`,
+          title: item.title,
+          department: item.department || item.organization || 'Government Recruitment',
+          category: item.category || 'central',
+          categoryLabel: item.category === 'ap_state' ? 'AP State Govt' : item.category === 'railway' || item.category === 'railways' ? 'Railways (RRB)' : item.category === 'banking' ? 'Banking & Finance' : item.category === 'defense' || item.category === 'defense_psu' ? 'Defense & PSUs' : 'Central Govt',
+          vacancies: item.vacancies || 'Various Posts',
+          qualification: item.qualification || 'Degree / Diploma / 12th',
+          ageLimit: item.ageLimit || '18 - 42 Years',
+          salary: item.salaryScale || item.salary || 'Govt Pay Scale',
+          salaryScale: item.salaryScale || item.salary || 'Govt Pay Scale',
+          location: item.location || 'India',
+          postedDate: item.importantDates?.notificationDate || (item.postedAt ? item.postedAt.split('T')[0] : '2026-08-01'),
+          lastDate: item.importantDates?.lastDate || (item.expiresAt ? item.expiresAt.split('T')[0] : '2026-12-31'),
+          status: item.status === 'expired' ? 'Expired' : 'Active',
+          officialWebsite: item.officialApplyLink || item.applyLink || 'https://psc.ap.gov.in',
+          applyLink: item.applyLink || item.officialApplyLink || 'https://psc.ap.gov.in',
+          officialApplyLink: item.officialApplyLink || item.applyLink || 'https://psc.ap.gov.in',
+          notificationPdf: item.notificationPdfLink || item.officialApplyLink || 'https://psc.ap.gov.in',
+          notificationPdfLink: item.notificationPdfLink || item.officialApplyLink || 'https://psc.ap.gov.in',
+          description: item.description || '',
+          tags: Array.isArray(item.tags) ? item.tags : []
+        }));
+        setLiveGovtJobs(normalized);
+      }
+    } catch {
+      // Backend gracefully falls back to local verified seed
+    } finally {
+      setLoadingGovt(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGovtOpportunities();
+  }, []);
+
+  // Merge live database notifications with seed notifications (using Map to deduplicate by title/id)
+  const activeGovtDataset = useMemo(() => {
+    if (liveGovtJobs.length === 0) return govtJobNotifications;
+    const map = new Map<string, GovtJobNotification>();
+    // Live database jobs take priority
+    liveGovtJobs.forEach(job => map.set(job.title.toLowerCase().trim(), job));
+    // Seed dataset acts as guaranteed fallback
+    govtJobNotifications.forEach(job => {
+      const key = job.title.toLowerCase().trim();
+      if (!map.has(key)) map.set(key, job);
+    });
+    return Array.from(map.values());
+  }, [liveGovtJobs]);
 
   const filteredGovtJobs = useMemo(() => {
-    return govtJobNotifications.filter(job => {
-      const matchCat = govtCategory === 'all' || job.category === govtCategory;
-      const qual = (job.qualification + " " + job.tags.join(" ")).toLowerCase();
+    return activeGovtDataset.filter(job => {
+      const matchCat = govtCategory === 'all' || job.category === govtCategory || (govtCategory === 'railways' && job.category === 'railway') || (govtCategory === 'defense_psu' && job.category === 'defense');
+      const qual = (job.qualification + " " + (job.tags || []).join(" ")).toLowerCase();
       const matchEdu = govtEducation === 'all' ||
         (govtEducation === 'btech' && (qual.includes('b.tech') || qual.includes('b.e') || qual.includes('engineering'))) ||
         (govtEducation === 'degree' && (qual.includes('degree') || qual.includes('bachelor') || qual.includes('graduation') || qual.includes('b.sc') || qual.includes('b.com'))) ||
@@ -110,15 +168,15 @@ const typeColors: Record<string, string> = {
       const q = govtSearch.trim().toLowerCase();
       const matchQuery = !q ||
         job.title.toLowerCase().includes(q) ||
-        job.department.toLowerCase().includes(q) ||
-        job.qualification.toLowerCase().includes(q) ||
-        job.location.toLowerCase().includes(q) ||
-        job.tags.some(t => t.toLowerCase().includes(q));
+        (job.department && job.department.toLowerCase().includes(q)) ||
+        (job.qualification && job.qualification.toLowerCase().includes(q)) ||
+        (job.location && job.location.toLowerCase().includes(q)) ||
+        (job.tags && job.tags.some(t => t.toLowerCase().includes(q)));
       return matchCat && matchEdu && matchQuery;
     });
-  }, [govtCategory, govtEducation, govtSearch]);
+  }, [activeGovtDataset, govtCategory, govtEducation, govtSearch]);
 
-  const handleSubscribeAlerts = () => {
+  const handleSubscribeAlerts = async () => {
     if (!whatsappNumber || whatsappNumber.length < 10) {
       toast({
         title: "Valid WhatsApp Number Required",
@@ -127,17 +185,44 @@ const typeColors: Record<string, string> = {
       });
       return;
     }
-    localStorage.setItem('userWhatsapp', whatsappNumber);
-    localStorage.setItem('govtAlertPrefs', JSON.stringify(subscribedCategories));
-    setAlertSuccess(true);
-    toast({
-      title: "🎉 Alert Preferences Saved!",
-      description: `Daily alerts will be sent to WhatsApp (${whatsappNumber}) and ${user?.email || 'your registered Gmail'}.`
-    });
-    setTimeout(() => {
-      setAlertsModalOpen(false);
-      setAlertSuccess(false);
-    }, 1800);
+
+    try {
+      setSubscribing(true);
+      // Persist to MongoDB backend
+      await apiClient.post('/opportunities/alerts/subscribe', {
+        whatsapp: whatsappNumber,
+        email: user?.email || undefined,
+        categories: subscribedCategories,
+        userId: user?.id || undefined
+      });
+
+      localStorage.setItem('userWhatsapp', whatsappNumber);
+      localStorage.setItem('govtAlertPrefs', JSON.stringify(subscribedCategories));
+      setAlertSuccess(true);
+      toast({
+        title: "🎉 Alert Preferences Saved to Server!",
+        description: `Daily alerts configured for WhatsApp (${whatsappNumber}) and ${user?.email || 'your registered Gmail'}.`
+      });
+      setTimeout(() => {
+        setAlertsModalOpen(false);
+        setAlertSuccess(false);
+      }, 1800);
+    } catch {
+      // Still persist locally if backend is temporarily unreachable
+      localStorage.setItem('userWhatsapp', whatsappNumber);
+      localStorage.setItem('govtAlertPrefs', JSON.stringify(subscribedCategories));
+      setAlertSuccess(true);
+      toast({
+        title: "Preferences Saved Locally",
+        description: `Alert preferences recorded for ${whatsappNumber}.`
+      });
+      setTimeout(() => {
+        setAlertsModalOpen(false);
+        setAlertSuccess(false);
+      }, 1800);
+    } finally {
+      setSubscribing(false);
+    }
   };
 
   const fetchOpportunities = async (search = "", location = "all", type = "all") => {
@@ -869,7 +954,7 @@ const typeColors: Record<string, string> = {
                 {/* Live Vacancies Quick Stats */}
                 <div className="flex flex-wrap items-center gap-2.5 pt-2">
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-black text-emerald-400 flex items-center gap-1.5 shadow-sm">
-                    <TrendingUp className="w-3.5 h-3.5" /> 2,50,000+ Total Posts ({govtJobNotifications.length} Active Notifications)
+                    <TrendingUp className="w-3.5 h-3.5" /> 2,50,000+ Total Posts ({activeGovtDataset.length} Active Notifications)
                   </div>
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-cyan-300">
                     🚩 55,000+ AP State
@@ -1404,13 +1489,18 @@ const typeColors: Record<string, string> = {
             <div className="pt-2">
               <button
                 onClick={handleSubscribeAlerts}
-                disabled={alertSuccess}
+                disabled={alertSuccess || subscribing}
                 className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition disabled:opacity-50"
               >
                 {alertSuccess ? (
                   <>
                     <Check className="w-4 h-4 text-white" />
                     <span>Subscribed Successfully!</span>
+                  </>
+                ) : subscribing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>Saving Alert Preferences...</span>
                   </>
                 ) : (
                   <>

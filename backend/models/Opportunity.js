@@ -62,6 +62,60 @@ const opportunitySchema = new mongoose.Schema({
     trim: true
   },
 
+  // ── Government Job Specific Metadata ────────────────────────
+  category: {
+    type: String,
+    trim: true,
+    index: true // 'ap_state', 'central', 'railways', 'banking', 'defense_psu'
+  },
+  department: {
+    type: String,
+    trim: true,
+    index: true // 'APPSC', 'SSC', 'RRB', 'UPSC', 'IBPS', etc.
+  },
+  vacancies: {
+    type: String,
+    trim: true
+  },
+  qualification: {
+    type: String,
+    trim: true,
+    index: true
+  },
+  ageLimit: {
+    type: String,
+    trim: true
+  },
+  salaryScale: {
+    type: String,
+    trim: true
+  },
+  notificationPdfLink: {
+    type: String,
+    trim: true
+  },
+  officialApplyLink: {
+    type: String,
+    trim: true
+  },
+  importantDates: {
+    notificationDate: { type: String, trim: true },
+    applyStart: { type: String, trim: true },
+    lastDate: { type: String, trim: true },
+    examDate: { type: String, trim: true }
+  },
+  tags: {
+    type: [String],
+    default: [],
+    index: true
+  },
+  status: {
+    type: String,
+    enum: ['active', 'expired', 'archived'],
+    default: 'active',
+    index: true
+  },
+
   // ── Data Source Tracking ───────────────────────────────────
   source: {
     type: String,
@@ -88,6 +142,10 @@ const opportunitySchema = new mongoose.Schema({
 
 // Primary listing query: filter by type, sort by newest
 opportunitySchema.index({ type: 1, postedAt: -1 });
+
+// Government jobs query by category, status, and posted date
+opportunitySchema.index({ type: 1, category: 1, status: 1, postedAt: -1 });
+opportunitySchema.index({ type: 1, status: 1, expiresAt: 1 });
 
 // Location + type combo filter (common frontend usage)
 opportunitySchema.index({ location: 1, type: 1 });
