@@ -1,6 +1,11 @@
 import Opportunity from '../models/Opportunity.js';
 import AlertSubscription from '../models/AlertSubscription.js';
 import logger from '../config/logger.js';
+import {
+  sendWhatsAppMessage,
+  sendEmailAlert,
+  generateRecruitmentEmailHtml
+} from './notification.service.js';
 
 // ============================================================
 // OPPORTUNITY SERVICE — Unified Business Logic Layer
@@ -374,12 +379,40 @@ export const sendTestAlertService = async ({ whatsapp, email }) => {
   const phoneWithCountry = cleanWhatsapp.length === 10 ? `91${cleanWhatsapp}` : cleanWhatsapp;
   const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneWithCountry}&text=${encodeURIComponent(bulletin)}`;
 
-  logger.info(`[OpportunitiesService] Test alert synthesized for WhatsApp: +${phoneWithCountry}`);
+  // 1. Dispatch incoming WhatsApp message (via Twilio API if configured)
+  const whatsappDispatch = await sendWhatsAppMessage({
+    to: phoneWithCountry,
+    message: bulletin
+  });
+
+  // 2. Dispatch incoming Email notification (via Nodemailer if email exists)
+  let emailDispatch = null;
+  const targetEmail = email || subscription?.email;
+  if (targetEmail) {
+    const emailHtml = generateRecruitmentEmailHtml({
+      candidateName: 'Subba Reddy',
+      jobs: sampleJobs.map(j => ({
+        title: j.title,
+        organization: j.organization || j.department,
+        vacancies: j.vacancies,
+        lastDate: j.importantDates?.lastDate,
+        applyLink: j.applyLink || j.officialApplyLink
+      }))
+    });
+    emailDispatch = await sendEmailAlert({
+      to: targetEmail,
+      subject: '🎯 SkillVerse Daily Govt Recruitment Digest (AP & Central)',
+      htmlContent: emailHtml,
+      textContent: bulletin
+    });
+  }
+
+  logger.info(`[OpportunitiesService] Test alert processed for +${phoneWithCountry}. Twilio: ${whatsappDispatch.configured ? 'Configured' : 'Pending .env'}, Email: ${emailDispatch?.configured ? 'Configured' : 'Pending .env'}`);
 
   return {
     success: true,
     recipient: phoneWithCountry,
-    email: email || subscription?.email || null,
+    email: targetEmail || null,
     categories,
     jobCount: sampleJobs.length,
     jobs: sampleJobs.map(j => ({
@@ -391,6 +424,8 @@ export const sendTestAlertService = async ({ whatsapp, email }) => {
     })),
     bulletin,
     whatsappUrl,
+    whatsappDispatch,
+    emailDispatch,
     timestamp: new Date().toISOString()
   };
 };
