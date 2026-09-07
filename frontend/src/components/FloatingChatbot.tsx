@@ -43,14 +43,31 @@ const FloatingChatbot = () => {
   }, [messages]);
   useEffect(() => { if (isOpen) setUnreadCount(0); }, [isOpen]);
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  const getEducationalFallback = (query: string): string => {
+    const q = query.toLowerCase();
+    if (q.includes("quantum")) {
+      return "⚛️ **Quantum Computing**: Qubits leverage superposition & entanglement to compute in parallel. Check our *Quantum Tech* courses on SkillVerse!";
+    }
+    if (q.includes("mern") || q.includes("web") || q.includes("roadmap")) {
+      return "🚀 **Web Dev Roadmap**: Master HTML/CSS → JavaScript (ES6+) → React & TypeScript → Node.js & Express → MongoDB/PostgreSQL → Deploy to Vercel/Render.";
+    }
+    if (q.includes("interview") || q.includes("faang") || q.includes("dsa")) {
+      return "🎯 **Interview Tips**: Master Two Pointers, BFS/DFS, Sliding Window & Dynamic Programming. Check our FAANG resources in the Courses tab!";
+    }
+    if (q.includes("course") || q.includes("haappy")) {
+      return "📚 We offer expert-curated courses across Quantum Tech, AI & ML, Full-Stack Development, Cloud Computing, and Competitive Exams (GATE, GRE). Check out the Courses tab!";
+    }
+    return `Hello! I'm ${botName}. I'm here to help you with course advice, tech roadmaps, coding questions, and interview preparation. Ask me anything!`;
+  };
+
+  const sendMessage = async (overridePrompt?: string) => {
+    const textToSend = (typeof overridePrompt === 'string' ? overridePrompt : inputMessage).trim();
+    if (!textToSend) return;
     const now = Date.now();
     if (now - lastRequestTime < 1000) await new Promise(r => setTimeout(r, 1000 - (now - lastRequestTime)));
 
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: inputMessage, timestamp: new Date() };
+    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: textToSend, timestamp: new Date() };
     setMessages(p => [...p, userMsg]);
-    const currentInput = inputMessage;
     setInputMessage(""); setLoading(true); setLastRequestTime(Date.now());
 
     // Auto-fallback model chain: tries each model in order if one is busy/unavailable
@@ -80,16 +97,15 @@ const FloatingChatbot = () => {
             const data = await resp.json();
             return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, no response generated.';
           }
-          const e = await resp.json();
+          const e = await resp.json().catch(() => ({}));
           // If rate limited (429) or model not found (404), try next model
           if (resp.status === 429 || resp.status === 404 || resp.status === 400) {
-            lastError = e.error?.message || `Status ${resp.status}`;
+            lastError = (e as any)?.error?.message || `Status ${resp.status}`;
             continue;
           }
-          throw new Error(`API Error: ${e.error?.message || resp.status}`);
+          throw new Error(`API Error: ${(e as any)?.error?.message || resp.status}`);
         } catch (err: any) {
           lastError = err.message;
-          // If it's a network error or model error, try next model
           continue;
         }
       }
@@ -103,7 +119,9 @@ const FloatingChatbot = () => {
       const aiText = await callWithFallback(prompt);
       setMessages(p => [...p, { id: (Date.now()+1).toString(), role: 'assistant', content: aiText, timestamp: new Date() }]);
     } catch (err: any) {
-      setMessages(p => [...p, { id: (Date.now()+1).toString(), role: 'assistant', content: `Error: ${err.message}`, timestamp: new Date() }]);
+      console.warn('Floating chatbot fallback engaged:', err);
+      const fallbackText = getEducationalFallback(textToSend);
+      setMessages(p => [...p, { id: (Date.now()+1).toString(), role: 'assistant', content: fallbackText, timestamp: new Date() }]);
     } finally { setLoading(false); }
   };
 
@@ -201,16 +219,33 @@ const FloatingChatbot = () => {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-8">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+              <div className="flex flex-col items-center justify-center h-full text-center gap-2.5 py-4">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
                   style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.2),rgba(6,182,212,0.15))' }}>
-                  <Sparkles className="w-6 h-6 text-primary" />
+                  <Sparkles className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-white text-sm mb-1" style={{fontFamily:'Sora,sans-serif'}}>Ask me anything!</p>
-                  <p className="text-xs text-zinc-400 max-w-[200px] leading-relaxed">
-                    I'm your AI learning companion. Ask about courses, career advice, or anything you want to learn.
+                  <p className="font-semibold text-white text-sm mb-0.5" style={{fontFamily:'Sora,sans-serif'}}>Ask me anything!</p>
+                  <p className="text-[11px] text-zinc-400 max-w-[220px] leading-relaxed mx-auto mb-2">
+                    Your AI companion for learning, roadmaps & career tips.
                   </p>
+                </div>
+                <div className="flex flex-col gap-1.5 w-full text-left">
+                  {[
+                    { text: "What courses are on Haappy?", icon: "📚" },
+                    { text: "Explain Quantum Computing simply", icon: "⚛️" },
+                    { text: "Full-Stack MERN 30-day roadmap", icon: "🚀" },
+                    { text: "DSA interview preparation tips", icon: "🎯" }
+                  ].map((chip, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => sendMessage(chip.text)}
+                      className="px-3 py-2 rounded-xl border border-zinc-800/80 bg-white/[0.03] hover:bg-white/[0.08] hover:border-violet-500/40 text-left transition-all flex items-center gap-2 group cursor-pointer"
+                    >
+                      <span className="text-xs">{chip.icon}</span>
+                      <span className="text-xs text-zinc-300 group-hover:text-white transition-colors truncate">{chip.text}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}

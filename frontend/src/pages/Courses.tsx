@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { BookOpen, Clock, Users, Star, CheckCircle, Play, Wrench, Award, GraduationCap, FileText, Trophy, Video, Download, ExternalLink, Monitor, Search, Radio } from "lucide-react";
-import { useState, useEffect } from "react";
+import { BookOpen, Clock, Users, Star, CheckCircle, Play, Wrench, Award, GraduationCap, FileText, Trophy, Video, Download, ExternalLink, Monitor, Search, Radio, X, Sparkles } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import CourseDashboard from "../components/CourseDashboard";
 import VideoPlayerWithTracking from "../components/VideoPlayerWithTracking";
@@ -12,6 +12,18 @@ import CourseCertificate from "../components/CourseCertificate";
 import { useCourseContext } from "../contexts/CourseContext";
 import { useVideoProgress } from "../contexts/VideoProgressContext";
 import apiClient from "@/lib/apiClient";
+
+const filterCategories = [
+  { id: "All", label: "All Courses" },
+  { id: "Quantum Tech", label: "⚛️ Quantum Computing" },
+  { id: "AI & ML", label: "🤖 AI & Machine Learning" },
+  { id: "Web Development", label: "💻 Web Development" },
+  { id: "Cloud & DevOps", label: "☁️ Cloud & DevOps" },
+  { id: "Cybersecurity", label: "🛡️ Cybersecurity" },
+  { id: "Data Science", label: "📊 Data Science" },
+  { id: "Programming", label: "⚡ Programming & DSA" },
+  { id: "Mobile Development", label: "📱 Mobile Dev" },
+];
 
 const Courses = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -22,6 +34,8 @@ const Courses = () => {
   const [selectedVideo, setSelectedVideo] = useState<any>(null);
   const [showCertificate, setShowCertificate] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { enrolledCourses, addCourse } = useCourseContext();
@@ -1225,6 +1239,40 @@ const Courses = () => {
     setShowVideoPlayer(true);
   };
 
+  const filteredCourses = useMemo(() => {
+    return courses.filter((course) => {
+      const cat = (course.category || "").toLowerCase();
+      const title = (course.title || "").toLowerCase();
+      const desc = (course.description || "").toLowerCase();
+      const instructor = (course.instructor || "").toLowerCase();
+
+      // Category matching
+      let matchesCategory = selectedCategory === "All";
+      if (!matchesCategory) {
+        if (selectedCategory === "Quantum Tech") {
+          matchesCategory = cat.includes("quantum") || title.includes("quantum") || desc.includes("quantum");
+        } else if (selectedCategory === "AI & ML") {
+          matchesCategory = cat.includes("ai") || cat.includes("machine learning") || cat.includes("data science") || title.includes("ai") || title.includes("ml") || title.includes("deep learning");
+        } else if (selectedCategory === "Programming") {
+          matchesCategory = cat.includes("programming") || cat.includes("dsa") || cat.includes("algorithms") || title.includes("dsa") || title.includes("algorithms");
+        } else {
+          matchesCategory = cat.includes(selectedCategory.toLowerCase());
+        }
+      }
+
+      // Search query matching
+      const q = searchQuery.trim().toLowerCase();
+      const matchesSearch =
+        !q ||
+        title.includes(q) ||
+        instructor.includes(q) ||
+        cat.includes(q) ||
+        desc.includes(q);
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [courses, selectedCategory, searchQuery]);
+
   if (showDashboard) {
     return (
       <PageLayout>
@@ -1270,10 +1318,65 @@ const Courses = () => {
                 </button>
               </div>
             </div>
-            <div className="relative w-full max-w-lg mt-7">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
-              <input type="text" placeholder="Search courses, instructors..."
-                className="premium-input pl-11" />
+
+            {/* Search & Filter Bar */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-7 max-w-3xl">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search courses, topics, instructors (e.g. Quantum, React, AI)..."
+                  className="premium-input pl-11 pr-10 w-full"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                    title="Clear search"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              {(searchQuery || selectedCategory !== "All") && (
+                <button
+                  onClick={() => { setSearchQuery(""); setSelectedCategory("All"); }}
+                  className="px-3.5 py-2 rounded-xl text-xs font-medium text-violet-300 border border-violet-500/30 bg-violet-500/10 hover:bg-violet-500/20 transition-colors whitespace-nowrap self-start sm:self-auto"
+                >
+                  Reset Filters
+                </button>
+              )}
+            </div>
+
+            {/* Category Filter Chips */}
+            <div className="flex items-center gap-2 mt-4 pb-2 overflow-x-auto scrollbar-hide">
+              {filterCategories.map((cat) => {
+                const isSelected = selectedCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 border ${
+                      isSelected
+                        ? "bg-violet-600/25 border-violet-500/60 text-violet-200 shadow-sm shadow-violet-500/20 scale-[1.02]"
+                        : "bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800/80 hover:border-zinc-700"
+                    }`}
+                  >
+                    <span>{cat.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Results Counter */}
+            <div className="flex items-center justify-between mt-3 text-xs text-zinc-400">
+              <p>
+                Showing <span className="font-semibold text-white">{filteredCourses.length}</span> course{filteredCourses.length === 1 ? '' : 's'}
+                {selectedCategory !== "All" && <span> in <span className="text-violet-400 font-medium">{filterCategories.find(c => c.id === selectedCategory)?.label || selectedCategory}</span></span>}
+                {searchQuery && <span> matching "<span className="text-violet-400 font-medium">{searchQuery}</span>"</span>}
+              </p>
             </div>
           </div>
 
@@ -1299,14 +1402,23 @@ const Courses = () => {
                 Try Again
               </button>
             </div>
-          ) : courses.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <BookOpen className="w-10 h-10 mx-auto mb-3 text-muted-foreground/40" />
-              <p>No courses available</p>
+          ) : filteredCourses.length === 0 ? (
+            <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-12 text-center my-4">
+              <BookOpen className="w-10 h-10 mx-auto mb-3 text-zinc-500" />
+              <h3 className="text-base font-semibold text-white mb-1">No matching courses found</h3>
+              <p className="text-xs text-zinc-400 mb-4 max-w-sm mx-auto">
+                We couldn't find any courses matching your search criteria. Try searching for a different keyword or reset filters.
+              </p>
+              <button
+                onClick={() => { setSearchQuery(""); setSelectedCategory("All"); }}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition-all"
+              >
+                View All Courses
+              </button>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {courses.map((course, index) => {
+            {filteredCourses.map((course, index) => {
               const isEnrolled = enrolledCourses.some((c: any) => (c._id && course._id && c._id === course._id) || c.title === course.title);
               return (
                 <div

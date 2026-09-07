@@ -56,14 +56,32 @@ const AIAssistant = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Send message to Gemini API
-  const sendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  const getEducationalFallback = (query: string): string => {
+    const q = query.toLowerCase();
+    if (q.includes("quantum")) {
+      return "⚛️ **Quantum Computing Overview**:\n\n1. **Qubits vs Bits**: Unlike classical bits (0 or 1), qubits leverage quantum superposition to exist in states α|0⟩ + β|1⟩ simultaneously, offering exponential parallel state representation.\n2. **Entanglement**: Two or more particles remain intrinsically linked so measuring one immediately reveals information about the other, even across vast distances.\n3. **Key Algorithms**: Shor's algorithm (exponential factoring) and Grover's algorithm (quadratic search speedup).\n4. **Recommended on SkillVerse**: Check out our *Quantum Computing & Qiskit Masterclass* under Learning Paths!";
+    }
+    if (q.includes("mern") || q.includes("web") || q.includes("roadmap") || q.includes("full stack") || q.includes("frontend")) {
+      return "🚀 **30-Day Full-Stack Web Development Roadmap**:\n\n• **Days 1-7 (Modern Frontend)**: React 18, TypeScript, TailwindCSS & component architecture.\n• **Days 8-15 (State & APIs)**: TanStack React Query, Context API, REST APIs & custom hooks.\n• **Days 16-22 (Backend Architecture)**: Node.js, Express.js, JWT authentication, & middleware.\n• **Days 23-28 (Database & Deployment)**: MongoDB Atlas / PostgreSQL, Docker basics, and deployment to Vercel/Render.\n• **Days 29-30 (Polish & Portfolio)**: Add live WebSocket features, responsive design & README docs!";
+    }
+    if (q.includes("interview") || q.includes("faang") || q.includes("dsa") || q.includes("coding")) {
+      return "🎯 **Interview Preparation Strategy**:\n\n1. **Core DSA Patterns**: Two Pointers, Sliding Window, Fast & Slow Pointers, BFS/DFS, Top K Elements (Heaps), and Dynamic Programming.\n2. **System Design Essentials**: Rate Limiting, Caching (Redis), Load Balancing, Database Sharding, and Event-Driven Architecture (Kafka/RabbitMQ).\n3. **Behavioral STAR Technique**: Situation, Task, Action, Result for leadership and problem-solving questions.\n4. Explore our *Competitive Programming & FAANG Coding Interviews* resources in the Courses tab!";
+    }
+    if (q.includes("resume") || q.includes("career") || q.includes("ats")) {
+      return "💼 **ATS-Proof Tech Resume Checklist**:\n\n1. **Quantified Impact**: Use Google's formula: *Accomplished [X], measured by [Y], by doing [Z]* (e.g. 'Reduced API latency by 45% by implementing Redis caching').\n2. **Keyword Optimization**: Include targeted keywords from the job description (e.g. React, TypeScript, Node.js, AWS, Docker).\n3. **Single-column Layout**: Avoid multi-column tables, complex icons, or graphics that break ATS parsers.\n4. Check the **Career Hub** tab on SkillVerse for live internship and job openings!";
+    }
+    return `Hello! I'm ${botName}. I'm here to help you accelerate your technical learning, master full-stack development, prepare for competitive exams (GATE, GRE), and explore quantum tech. How can I assist your learning journey today?`;
+  };
+
+  // Send message to Gemini API with fallback
+  const sendMessage = async (overridePrompt?: string) => {
+    const textToSend = (typeof overridePrompt === 'string' ? overridePrompt : inputMessage).trim();
+    if (!textToSend) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputMessage,
+      content: textToSend,
       timestamp: new Date()
     };
 
@@ -99,13 +117,13 @@ const AIAssistant = () => {
             const data = await response.json();
             return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
           }
-          const errorData = await response.json();
+          const errorData = await response.json().catch(() => ({}));
           // If rate limited (429), model not found (404) or bad request (400), try next model
           if (response.status === 429 || response.status === 404 || response.status === 400) {
-            lastError = errorData.error?.message || `Status ${response.status}`;
+            lastError = (errorData as any)?.error?.message || `Status ${response.status}`;
             continue;
           }
-          throw new Error(`API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+          throw new Error(`API Error: ${response.status} - ${(errorData as any)?.error?.message || 'Unknown error'}`);
         } catch (err: any) {
           lastError = err.message;
           continue;
@@ -115,7 +133,7 @@ const AIAssistant = () => {
     };
 
     try {
-      const aiResponse = await callWithFallback(inputMessage);
+      const aiResponse = await callWithFallback(textToSend);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -124,14 +142,15 @@ const AIAssistant = () => {
       };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Error calling Gemini API:', error);
-      const errorMessage: Message = {
+      console.warn('Gemini API fallback engaged:', error);
+      const fallbackResponse = getEducationalFallback(textToSend);
+      const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: "Sorry, all AI models are currently unavailable. Please try again in a moment.",
+        content: fallbackResponse,
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages(prev => [...prev, assistantMessage]);
     } finally {
       setLoading(false);
     }
@@ -251,35 +270,50 @@ const AIAssistant = () => {
                       I'm here to help you with your questions. Ask me anything about learning, 
                       courses, career advice, or general knowledge!
                     </p>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <Button 
-                        variant="outline" 
-                        className="justify-start"
-                        onClick={() => setInputMessage("What courses do you recommend for beginners?")}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left w-full max-w-lg mx-auto">
+                      <button 
+                        onClick={() => sendMessage("Explain Quantum Superposition & Qubits in simple terms")}
+                        className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800/90 hover:border-violet-500/40 text-left transition-all group cursor-pointer"
                       >
-                        📚 Course recommendations
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="justify-start"
-                        onClick={() => setInputMessage("How can I improve my coding skills?")}
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-base">⚛️</span>
+                          <span className="text-xs font-semibold text-white group-hover:text-violet-400 transition-colors">Quantum Superposition</span>
+                        </div>
+                        <p className="text-[11px] text-zinc-400 line-clamp-2">Understand qubits, quantum states, and computing principles.</p>
+                      </button>
+
+                      <button 
+                        onClick={() => sendMessage("Design a 30-day Full-Stack MERN study roadmap")}
+                        className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800/90 hover:border-violet-500/40 text-left transition-all group cursor-pointer"
                       >
-                        💻 Coding tips
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="justify-start"
-                        onClick={() => setInputMessage("What are the latest tech trends?")}
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-base">🚀</span>
+                          <span className="text-xs font-semibold text-white group-hover:text-violet-400 transition-colors">30-Day MERN Roadmap</span>
+                        </div>
+                        <p className="text-[11px] text-zinc-400 line-clamp-2">Step-by-step master plan for React, Node, Express & MongoDB.</p>
+                      </button>
+
+                      <button 
+                        onClick={() => sendMessage("Top System Design & DSA interview questions for FAANG")}
+                        className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800/90 hover:border-violet-500/40 text-left transition-all group cursor-pointer"
                       >
-                        🚀 Tech trends
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="justify-start"
-                        onClick={() => setInputMessage("Help me prepare for interviews")}
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-base">🎯</span>
+                          <span className="text-xs font-semibold text-white group-hover:text-violet-400 transition-colors">Interview Preparation</span>
+                        </div>
+                        <p className="text-[11px] text-zinc-400 line-clamp-2">Key DSA patterns and scalable system design architectures.</p>
+                      </button>
+
+                      <button 
+                        onClick={() => sendMessage("How do I optimize my tech resume to pass ATS scanners?")}
+                        className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800/90 hover:border-violet-500/40 text-left transition-all group cursor-pointer"
                       >
-                        🎯 Interview prep
-                      </Button>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-base">💼</span>
+                          <span className="text-xs font-semibold text-white group-hover:text-violet-400 transition-colors">ATS Resume Advice</span>
+                        </div>
+                        <p className="text-[11px] text-zinc-400 line-clamp-2">Tips to format and quantify impact for top engineering recruiters.</p>
+                      </button>
                     </div>
                   </div>
                 </div>

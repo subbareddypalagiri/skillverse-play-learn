@@ -13,6 +13,8 @@ const primaryNavigation = [
 ];
 
 const eventsDropdown = [
+  { name: "Live Rooms", path: "/live-rooms" },
+  { name: "AI Tools", path: "/ai-tools" },
   { name: "Sync", path: "/sync" },
   { name: "Clubs", path: "/clubs" },
   { name: "Achievements", path: "/achievements" },
