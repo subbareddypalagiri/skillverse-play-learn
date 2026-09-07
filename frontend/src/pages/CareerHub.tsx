@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import PageLayout from "@/components/PageLayout";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, MapPin, Search, ChevronLeft, ChevronRight, ExternalLink, Loader2, AlertCircle, RefreshCw, Sparkles, Clock, Building2, Tag, CheckCircle2, Award, Terminal, Calendar, TrendingUp, Zap, Target } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { 
+  Briefcase, MapPin, Search, ChevronLeft, ChevronRight, ExternalLink, Loader2, 
+  AlertCircle, RefreshCw, Sparkles, Clock, Building2, Tag, CheckCircle2, Award, 
+  Terminal, Calendar, TrendingUp, Zap, Target, Landmark, Bell, Phone, Mail, FileText, Send, Check, ShieldCheck, X
+} from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
-
-const typeColors: Record<string, string> = {
-  job: "bg-violet-500/10 text-violet-400 border-violet-500/20",
-  internship: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-  place: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-};
-
 import { careerDatabase, branchCatalog, branchCustomData, getRoleCustomData } from "@/data/careerDatabase";
+import { govtJobNotifications, govtJobCategories, GovtJobNotification } from "@/data/govtJobsData";
 
 const CareerHub = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -73,8 +74,64 @@ const CareerHub = () => {
     }
   };
 
-  // Tab State: 'jobs' shows career board, 'guidance' shows Know Your Role Matrix
-  const [activeTab, setActiveTab] = useState<'jobs' | 'guidance'>('jobs');
+const typeColors: Record<string, string> = {
+  job: "bg-violet-500/10 text-violet-400 border-violet-500/20",
+  internship: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+  place: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+  govt: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+};
+
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  // Tab State: 'jobs' shows career board, 'govt' shows Govt notifications, 'guidance' shows Know Your Role Matrix
+  const [activeTab, setActiveTab] = useState<'jobs' | 'govt' | 'guidance'>('jobs');
+
+  // Govt Notifications state
+  const [govtCategory, setGovtCategory] = useState<string>('all');
+  const [govtSearch, setGovtSearch] = useState<string>('');
+  const [alertsModalOpen, setAlertsModalOpen] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState<string>(() => {
+    return localStorage.getItem('userWhatsapp') || '';
+  });
+  const [subscribedCategories, setSubscribedCategories] = useState<string[]>(['ap_state', 'central', 'banking']);
+  const [alertSuccess, setAlertSuccess] = useState(false);
+
+  const filteredGovtJobs = useMemo(() => {
+    return govtJobNotifications.filter(job => {
+      const matchCat = govtCategory === 'all' || job.category === govtCategory;
+      const q = govtSearch.trim().toLowerCase();
+      const matchQuery = !q ||
+        job.title.toLowerCase().includes(q) ||
+        job.department.toLowerCase().includes(q) ||
+        job.qualification.toLowerCase().includes(q) ||
+        job.location.toLowerCase().includes(q) ||
+        job.tags.some(t => t.toLowerCase().includes(q));
+      return matchCat && matchQuery;
+    });
+  }, [govtCategory, govtSearch]);
+
+  const handleSubscribeAlerts = () => {
+    if (!whatsappNumber || whatsappNumber.length < 10) {
+      toast({
+        title: "Valid WhatsApp Number Required",
+        description: "Please enter a valid 10-digit WhatsApp mobile number.",
+        variant: "destructive"
+      });
+      return;
+    }
+    localStorage.setItem('userWhatsapp', whatsappNumber);
+    localStorage.setItem('govtAlertPrefs', JSON.stringify(subscribedCategories));
+    setAlertSuccess(true);
+    toast({
+      title: "🎉 Alert Preferences Saved!",
+      description: `Daily alerts will be sent to WhatsApp (${whatsappNumber}) and ${user?.email || 'your registered Gmail'}.`
+    });
+    setTimeout(() => {
+      setAlertsModalOpen(false);
+      setAlertSuccess(false);
+    }, 1800);
+  };
 
   const fetchOpportunities = async (search = "", location = "all", type = "all") => {
     try {
@@ -124,50 +181,68 @@ const CareerHub = () => {
             Career Hub
           </h1>
           <p className="text-muted-foreground">
-            {loading ? 'Loading...' : `${filteredOpportunities.length} opportunities available`}
+            {activeTab === 'govt'
+              ? `${filteredGovtJobs.length} active government notifications (AP & All-India)`
+              : activeTab === 'jobs'
+                ? loading ? 'Loading...' : `${filteredOpportunities.length} opportunities available`
+                : 'Explore department-wise technical pathways & growth matrix'}
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Tab Switcher — Sleek Pill Design */}
-          <div className="relative flex items-center bg-black/5 dark:bg-white/5 rounded-2xl p-1 border border-border/50 backdrop-blur-sm">
-            {/* Sliding highlight */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '4px',
-                bottom: '4px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #7c3aed 0%, #6366f1 50%, #a855f7 100%)',
-                boxShadow: '0 4px 20px rgba(124,58,237,0.45)',
-                left: activeTab === 'jobs' ? '4px' : '50%',
-                right: activeTab === 'jobs' ? '50%' : '4px',
-                transition: 'left 0.32s cubic-bezier(0.34,1.56,0.64,1), right 0.32s cubic-bezier(0.34,1.56,0.64,1)',
-              }}
-            />
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Tab Switcher — 3 Sleek Tabs */}
+          <div className="flex items-center gap-1 bg-black/10 dark:bg-white/5 rounded-2xl p-1 border border-border/50 backdrop-blur-sm">
             <button
               onClick={() => setActiveTab('jobs')}
-              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-200 z-10 ${
-                activeTab === 'jobs' ? 'text-white' : 'text-muted-foreground hover:text-foreground'
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                activeTab === 'jobs'
+                  ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-600/30'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Briefcase className="w-4 h-4" />
-              Opportunities
+              Private & Tech
+            </button>
+            <button
+              onClick={() => setActiveTab('govt')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                activeTab === 'govt'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/30'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Landmark className="w-4 h-4 text-emerald-400" />
+              Govt Notifications
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             </button>
             <button
               onClick={() => setActiveTab('guidance')}
-              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-200 z-10 ${
-                activeTab === 'guidance' ? 'text-white' : 'text-muted-foreground hover:text-foreground'
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
+                activeTab === 'guidance'
+                  ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-600/30'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Target className="w-4 h-4" />
               Know Your Role
             </button>
           </div>
-          <button onClick={() => fetchOpportunities(searchQuery, locationFilter, typeFilter)} disabled={loading}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground border border-border/50 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all duration-200 disabled:opacity-50">
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+
+          <button
+            onClick={() => setAlertsModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-90 shadow-md shadow-emerald-500/20 transition-all hover:scale-[1.02]"
+            title="Subscribe for WhatsApp & Gmail Job Alerts"
+          >
+            <Bell className="w-3.5 h-3.5 animate-bounce" />
+            <span>Job Alerts</span>
           </button>
+
+          {activeTab === 'jobs' && (
+            <button onClick={() => fetchOpportunities(searchQuery, locationFilter, typeFilter)} disabled={loading}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium text-muted-foreground border border-border/50 hover:border-primary/30 hover:text-primary hover:bg-primary/5 transition-all duration-200 disabled:opacity-50">
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          )}
         </div>
       </div>
 
@@ -768,6 +843,223 @@ const CareerHub = () => {
         </div>
       )}
 
+      {/* Govt Notifications Feed (Visible under activeTab === 'govt') */}
+      {activeTab === 'govt' && (
+        <div className="space-y-6 mb-12 animate-reveal-up">
+          {/* AP & All-India Govt Tracker Banner */}
+          <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-slate-900 to-teal-950/30 backdrop-blur-xl">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+              <div className="space-y-2 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                  <Landmark className="w-3.5 h-3.5 text-emerald-400" />
+                  Official Govt Recruitment Tracker (AP & Central)
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+                  Verified Government Job Notifications
+                </h2>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Real-time recruitment notices from APPSC, AP Police, AP Mega DSC, Sachivalayam, UPSC, SSC, Railways & Public Sector Undertakings. Directly linked to official gazettes and application portals.
+                </p>
+                <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" /> 100% Official Portals Only
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <RefreshCw className="w-3.5 h-3.5 text-cyan-400" /> Daily Auto-Refresh & TTL Expiry
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Bell className="w-3.5 h-3.5 text-amber-400" /> WhatsApp & Gmail Alert Ready
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-3 flex-shrink-0">
+                <button
+                  onClick={() => setAlertsModalOpen(true)}
+                  className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition hover:scale-[1.02]"
+                >
+                  <Bell className="w-4 h-4 animate-bounce" />
+                  <span>Get WhatsApp & Gmail Alerts</span>
+                </button>
+                <a
+                  href="https://psc.ap.gov.in"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2.5 rounded-2xl border border-border/60 hover:border-emerald-500/40 bg-black/20 hover:bg-emerald-500/10 text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 transition"
+                >
+                  <span>Visit APPSC Official Portal</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Search and Category Filter Bar */}
+          <div className="rounded-2xl border border-border/50 p-4 sm:p-5 space-y-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+              <div className="relative flex-1">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search APPSC, Group 2, Police, SSC, B.Tech, Degree..."
+                  value={govtSearch}
+                  onChange={(e) => setGovtSearch(e.target.value)}
+                  className="premium-input pl-10 pr-9 w-full"
+                />
+                {govtSearch && (
+                  <button
+                    onClick={() => setGovtSearch('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <div className="text-xs font-semibold text-muted-foreground flex-shrink-0 self-center">
+                Showing <span className="text-foreground font-bold">{filteredGovtJobs.length}</span> notices
+              </div>
+            </div>
+
+            {/* Category Filter Chips */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/40">
+              {govtJobCategories.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setGovtCategory(cat.id)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
+                    govtCategory === cat.id
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm shadow-emerald-600/30 scale-[1.02]'
+                      : 'bg-muted/15 text-muted-foreground hover:text-foreground hover:bg-muted/25 border border-border/40'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Govt Notifications Cards Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredGovtJobs.map((job) => {
+              const isAp = job.category === 'ap_state';
+              return (
+                <div
+                  key={job.id}
+                  className="rounded-3xl border border-border/60 hover:border-emerald-500/40 p-5 sm:p-6 transition-all duration-200 flex flex-col justify-between hover:shadow-xl hover:shadow-emerald-950/20 group relative overflow-hidden"
+                  style={{ background: 'rgba(255,255,255,0.015)' }}
+                >
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${isAp ? 'from-emerald-500 to-teal-400' : 'from-blue-500 to-indigo-500'}`} />
+
+                  <div>
+                    {/* Top Row: Department + State/Central Tag + Last Date */}
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider ${
+                          isAp ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/15 text-blue-400 border border-blue-500/20'
+                        }`}>
+                          {job.department}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-muted-foreground/70" />
+                          {job.location}
+                        </span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap">
+                        ⏳ {job.lastDate}
+                      </span>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-base font-bold text-foreground leading-snug group-hover:text-emerald-400 transition-colors mb-3">
+                      {job.title}
+                    </h3>
+
+                    {/* Meta Info Grid */}
+                    <div className="grid grid-cols-2 gap-2 text-xs py-3 my-2 border-y border-border/40">
+                      <div className="bg-muted/10 p-2.5 rounded-xl border border-border/30">
+                        <span className="text-[10px] text-muted-foreground uppercase font-semibold block">Total Posts</span>
+                        <span className="font-extrabold text-foreground text-xs sm:text-sm text-emerald-400">{job.vacancies}</span>
+                      </div>
+                      <div className="bg-muted/10 p-2.5 rounded-xl border border-border/30">
+                        <span className="text-[10px] text-muted-foreground uppercase font-semibold block">Salary Scale</span>
+                        <span className="font-bold text-foreground text-[11px] truncate block" title={job.salaryScale}>{job.salaryScale}</span>
+                      </div>
+                      <div className="bg-muted/10 p-2.5 rounded-xl border border-border/30 col-span-2">
+                        <span className="text-[10px] text-muted-foreground uppercase font-semibold block">Qualification Required</span>
+                        <span className="font-medium text-foreground text-xs leading-relaxed">{job.qualification}</span>
+                      </div>
+                    </div>
+
+                    {/* Age Limit & Tags */}
+                    <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground mt-2 mb-4">
+                      <span>🎂 Age: <b className="text-foreground">{job.ageLimit}</b></span>
+                      <div className="flex gap-1">
+                        {job.tags.slice(0, 2).map((t, idx) => (
+                          <span key={idx} className="text-[10px] px-1.5 py-0.5 rounded bg-muted/20 text-muted-foreground">
+                            #{t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="pt-3 border-t border-border/40 flex items-center gap-2">
+                    <a
+                      href={job.officialApplyLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition"
+                    >
+                      <span>Apply Official</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                    {job.notificationPdfLink && (
+                      <a
+                        href={job.notificationPdfLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="py-2.5 px-3 rounded-xl border border-border/60 hover:border-emerald-500/40 bg-muted/10 hover:bg-muted/20 text-muted-foreground hover:text-foreground text-xs font-semibold flex items-center gap-1 transition"
+                        title="Official Gazette / PDF"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Notice</span>
+                      </a>
+                    )}
+                    <a
+                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`📢 *Govt Job Alert:* ${job.title}\n👥 Posts: ${job.vacancies}\n🎓 Qualification: ${job.qualification}\n⏳ Last Date: ${job.lastDate}\n👉 Apply: ${job.officialApplyLink}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-2.5 px-2.5 rounded-xl border border-border/60 hover:border-emerald-500/40 bg-muted/10 hover:bg-emerald-500/15 text-emerald-400 text-xs transition"
+                      title="Share to WhatsApp"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+
+            {filteredGovtJobs.length === 0 && (
+              <div className="col-span-full text-center py-16 rounded-3xl border border-border/50 bg-muted/5">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+                  <Landmark className="w-6 h-6 text-emerald-400" />
+                </div>
+                <h3 className="font-bold text-foreground mb-1.5 text-base">No government notifications match your filter</h3>
+                <p className="text-xs text-muted-foreground mb-4">Try clearing the search query or switching to 'All Notifications'</p>
+                <button
+                  onClick={() => { setGovtCategory('all'); setGovtSearch(''); }}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-500 transition"
+                >
+                  Reset Govt Filters
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Filters (Only visible under activeTab === 'jobs') */}
       {activeTab === 'jobs' && (
         <div className="rounded-2xl border border-border/50 p-5 mb-6 animate-reveal-up delay-100"
@@ -962,6 +1254,120 @@ const CareerHub = () => {
           )}
         </>
       )}
+
+      {/* WhatsApp & Email Job Alert Subscription Dialog */}
+      <Dialog open={alertsModalOpen} onOpenChange={setAlertsModalOpen}>
+        <DialogContent className="max-w-md bg-slate-950 border border-border/60 text-foreground p-6 rounded-3xl">
+          <DialogHeader>
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center mb-3 shadow-lg shadow-emerald-500/20">
+              <Bell className="w-6 h-6 animate-bounce" />
+            </div>
+            <DialogTitle className="text-xl font-extrabold text-foreground">
+              AP & Central Govt Job Alerts
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Receive fresh recruitment notifications, hall tickets, and syllabus releases directly on your WhatsApp number and registered Gmail.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 my-2">
+            {/* Registered Gmail (Auto-detected from Login) */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-violet-400" /> Registered Email Address
+              </label>
+              <div className="px-3.5 py-2.5 rounded-xl border border-border/60 bg-muted/10 text-xs font-medium text-foreground flex items-center justify-between">
+                <span>{user?.email || 'Logged in student email'}</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold">Auto-Linked</span>
+              </div>
+            </div>
+
+            {/* WhatsApp Number Input */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-emerald-400" /> WhatsApp Mobile Number
+              </label>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+                  +91
+                </span>
+                <input
+                  type="tel"
+                  maxLength={10}
+                  placeholder="9876543210"
+                  value={whatsappNumber}
+                  onChange={(e) => setWhatsappNumber(e.target.value.replace(/\D/g, ''))}
+                  className="premium-input pl-12 w-full text-sm font-semibold tracking-wider"
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                We will send job alerts, syllabus PDFs & deadline reminders on WhatsApp.
+              </p>
+            </div>
+
+            {/* Alert Categories Selection */}
+            <div className="space-y-2 pt-1">
+              <label className="text-xs font-semibold text-muted-foreground block">
+                Select Notifications to Receive:
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { id: 'ap_state', label: '🚩 AP State Govt (APPSC, DSC, Police)' },
+                  { id: 'central', label: '🇮🇳 Central Govt (SSC, UPSC)' },
+                  { id: 'banking', label: '🏦 Banking (SBI, IBPS)' },
+                  { id: 'railways', label: '🚆 Railways (RRB NTPC, ALP)' },
+                  { id: 'defense', label: '🛡️ Defense & PSUs (ISRO, DRDO)' },
+                  { id: 'gate', label: '⚡ GATE / PSU Trainees' },
+                ].map((item) => {
+                  const isSelected = subscribedCategories.includes(item.id);
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setSubscribedCategories(prev =>
+                          isSelected ? prev.filter(c => c !== item.id) : [...prev, item.id]
+                        );
+                      }}
+                      className={`p-2.5 rounded-xl border text-left text-xs font-semibold transition-all ${
+                        isSelected
+                          ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
+                          : 'bg-muted/10 border-border/40 text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] leading-tight">{item.label}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Submit Action */}
+            <div className="pt-2">
+              <button
+                onClick={handleSubscribeAlerts}
+                disabled={alertSuccess}
+                className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition disabled:opacity-50"
+              >
+                {alertSuccess ? (
+                  <>
+                    <Check className="w-4 h-4 text-white" />
+                    <span>Subscribed Successfully!</span>
+                  </>
+                ) : (
+                  <>
+                    <Bell className="w-4 h-4" />
+                    <span>Activate Daily Alerts</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageLayout>
   );
 };

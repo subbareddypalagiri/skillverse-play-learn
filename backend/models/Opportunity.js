@@ -30,7 +30,7 @@ const opportunitySchema = new mongoose.Schema({
     type: String,
     required: [true, 'Opportunity type is required'],
     enum: {
-      values: ['job', 'internship', 'place'],
+      values: ['job', 'internship', 'place', 'govt'],
       message: '{VALUE} is not a valid opportunity type'
     },
     index: true

@@ -15,7 +15,7 @@ const PageLayout = ({ children, className = "", fullWidth = false, noPadding = f
       <NeatGradientBackground />
       <div className="relative z-10 flex flex-col min-h-screen">
         <Navbar />
-        <main className={`flex-1 ${noPadding ? "" : "pb-12 px-4"}`}>
+        <main className={`flex-1 ${noPadding ? "" : "pt-24 sm:pt-28 pb-12 px-4"}`}>
           <div className={`${fullWidth ? "" : "container mx-auto max-w-7xl"} ${className}`}>
             {children}
           </div>
