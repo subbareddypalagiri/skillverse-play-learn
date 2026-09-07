@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { 
   Briefcase, MapPin, Search, ChevronLeft, ChevronRight, ExternalLink, Loader2, 
   AlertCircle, RefreshCw, Sparkles, Clock, Building2, Tag, CheckCircle2, Award, 
-  Terminal, Calendar, TrendingUp, Zap, Target, Landmark, Bell, Phone, Mail, FileText, Send, Check, ShieldCheck, X
+  Terminal, Calendar, TrendingUp, Zap, Target, Landmark, Bell, Phone, Mail, FileText, Send, Check, ShieldCheck, X, GraduationCap
 } from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
 import { careerDatabase, branchCatalog, branchCustomData, getRoleCustomData } from "@/data/careerDatabase";
@@ -89,6 +89,7 @@ const typeColors: Record<string, string> = {
 
   // Govt Notifications state
   const [govtCategory, setGovtCategory] = useState<string>('all');
+  const [govtEducation, setGovtEducation] = useState<string>('all');
   const [govtSearch, setGovtSearch] = useState<string>('');
   const [alertsModalOpen, setAlertsModalOpen] = useState(false);
   const [whatsappNumber, setWhatsappNumber] = useState<string>(() => {
@@ -100,6 +101,12 @@ const typeColors: Record<string, string> = {
   const filteredGovtJobs = useMemo(() => {
     return govtJobNotifications.filter(job => {
       const matchCat = govtCategory === 'all' || job.category === govtCategory;
+      const qual = (job.qualification + " " + job.tags.join(" ")).toLowerCase();
+      const matchEdu = govtEducation === 'all' ||
+        (govtEducation === 'btech' && (qual.includes('b.tech') || qual.includes('b.e') || qual.includes('engineering'))) ||
+        (govtEducation === 'degree' && (qual.includes('degree') || qual.includes('bachelor') || qual.includes('graduation') || qual.includes('b.sc') || qual.includes('b.com'))) ||
+        (govtEducation === 'diploma' && (qual.includes('diploma') || qual.includes('polytechnic') || qual.includes('iti'))) ||
+        (govtEducation === 'inter' && (qual.includes('12th') || qual.includes('intermediate') || qual.includes('10+2') || qual.includes('matriculation')));
       const q = govtSearch.trim().toLowerCase();
       const matchQuery = !q ||
         job.title.toLowerCase().includes(q) ||
@@ -107,9 +114,9 @@ const typeColors: Record<string, string> = {
         job.qualification.toLowerCase().includes(q) ||
         job.location.toLowerCase().includes(q) ||
         job.tags.some(t => t.toLowerCase().includes(q));
-      return matchCat && matchQuery;
+      return matchCat && matchEdu && matchQuery;
     });
-  }, [govtCategory, govtSearch]);
+  }, [govtCategory, govtEducation, govtSearch]);
 
   const handleSubscribeAlerts = () => {
     if (!whatsappNumber || whatsappNumber.length < 10) {
@@ -858,7 +865,27 @@ const typeColors: Record<string, string> = {
                 <p className="text-sm text-slate-300 leading-relaxed font-normal">
                   Real-time recruitment notices from APPSC, AP Police, AP Mega DSC, Sachivalayam, UPSC, SSC, Railways & Public Sector Undertakings. Directly linked to official gazettes and application portals.
                 </p>
-                <div className="flex flex-wrap items-center gap-4 pt-2 text-xs">
+
+                {/* Live Vacancies Quick Stats */}
+                <div className="flex flex-wrap items-center gap-2.5 pt-2">
+                  <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-black text-emerald-400 flex items-center gap-1.5 shadow-sm">
+                    <TrendingUp className="w-3.5 h-3.5" /> 1,45,000+ Total Posts
+                  </div>
+                  <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-cyan-300">
+                    🚩 47,000+ AP State
+                  </div>
+                  <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-amber-300">
+                    🚆 38,000+ Railways
+                  </div>
+                  <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-indigo-300">
+                    🇮🇳 35,000+ Central
+                  </div>
+                  <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-rose-300">
+                    🏦 20,000+ Banking
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 pt-1 text-xs">
                   <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
                     <ShieldCheck className="w-4 h-4 text-emerald-400" /> 100% Official Portals Only
                   </span>
@@ -892,58 +919,87 @@ const typeColors: Record<string, string> = {
             </div>
           </div>
 
-          {/* Search and Category Filter Bar - 100% Solid Opaque */}
-          <div className="rounded-2xl border border-border p-4 sm:p-5 space-y-4 bg-white dark:bg-slate-900 shadow-md">
+          {/* Search and Category Filter Bar - Pure Solid White */}
+          <div className="rounded-3xl border border-slate-200 p-5 space-y-4 bg-white text-slate-900 shadow-md">
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
               <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 <input
                   type="text"
-                  placeholder="Search APPSC, Group 2, Police, SSC, B.Tech, Degree..."
+                  placeholder="Search APPSC, Group 1, Group 2, Police, SSC, B.Tech, Degree..."
                   value={govtSearch}
                   onChange={(e) => setGovtSearch(e.target.value)}
-                  className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-border bg-slate-50 dark:bg-slate-800 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-sm font-medium transition"
+                  className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-sm font-medium transition"
                 />
                 {govtSearch && (
                   <button
                     onClick={() => setGovtSearch('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
-              <div className="text-xs font-semibold text-muted-foreground flex-shrink-0 self-center">
-                Showing <span className="text-foreground font-bold">{filteredGovtJobs.length}</span> notices
+              <div className="text-xs font-bold text-slate-600 flex-shrink-0 self-center">
+                Showing <span className="text-emerald-700 font-extrabold text-sm">{filteredGovtJobs.length}</span> active notices
               </div>
             </div>
 
             {/* Category Filter Chips */}
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+              <span className="text-xs font-bold text-slate-600 mr-1 flex items-center gap-1">
+                <Landmark className="w-3.5 h-3.5 text-emerald-600" /> Sector:
+              </span>
               {govtJobCategories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setGovtCategory(cat.id)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all duration-150 ${
                     govtCategory === cat.id
                       ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-[1.02]'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
                   }`}
                 >
                   {cat.label}
                 </button>
               ))}
             </div>
+
+            {/* Qualification Filter Row */}
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+              <span className="text-xs font-bold text-slate-600 mr-1 flex items-center gap-1">
+                <GraduationCap className="w-3.5 h-3.5 text-violet-600" /> Qualification:
+              </span>
+              {[
+                { id: 'all', label: 'All Qualifications' },
+                { id: 'btech', label: '💻 B.Tech / Engineering' },
+                { id: 'degree', label: '🎓 Any Degree (B.Sc / B.Com / BA)' },
+                { id: 'diploma', label: '📐 Diploma / Polytechnic' },
+                { id: 'inter', label: '🏫 12th / Intermediate' }
+              ].map(edu => (
+                <button
+                  key={edu.id}
+                  onClick={() => setGovtEducation(edu.id)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all duration-150 ${
+                    govtEducation === edu.id
+                      ? 'bg-violet-600 text-white shadow-md shadow-violet-600/30 scale-[1.02]'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+                  }`}
+                >
+                  {edu.label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Govt Notifications Cards Grid - 100% Solid Opaque */}
+          {/* Govt Notifications Cards Grid - PURE SOLID WHITE CARDS */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredGovtJobs.map((job) => {
               const isAp = job.category === 'ap_state';
               return (
                 <div
                   key={job.id}
-                  className="rounded-3xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 transition-all duration-200 flex flex-col justify-between shadow-lg hover:shadow-2xl hover:border-emerald-500 dark:hover:border-emerald-500 group relative overflow-hidden"
+                  className="rounded-3xl border border-slate-200/90 bg-white text-slate-900 p-5 sm:p-6 transition-all duration-200 flex flex-col justify-between shadow-md hover:shadow-2xl hover:border-emerald-500 group relative overflow-hidden"
                 >
                   <div className={`absolute top-0 left-0 right-0 h-1.5 ${isAp ? 'bg-emerald-500' : 'bg-blue-600'}`} />
 
@@ -953,48 +1009,50 @@ const typeColors: Record<string, string> = {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
                           isAp
-                            ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
-                            : 'bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-blue-50 text-blue-700 border border-blue-200'
                         }`}>
                           {job.department}
                         </span>
-                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1">
+                        <span className="text-[11px] text-slate-500 font-semibold flex items-center gap-1">
                           <MapPin className="w-3 h-3 text-slate-400" />
                           {job.location}
                         </span>
                       </div>
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 dark:bg-amber-950/90 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 whitespace-nowrap shadow-sm">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap shadow-sm">
                         ⏳ {job.lastDate}
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors mb-3">
+                    <h3 className="text-base font-extrabold text-slate-900 leading-snug group-hover:text-emerald-600 transition-colors mb-3">
                       {job.title}
                     </h3>
 
                     {/* Meta Info Grid */}
-                    <div className="grid grid-cols-2 gap-2 text-xs py-3 my-2 border-y border-slate-200 dark:border-slate-800">
-                      <div className="bg-slate-50 dark:bg-slate-800/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold block">Total Posts</span>
-                        <span className="font-black text-emerald-600 dark:text-emerald-400 text-sm sm:text-base">{job.vacancies}</span>
+                    <div className="grid grid-cols-2 gap-2 text-xs py-3 my-2 border-y border-slate-100">
+                      <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                        <span className="text-[10px] text-slate-500 uppercase font-bold block">Total Posts</span>
+                        <span className="font-black text-emerald-600 text-sm sm:text-base">{job.vacancies}</span>
                       </div>
-                      <div className="bg-slate-50 dark:bg-slate-800/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold block">Salary Scale</span>
-                        <span className="font-bold text-slate-800 dark:text-slate-200 text-xs truncate block" title={job.salaryScale}>{job.salaryScale}</span>
+                      <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                        <span className="text-[10px] text-slate-500 uppercase font-bold block">Salary Scale</span>
+                        <span className="font-bold text-slate-900 text-xs truncate block" title={job.salaryScale || job.salary}>
+                          {job.salaryScale || job.salary}
+                        </span>
                       </div>
-                      <div className="bg-slate-50 dark:bg-slate-800/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 col-span-2">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold block">Qualification Required</span>
-                        <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs leading-relaxed">{job.qualification}</span>
+                      <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 col-span-2">
+                        <span className="text-[10px] text-slate-500 uppercase font-bold block">Qualification Required</span>
+                        <span className="font-semibold text-slate-800 text-xs leading-relaxed">{job.qualification}</span>
                       </div>
                     </div>
 
                     {/* Age Limit & Tags */}
-                    <div className="flex items-center justify-between gap-2 text-[11px] text-slate-600 dark:text-slate-400 mt-2 mb-4">
-                      <span>🎂 Age: <b className="text-slate-900 dark:text-white font-bold">{job.ageLimit}</b></span>
-                      <div className="flex gap-1">
+                    <div className="flex items-center justify-between gap-2 text-[11px] text-slate-600 mt-2 mb-4">
+                      <span>🎂 Age: <b className="text-slate-900 font-bold">{job.ageLimit}</b></span>
+                      <div className="flex gap-1 flex-wrap">
                         {job.tags.slice(0, 2).map((t, idx) => (
-                          <span key={idx} className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 font-medium">
+                          <span key={idx} className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200 font-semibold">
                             #{t}
                           </span>
                         ))}
@@ -1003,33 +1061,33 @@ const typeColors: Record<string, string> = {
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center gap-2">
+                  <div className="pt-3 border-t border-slate-100 flex items-center gap-2">
                     <a
-                      href={job.officialApplyLink}
+                      href={job.officialApplyLink || job.applyLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-md shadow-emerald-600/30 flex items-center justify-center gap-1.5 transition"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-md shadow-emerald-600/30 flex items-center justify-center gap-1.5 transition"
                     >
                       <span>Apply Official</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
-                    {job.notificationPdfLink && (
+                    {(job.notificationPdfLink || job.notificationPdf) && (
                       <a
-                        href={job.notificationPdfLink}
+                        href={job.notificationPdfLink || job.notificationPdf}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="py-2.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1 transition shadow-sm"
+                        className="py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition shadow-sm"
                         title="Official Gazette / PDF"
                       >
-                        <FileText className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                        <FileText className="w-3.5 h-3.5 text-slate-500" />
                         <span className="hidden sm:inline">Notice</span>
                       </a>
                     )}
                     <a
-                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`📢 *Govt Job Alert:* ${job.title}\n👥 Posts: ${job.vacancies}\n🎓 Qualification: ${job.qualification}\n⏳ Last Date: ${job.lastDate}\n👉 Apply: ${job.officialApplyLink}`)}`}
+                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`📢 *Govt Job Alert:* ${job.title}\n👥 Posts: ${job.vacancies}\n🎓 Qualification: ${job.qualification}\n⏳ Last Date: ${job.lastDate}\n👉 Apply: ${job.officialApplyLink || job.applyLink}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="py-2.5 px-2.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition shadow-sm"
+                      className="py-2.5 px-2.5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 text-xs font-bold transition shadow-sm"
                       title="Share to WhatsApp"
                     >
                       <Send className="w-3.5 h-3.5" />
@@ -1040,15 +1098,15 @@ const typeColors: Record<string, string> = {
             })}
 
             {filteredGovtJobs.length === 0 && (
-              <div className="col-span-full text-center py-16 rounded-3xl border border-border bg-white dark:bg-slate-900 shadow-md">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
-                  <Landmark className="w-6 h-6 text-emerald-500" />
+              <div className="col-span-full text-center py-16 rounded-3xl border border-slate-200 bg-white text-slate-900 shadow-md">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-4">
+                  <Landmark className="w-6 h-6 text-emerald-600" />
                 </div>
-                <h3 className="font-bold text-foreground mb-1.5 text-base">No government notifications match your filter</h3>
-                <p className="text-xs text-muted-foreground mb-4">Try clearing the search query or switching to 'All Notifications'</p>
+                <h3 className="font-extrabold text-slate-900 mb-1.5 text-base">No government notifications match your filter</h3>
+                <p className="text-xs text-slate-500 mb-4">Try clearing the search query or switching to 'All Notifications'</p>
                 <button
-                  onClick={() => { setGovtCategory('all'); setGovtSearch(''); }}
-                  className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-500 transition"
+                  onClick={() => { setGovtCategory('all'); setGovtEducation('all'); setGovtSearch(''); }}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition"
                 >
                   Reset Govt Filters
                 </button>

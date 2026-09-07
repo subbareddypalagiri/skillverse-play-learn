@@ -8,13 +8,16 @@ export interface GovtJobNotification {
   qualification: string;
   ageLimit: string;
   salary: string;
+  salaryScale: string;
   location: string;
   postedDate: string;
   lastDate: string;
   status: 'Active' | 'Closing Soon';
   officialWebsite: string;
   applyLink: string;
+  officialApplyLink: string;
   notificationPdf: string;
+  notificationPdfLink: string;
   description: string;
   tags: string[];
 }
@@ -29,6 +32,32 @@ export const govtJobCategories = [
 ];
 
 export const govtJobNotifications: GovtJobNotification[] = [
+  // 1. APPSC Group 1
+  {
+    id: 'appsc-grp1-2026',
+    title: 'APPSC Group 1 Services Examination',
+    department: 'Andhra Pradesh Public Service Commission (APPSC)',
+    category: 'ap_state',
+    categoryLabel: 'AP State Govt',
+    vacancies: '110 Posts',
+    qualification: 'Any Bachelor’s Degree from a recognized University',
+    ageLimit: '18 - 42 Years (Age relaxation as per AP Govt Rules)',
+    salary: '₹54,060 - ₹1,40,540 / month',
+    salaryScale: '₹54,060 - ₹1,40,540 / month',
+    location: 'Andhra Pradesh (Statewide Cadre)',
+    postedDate: '2026-08-28',
+    lastDate: '2026-10-20',
+    status: 'Active',
+    officialWebsite: 'https://psc.ap.gov.in',
+    applyLink: 'https://psc.ap.gov.in',
+    officialApplyLink: 'https://psc.ap.gov.in',
+    notificationPdf: 'https://psc.ap.gov.in',
+    notificationPdfLink: 'https://psc.ap.gov.in',
+    description: 'Top AP State Civil Services recruitment for Deputy Collector, DSP (Civil), Commercial Tax Officer, RDO, and District Registrar.',
+    tags: ['Group 1', 'Deputy Collector', 'DSP', 'Degree', 'APPSC']
+  },
+
+  // 2. APPSC Group 2
   {
     id: 'appsc-grp2-2026',
     title: 'APPSC Group 2 Services Recruitment',
@@ -37,41 +66,101 @@ export const govtJobNotifications: GovtJobNotification[] = [
     categoryLabel: 'AP State Govt',
     vacancies: '897 Posts',
     qualification: 'Any Bachelor’s Degree from a recognized University',
-    ageLimit: '18 - 42 Years (Age relaxation applicable as per AP norms)',
+    ageLimit: '18 - 42 Years',
     salary: '₹44,570 - ₹1,27,480 / month',
+    salaryScale: '₹44,570 - ₹1,27,480 / month',
     location: 'Andhra Pradesh (All 26 Districts)',
     postedDate: '2026-08-15',
     lastDate: '2026-09-30',
     status: 'Active',
     officialWebsite: 'https://psc.ap.gov.in',
     applyLink: 'https://psc.ap.gov.in',
+    officialApplyLink: 'https://psc.ap.gov.in',
     notificationPdf: 'https://psc.ap.gov.in',
-    description: 'Recruitment for Executive & Non-Executive posts including Deputy Tahsildar, Sub-Registrar Grade-II, Assistant Commercial Tax Officer, and Municipal Commissioner Grade-III.',
+    notificationPdfLink: 'https://psc.ap.gov.in',
+    description: 'Executive & Non-Executive posts: Deputy Tahsildar, Sub-Registrar Grade-II, Assistant Commercial Tax Officer, and Municipal Commissioner.',
     tags: ['Executive', 'Degree', 'Group 2', 'State Govt', 'APPSC']
   },
+
+  // 3. APPSC AEE (Engineering)
+  {
+    id: 'appsc-aee-2026',
+    title: 'APPSC Assistant Executive Engineers (AEE)',
+    department: 'AP Engineering Services (R&B, Water Resources, PR)',
+    category: 'ap_state',
+    categoryLabel: 'AP State Govt',
+    vacancies: '250 Posts',
+    qualification: 'B.E / B.Tech in Civil, Mechanical, or Electrical Engineering',
+    ageLimit: '18 - 42 Years',
+    salary: '₹57,100 - ₹1,47,760 / month',
+    salaryScale: '₹57,100 - ₹1,47,760 / month',
+    location: 'Andhra Pradesh (Irrigation & Roads)',
+    postedDate: '2026-08-12',
+    lastDate: '2026-10-10',
+    status: 'Active',
+    officialWebsite: 'https://psc.ap.gov.in',
+    applyLink: 'https://psc.ap.gov.in',
+    officialApplyLink: 'https://psc.ap.gov.in',
+    notificationPdf: 'https://psc.ap.gov.in',
+    notificationPdfLink: 'https://psc.ap.gov.in',
+    description: 'Premier engineering gazetted officer posts in AP Water Resources, Panchayat Raj Engineering, and Roads & Buildings Departments.',
+    tags: ['AEE', 'B.Tech', 'Civil Engineering', 'Mechanical', 'Electrical']
+  },
+
+  // 4. AP Police SI
   {
     id: 'ap-police-si-2026',
-    title: 'AP State Police Sub-Inspector & Constable Recruitment',
+    title: 'AP Police Sub-Inspector (Civil & AR)',
     department: 'AP State Level Police Recruitment Board (SLPRB)',
     category: 'ap_state',
     categoryLabel: 'AP State Govt',
-    vacancies: '6,511 Posts',
-    qualification: 'Degree for SI | Intermediate (10+2) for Constables',
-    ageLimit: '21 - 30 Years (SI) | 18 - 26 Years (Constable)',
-    salary: '₹31,460 - ₹84,970 / month',
-    location: 'Andhra Pradesh',
+    vacancies: '411 Posts',
+    qualification: 'Any Degree from recognized university',
+    ageLimit: '21 - 30 Years (Relaxation for BC/SC/ST)',
+    salary: '₹44,570 - ₹1,27,480 / month',
+    salaryScale: '₹44,570 - ₹1,27,480 / month',
+    location: 'Andhra Pradesh (Police Zones I to IV)',
     postedDate: '2026-08-20',
     lastDate: '2026-10-05',
     status: 'Active',
     officialWebsite: 'https://slprb.ap.gov.in',
     applyLink: 'https://slprb.ap.gov.in',
+    officialApplyLink: 'https://slprb.ap.gov.in',
     notificationPdf: 'https://slprb.ap.gov.in',
-    description: 'Recruitment for Stipendiary Cadet Trainee (SCT) Sub-Inspectors of Police (Civil), SCT Reserve Sub-Inspectors (AR/APSP) & Police Constables across AP battalions.',
-    tags: ['Police', 'Physical Test', 'Uniform Service', 'AP SLPRB']
+    notificationPdfLink: 'https://slprb.ap.gov.in',
+    description: 'Stipendiary Cadet Trainee (SCT) Sub-Inspectors of Police (Civil & Armed Reserve) with physical endurance and written test phases.',
+    tags: ['Police SI', 'Uniform', 'Physical Test', 'Degree', 'AP SLPRB']
   },
+
+  // 5. AP Police Constables
+  {
+    id: 'ap-police-constable-2026',
+    title: 'AP Police Constable Recruitment (Civil & APSP)',
+    department: 'AP State Level Police Recruitment Board (SLPRB)',
+    category: 'ap_state',
+    categoryLabel: 'AP State Govt',
+    vacancies: '6,100 Posts',
+    qualification: 'Intermediate (10+2) or equivalent qualification',
+    ageLimit: '18 - 26 Years',
+    salary: '₹25,220 - ₹80,910 / month',
+    salaryScale: '₹25,220 - ₹80,910 / month',
+    location: 'All 26 Districts of Andhra Pradesh',
+    postedDate: '2026-08-20',
+    lastDate: '2026-10-05',
+    status: 'Active',
+    officialWebsite: 'https://slprb.ap.gov.in',
+    applyLink: 'https://slprb.ap.gov.in',
+    officialApplyLink: 'https://slprb.ap.gov.in',
+    notificationPdf: 'https://slprb.ap.gov.in',
+    notificationPdfLink: 'https://slprb.ap.gov.in',
+    description: 'Police Constables in AP Civil Police and AP Special Police (APSP) Battalions across the state.',
+    tags: ['Constable', '12th Pass', 'Physical Test', 'AP Police']
+  },
+
+  // 6. AP Mega DSC
   {
     id: 'ap-mega-dsc-2026',
-    title: 'AP Mega DSC Teacher Recruitment',
+    title: 'AP Mega DSC Teacher Recruitment (16,347 Posts)',
     department: 'Department of School Education, Govt of Andhra Pradesh',
     category: 'ap_state',
     categoryLabel: 'AP State Govt',
@@ -79,19 +168,24 @@ export const govtJobNotifications: GovtJobNotification[] = [
     qualification: 'D.Ed / B.Ed / Language Pandit Training + Qualified AP TET',
     ageLimit: '18 - 44 Years',
     salary: '₹35,000 - ₹90,000 / month',
-    location: 'All Districts of AP',
+    salaryScale: '₹35,000 - ₹90,000 / month',
+    location: 'All 26 Districts of AP',
     postedDate: '2026-08-25',
     lastDate: '2026-09-28',
     status: 'Closing Soon',
     officialWebsite: 'https://apdsc.apcfss.in',
     applyLink: 'https://apdsc.apcfss.in',
+    officialApplyLink: 'https://apdsc.apcfss.in',
     notificationPdf: 'https://apdsc.apcfss.in',
-    description: 'Mega Teacher Recruitment across Andhra Pradesh Government, Zilla Parishad, Mandal Parishad, and Municipal Schools for SGT, School Assistant, and Language Pandit roles.',
+    notificationPdfLink: 'https://apdsc.apcfss.in',
+    description: 'Mega Teacher Recruitment for Secondary Grade Teachers (SGT), School Assistants (SA), and Language Pandits across AP.',
     tags: ['Teaching', 'TET', 'B.Ed', 'DSC', 'Govt School']
   },
+
+  // 7. AP High Court
   {
     id: 'ap-high-court-2026',
-    title: 'AP High Court & District Judiciary Staff Recruitment',
+    title: 'AP High Court & District Judiciary Staff',
     department: 'High Court of Andhra Pradesh, Amaravati',
     category: 'ap_state',
     categoryLabel: 'AP State Govt',
@@ -99,19 +193,24 @@ export const govtJobNotifications: GovtJobNotification[] = [
     qualification: 'Degree / Intermediate + English/Telugu Typewriting',
     ageLimit: '18 - 42 Years',
     salary: '₹25,220 - ₹80,910 / month',
+    salaryScale: '₹25,220 - ₹80,910 / month',
     location: 'Amaravati & District Courts',
     postedDate: '2026-08-10',
     lastDate: '2026-09-25',
     status: 'Closing Soon',
     officialWebsite: 'https://aphc.gov.in',
     applyLink: 'https://aphc.gov.in',
+    officialApplyLink: 'https://aphc.gov.in',
     notificationPdf: 'https://aphc.gov.in',
-    description: 'Recruitment for Junior Assistants, Typists, Field Assistants, Examiners, Copyists, Record Assistants, and Process Servers in AP Subordinate Judiciary.',
+    notificationPdfLink: 'https://aphc.gov.in',
+    description: 'Junior Assistants, Typists, Field Assistants, Examiners, Copyists, and Process Servers in AP Subordinate Judiciary.',
     tags: ['High Court', 'Typist', 'Junior Assistant', 'Amaravati']
   },
+
+  // 8. AP Sachivalayam
   {
     id: 'ap-sachivalayam-2026',
-    title: 'AP Grama & Ward Sachivalayam Recruitment (Phase 3)',
+    title: 'AP Grama & Ward Sachivalayam (Phase 3)',
     department: 'Panchayat Raj & Rural Development Department, AP',
     category: 'ap_state',
     categoryLabel: 'AP State Govt',
@@ -119,16 +218,71 @@ export const govtJobNotifications: GovtJobNotification[] = [
     qualification: 'Degree / Diploma in Computer Science / ITI / Engineering',
     ageLimit: '18 - 42 Years',
     salary: '₹22,460 - ₹72,810 / month',
+    salaryScale: '₹22,460 - ₹72,810 / month',
     location: 'Grama & Ward Secretariats in AP',
     postedDate: '2026-08-18',
     lastDate: '2026-10-15',
     status: 'Active',
     officialWebsite: 'https://gramasachivalayam.ap.gov.in',
     applyLink: 'https://gramasachivalayam.ap.gov.in',
+    officialApplyLink: 'https://gramasachivalayam.ap.gov.in',
     notificationPdf: 'https://gramasachivalayam.ap.gov.in',
-    description: 'Recruitment for Panchayat Secretary Grade-V, Digital Assistant, Welfare & Education Assistant, Engineering Assistant, and Village Revenue Officer (VRO).',
+    notificationPdfLink: 'https://gramasachivalayam.ap.gov.in',
+    description: 'Panchayat Secretary Grade-V, Digital Assistant, Welfare & Education Assistant, Engineering Assistant, and Village Revenue Officer.',
     tags: ['Sachivalayam', 'Digital Assistant', 'Village Level', 'Direct Govt']
   },
+
+  // 9. APGENCO / APTRANSCO
+  {
+    id: 'apgenco-transco-ae-2026',
+    title: 'APGENCO & APTRANSCO Assistant Engineers (AE)',
+    department: 'Andhra Pradesh Power Generation & Transmission Corporation',
+    category: 'ap_state',
+    categoryLabel: 'AP State Govt',
+    vacancies: '380 Posts',
+    qualification: 'B.Tech / B.E in Electrical (EEE), Mechanical, Civil, or CSE',
+    ageLimit: '18 - 42 Years',
+    salary: '₹64,295 - ₹1,32,525 / month',
+    salaryScale: '₹64,295 - ₹1,32,525 / month',
+    location: 'AP Thermal/Hydel Stations & Substations',
+    postedDate: '2026-08-22',
+    lastDate: '2026-10-12',
+    status: 'Active',
+    officialWebsite: 'https://apgenco.gov.in',
+    applyLink: 'https://apgenco.gov.in',
+    officialApplyLink: 'https://apgenco.gov.in',
+    notificationPdf: 'https://apgenco.gov.in',
+    notificationPdfLink: 'https://apgenco.gov.in',
+    description: 'High-paying engineering careers in state power utilities managing transmission grids, generating stations, and SCADA infrastructure.',
+    tags: ['APGENCO', 'APTRANSCO', 'Electrical', 'B.Tech', 'Power Sector']
+  },
+
+  // 10. AP Forest Department
+  {
+    id: 'ap-forest-officer-2026',
+    title: 'AP Forest Section Officers & Beat Officers',
+    department: 'Andhra Pradesh Forest Department',
+    category: 'ap_state',
+    categoryLabel: 'AP State Govt',
+    vacancies: '950 Posts',
+    qualification: 'Bachelor’s Degree in Science/Maths/Engg (FSO) | Intermediate (FBO)',
+    ageLimit: '18 - 34 Years (with physical standards)',
+    salary: '₹28,940 - ₹85,930 / month',
+    salaryScale: '₹28,940 - ₹85,930 / month',
+    location: 'Forest Divisions across AP (Seshachalam, Eastern Ghats)',
+    postedDate: '2026-08-16',
+    lastDate: '2026-10-02',
+    status: 'Active',
+    officialWebsite: 'https://forests.ap.gov.in',
+    applyLink: 'https://forests.ap.gov.in',
+    officialApplyLink: 'https://forests.ap.gov.in',
+    notificationPdf: 'https://forests.ap.gov.in',
+    notificationPdfLink: 'https://forests.ap.gov.in',
+    description: 'Forest Section Officers (FSO) and Forest Beat Officers (FBO) protecting wildlife sanctuaries and state reserve forests.',
+    tags: ['Forest Officer', 'Wildlife', 'Science Graduate', 'State Govt']
+  },
+
+  // 11. SSC CGL 2026
   {
     id: 'ssc-cgl-2026',
     title: 'SSC CGL 2026 (Combined Graduate Level)',
@@ -138,17 +292,72 @@ export const govtJobNotifications: GovtJobNotification[] = [
     vacancies: '17,727 Posts',
     qualification: 'Any Bachelor’s Degree in any discipline',
     ageLimit: '18 - 32 Years',
-    salary: '₹44,900 - ₹1,42,400 / month (Level 7 & 8)',
+    salary: '₹44,900 - ₹1,42,400 / month (Pay Level 7 & 8)',
+    salaryScale: '₹44,900 - ₹1,42,400 / month',
     location: 'All India (Central Ministries & Departments)',
     postedDate: '2026-08-01',
     lastDate: '2026-10-02',
     status: 'Active',
     officialWebsite: 'https://ssc.gov.in',
     applyLink: 'https://ssc.gov.in',
+    officialApplyLink: 'https://ssc.gov.in',
     notificationPdf: 'https://ssc.gov.in',
-    description: 'Premier Central Government examination for Assistant Section Officer (CSS, MEA, IB), Inspector of Income Tax, Central Excise Inspector, and Enforcement Officer.',
+    notificationPdfLink: 'https://ssc.gov.in',
+    description: 'Premier Central Government examination for Assistant Section Officer (CSS, MEA, IB), Income Tax Inspector, Central Excise, and Enforcement Officer.',
     tags: ['SSC CGL', 'Central Govt', 'Income Tax', 'MEA', 'Tier 1 & Tier 2']
   },
+
+  // 12. SSC CHSL 2026
+  {
+    id: 'ssc-chsl-2026',
+    title: 'SSC CHSL 2026 (10+2 Combined Higher Secondary)',
+    department: 'Staff Selection Commission (SSC)',
+    category: 'central',
+    categoryLabel: 'Central Govt',
+    vacancies: '3,712 Posts',
+    qualification: '12th Standard (Intermediate) or equivalent',
+    ageLimit: '18 - 27 Years',
+    salary: '₹25,500 - ₹81,100 / month (Level 4)',
+    salaryScale: '₹25,500 - ₹81,100 / month',
+    location: 'Central Ministries across India',
+    postedDate: '2026-08-10',
+    lastDate: '2026-10-06',
+    status: 'Active',
+    officialWebsite: 'https://ssc.gov.in',
+    applyLink: 'https://ssc.gov.in',
+    officialApplyLink: 'https://ssc.gov.in',
+    notificationPdf: 'https://ssc.gov.in',
+    notificationPdfLink: 'https://ssc.gov.in',
+    description: 'Lower Division Clerk (LDC), Junior Secretariat Assistant (JSA), and Data Entry Operator (DEO) in Central Ministries.',
+    tags: ['SSC CHSL', '12th Pass', 'Data Entry', 'LDC', 'Central Govt']
+  },
+
+  // 13. SSC JE 2026 (Engineering)
+  {
+    id: 'ssc-je-2026',
+    title: 'SSC JE 2026 Junior Engineer (Civil, Mech, Electrical)',
+    department: 'Staff Selection Commission (CPWD, MES, CWC)',
+    category: 'central',
+    categoryLabel: 'Central Govt',
+    vacancies: '1,765 Posts',
+    qualification: 'Diploma or B.Tech in Civil, Mechanical, or Electrical Engineering',
+    ageLimit: '18 - 32 Years',
+    salary: '₹35,400 - ₹1,12,400 / month (Pay Level 6)',
+    salaryScale: '₹35,400 - ₹1,12,400 / month',
+    location: 'All India (Central Public Works, Military Engineering)',
+    postedDate: '2026-08-14',
+    lastDate: '2026-10-08',
+    status: 'Active',
+    officialWebsite: 'https://ssc.gov.in',
+    applyLink: 'https://ssc.gov.in',
+    officialApplyLink: 'https://ssc.gov.in',
+    notificationPdf: 'https://ssc.gov.in',
+    notificationPdfLink: 'https://ssc.gov.in',
+    description: 'Junior Engineers for Central Public Works Department (CPWD), Military Engineer Services (MES), and Central Water Commission.',
+    tags: ['SSC JE', 'Junior Engineer', 'Diploma', 'B.Tech', 'CPWD']
+  },
+
+  // 14. RRB NTPC
   {
     id: 'rrb-ntpc-2026',
     title: 'RRB NTPC (Non-Technical Popular Categories)',
@@ -159,16 +368,71 @@ export const govtJobNotifications: GovtJobNotification[] = [
     qualification: '12th Pass (Undergraduate) or Bachelor’s Degree (Graduate)',
     ageLimit: '18 - 36 Years (Graduate) | 18 - 33 Years (12th)',
     salary: '₹35,400 - ₹1,12,400 / month',
+    salaryScale: '₹35,400 - ₹1,12,400 / month',
     location: 'All Indian Railway Zones (South Central Railway - Secunderabad included)',
     postedDate: '2026-08-22',
     lastDate: '2026-10-13',
     status: 'Active',
     officialWebsite: 'https://rrbapply.gov.in',
     applyLink: 'https://rrbapply.gov.in',
+    officialApplyLink: 'https://rrbapply.gov.in',
     notificationPdf: 'https://indianrailways.gov.in',
+    notificationPdfLink: 'https://indianrailways.gov.in',
     description: 'Station Master, Goods Train Manager, Senior Commercial cum Ticket Clerk, Accounts Clerk cum Typist across all RRB divisions.',
     tags: ['Railways', 'RRB NTPC', 'SCR', 'Station Master', 'Railway Jobs']
   },
+
+  // 15. RRB ALP & Technicians
+  {
+    id: 'rrb-alp-2026',
+    title: 'RRB Assistant Loco Pilot (ALP) & Technicians',
+    department: 'Railway Recruitment Boards (Indian Railways)',
+    category: 'railway',
+    categoryLabel: 'Railways (RRB)',
+    vacancies: '18,799 Posts',
+    qualification: 'Matriculation + ITI / Diploma in Engg / B.Tech (Mech/Elec/Auto)',
+    ageLimit: '18 - 33 Years',
+    salary: '₹19,900 - ₹63,200 + Running Allowances (~₹45,000/mo)',
+    salaryScale: '₹19,900 - ₹63,200 + Running Allowances (~₹45,000/mo)',
+    location: 'Indian Railways (South Central, Southern, East Coast Zones)',
+    postedDate: '2026-08-05',
+    lastDate: '2026-10-01',
+    status: 'Active',
+    officialWebsite: 'https://rrbapply.gov.in',
+    applyLink: 'https://rrbapply.gov.in',
+    officialApplyLink: 'https://rrbapply.gov.in',
+    notificationPdf: 'https://rrbapply.gov.in',
+    notificationPdfLink: 'https://rrbapply.gov.in',
+    description: 'Loco Pilots driving passenger and goods trains across Indian Railways with high allowances and safety grade bonuses.',
+    tags: ['RRB ALP', 'Loco Pilot', 'ITI', 'Diploma', 'Indian Railways']
+  },
+
+  // 16. RRB JE (Railway Junior Engineer)
+  {
+    id: 'rrb-je-2026',
+    title: 'RRB Junior Engineer (Track Machine, Works, Signal)',
+    department: 'Railway Recruitment Boards (Indian Railways)',
+    category: 'railway',
+    categoryLabel: 'Railways (RRB)',
+    vacancies: '7,951 Posts',
+    qualification: 'Diploma or Degree in Civil, Mechanical, Electrical, Electronics Engineering',
+    ageLimit: '18 - 36 Years',
+    salary: '₹35,400 - ₹1,12,400 / month (Pay Level 6)',
+    salaryScale: '₹35,400 - ₹1,12,400 / month',
+    location: 'All Railway Zones across India',
+    postedDate: '2026-08-11',
+    lastDate: '2026-10-18',
+    status: 'Active',
+    officialWebsite: 'https://rrbapply.gov.in',
+    applyLink: 'https://rrbapply.gov.in',
+    officialApplyLink: 'https://rrbapply.gov.in',
+    notificationPdf: 'https://rrbapply.gov.in',
+    notificationPdfLink: 'https://rrbapply.gov.in',
+    description: 'Junior Engineers overseeing railway infrastructure, signaling networks, locomotive maintenance, and permanent-way tracks.',
+    tags: ['RRB JE', 'Railway Engineer', 'B.Tech', 'Diploma', 'SCR']
+  },
+
+  // 17. SBI PO
   {
     id: 'sbi-po-2026',
     title: 'SBI Probationary Officers (PO) Recruitment',
@@ -179,16 +443,46 @@ export const govtJobNotifications: GovtJobNotification[] = [
     qualification: 'Graduation in any discipline (B.Tech / B.Sc / B.Com / BA)',
     ageLimit: '21 - 30 Years',
     salary: 'Starting CTC ~₹18.5 Lakhs / annum (~₹68,000/mo in-hand)',
+    salaryScale: 'Starting CTC ~₹18.5 Lakhs / annum (~₹68,000/mo in-hand)',
     location: 'Across India (SBI Circles)',
     postedDate: '2026-08-30',
     lastDate: '2026-09-29',
     status: 'Closing Soon',
     officialWebsite: 'https://sbi.co.in/web/careers',
     applyLink: 'https://sbi.co.in/web/careers',
+    officialApplyLink: 'https://sbi.co.in/web/careers',
     notificationPdf: 'https://sbi.co.in/web/careers',
-    description: 'Entry-level managerial cadre position at India’s largest public sector bank with attractive perks, lease accommodation, and rapid career progression to Scale IV/V.',
+    notificationPdfLink: 'https://sbi.co.in/web/careers',
+    description: 'Entry-level managerial cadre position at India’s largest public sector bank with attractive perks, lease accommodation, and rapid career progression.',
     tags: ['SBI PO', 'Banking', 'Prelims', 'Mains', 'Group Exercise']
   },
+
+  // 18. SBI Clerk (Junior Associates)
+  {
+    id: 'sbi-clerk-2026',
+    title: 'SBI Junior Associates (Customer Support & Sales)',
+    department: 'State Bank of India (SBI)',
+    category: 'banking',
+    categoryLabel: 'Banking (SBI)',
+    vacancies: '8,283 Posts',
+    qualification: 'Graduation in any discipline from recognized university',
+    ageLimit: '20 - 28 Years',
+    salary: '₹26,000 - ₹45,000 / month (including allowances)',
+    salaryScale: '₹26,000 - ₹45,000 / month',
+    location: 'All State Circles (Andhra Pradesh & Telangana Circles)',
+    postedDate: '2026-08-25',
+    lastDate: '2026-10-05',
+    status: 'Active',
+    officialWebsite: 'https://sbi.co.in/web/careers',
+    applyLink: 'https://sbi.co.in/web/careers',
+    officialApplyLink: 'https://sbi.co.in/web/careers',
+    notificationPdf: 'https://sbi.co.in/web/careers',
+    notificationPdfLink: 'https://sbi.co.in/web/careers',
+    description: 'Bank clerical cadre handling front-desk operations, customer accounts, cash transactions, and digital branch banking.',
+    tags: ['SBI Clerk', 'Junior Associate', 'Banking', 'Fresh Graduate']
+  },
+
+  // 19. IBPS PO
   {
     id: 'ibps-po-2026',
     title: 'IBPS PO / Management Trainee CRP XIV',
@@ -199,16 +493,71 @@ export const govtJobNotifications: GovtJobNotification[] = [
     qualification: 'Bachelor’s Degree in any stream',
     ageLimit: '20 - 30 Years',
     salary: '₹42,000 - ₹85,000 / month',
+    salaryScale: '₹42,000 - ₹85,000 / month',
     location: 'All India (11 Participating Public Sector Banks)',
     postedDate: '2026-08-05',
     lastDate: '2026-09-24',
     status: 'Closing Soon',
     officialWebsite: 'https://ibps.in',
     applyLink: 'https://ibps.in',
+    officialApplyLink: 'https://ibps.in',
     notificationPdf: 'https://ibps.in',
-    description: 'Recruitment of Probationary Officers in Punjab National Bank, Bank of Baroda, Canara Bank, Union Bank of India, Indian Bank, and other PSBs.',
+    notificationPdfLink: 'https://ibps.in',
+    description: 'Probationary Officers in Punjab National Bank, Bank of Baroda, Canara Bank, Union Bank of India, Indian Bank, and other PSBs.',
     tags: ['IBPS PO', 'Public Sector Banks', 'Banking Exam']
   },
+
+  // 20. IBPS Clerk
+  {
+    id: 'ibps-clerk-2026',
+    title: 'IBPS Clerical Cadre CRP XIV',
+    department: 'Institute of Banking Personnel Selection (IBPS)',
+    category: 'banking',
+    categoryLabel: 'Banking (IBPS)',
+    vacancies: '6,128 Posts',
+    qualification: 'Any Graduate Degree + Proficiency in Local Language',
+    ageLimit: '20 - 28 Years',
+    salary: '₹24,000 - ₹48,000 / month',
+    salaryScale: '₹24,000 - ₹48,000 / month',
+    location: 'Participating Public Sector Banks across AP & India',
+    postedDate: '2026-08-10',
+    lastDate: '2026-09-27',
+    status: 'Closing Soon',
+    officialWebsite: 'https://ibps.in',
+    applyLink: 'https://ibps.in',
+    officialApplyLink: 'https://ibps.in',
+    notificationPdf: 'https://ibps.in',
+    notificationPdfLink: 'https://ibps.in',
+    description: 'Clerks across 11 nationalized public sector banks with state-wise vacancy allocation and local language preference.',
+    tags: ['IBPS Clerk', 'Banking', 'Telugu Language', 'PSB']
+  },
+
+  // 21. RBI Grade B
+  {
+    id: 'rbi-grade-b-2026',
+    title: 'RBI Grade B Officers (General / DEPR / DSIM)',
+    department: 'Reserve Bank of India (RBI)',
+    category: 'banking',
+    categoryLabel: 'Banking (RBI)',
+    vacancies: '160 Posts',
+    qualification: 'Graduation in any discipline with min 60% marks (50% for SC/ST)',
+    ageLimit: '21 - 30 Years',
+    salary: 'Gross CTC ~₹1,16,684 / month (Basic ₹55,200)',
+    salaryScale: 'Gross CTC ~₹1,16,684 / month (Basic ₹55,200)',
+    location: 'RBI Headquarters (Mumbai) & Regional Offices',
+    postedDate: '2026-08-18',
+    lastDate: '2026-10-04',
+    status: 'Active',
+    officialWebsite: 'https://rbi.org.in',
+    applyLink: 'https://rbi.org.in',
+    officialApplyLink: 'https://rbi.org.in',
+    notificationPdf: 'https://rbi.org.in',
+    notificationPdfLink: 'https://rbi.org.in',
+    description: 'India’s elite central banking managerial position shaping monetary policy, banking supervision, and foreign exchange reserves.',
+    tags: ['RBI Grade B', 'Central Bank', 'Monetary Policy', 'Elite Banking']
+  },
+
+  // 22. UPSC CSE
   {
     id: 'upsc-cse-2026',
     title: 'UPSC Civil Services & Indian Forest Service',
@@ -219,16 +568,21 @@ export const govtJobNotifications: GovtJobNotification[] = [
     qualification: 'Bachelor’s Degree in any discipline',
     ageLimit: '21 - 32 Years',
     salary: '₹56,100 - ₹2,50,000 / month (Pay Level 10 to 17)',
+    salaryScale: '₹56,100 - ₹2,50,000 / month',
     location: 'All India (Cadre Allocations)',
     postedDate: '2026-08-01',
     lastDate: '2026-10-30',
     status: 'Active',
     officialWebsite: 'https://upsc.gov.in',
     applyLink: 'https://upsconline.nic.in',
+    officialApplyLink: 'https://upsconline.nic.in',
     notificationPdf: 'https://upsc.gov.in',
+    notificationPdfLink: 'https://upsc.gov.in',
     description: 'Prestigious national recruitment for Indian Administrative Service (IAS), Indian Police Service (IPS), Indian Foreign Service (IFS), and IRS.',
     tags: ['IAS', 'IPS', 'Civil Services', 'UPSC', 'All India']
   },
+
+  // 23. ISRO ICRB
   {
     id: 'isro-scientist-2026',
     title: 'ISRO ICRB Scientist / Engineer ‘SC’ Recruitment',
@@ -239,16 +593,21 @@ export const govtJobNotifications: GovtJobNotification[] = [
     qualification: 'B.E / B.Tech in CSE, ECE, Mechanical with min 65% marks / CGPA 6.84',
     ageLimit: '18 - 28 Years',
     salary: '₹56,100 + DA + HRA (Pay Level 10 ~₹95,000 gross/mo)',
+    salaryScale: '₹56,100 + DA + HRA (Pay Level 10 ~₹95,000 gross/mo)',
     location: 'ISRO Centers (VSSC Trivandrum, URSC Bengaluru, SDSC Sriharikota)',
     postedDate: '2026-08-14',
     lastDate: '2026-10-10',
     status: 'Active',
     officialWebsite: 'https://isro.gov.in',
     applyLink: 'https://isro.gov.in/careers',
+    officialApplyLink: 'https://isro.gov.in/careers',
     notificationPdf: 'https://isro.gov.in',
+    notificationPdfLink: 'https://isro.gov.in',
     description: 'Direct recruitment of Scientists/Engineers across national space missions (Chandrayaan, Gaganyaan, Aditya) at premier ISRO research centers.',
     tags: ['ISRO', 'Space Research', 'Scientist SC', 'B.Tech', 'GATE']
   },
+
+  // 24. DRDO CEPTAM
   {
     id: 'drdo-ceptam-2026',
     title: 'DRDO CEPTAM-11 Senior Technical Assistant (STA-B)',
@@ -259,14 +618,67 @@ export const govtJobNotifications: GovtJobNotification[] = [
     qualification: 'Diploma in Engineering / B.Sc in Computer Science, Physics, Chemistry',
     ageLimit: '18 - 28 Years',
     salary: '₹35,400 - ₹1,12,400 / month (Pay Level 6)',
+    salaryScale: '₹35,400 - ₹1,12,400 / month',
     location: 'DRDO Labs across India (RCI/DRDL Hyderabad, ADE Bengaluru)',
     postedDate: '2026-08-19',
     lastDate: '2026-10-08',
     status: 'Active',
     officialWebsite: 'https://drdo.gov.in',
     applyLink: 'https://drdo.gov.in/careers',
+    officialApplyLink: 'https://drdo.gov.in/careers',
     notificationPdf: 'https://drdo.gov.in',
+    notificationPdfLink: 'https://drdo.gov.in',
     description: 'Defense research technical recruitment in missile systems, avionics, radar technology, cyber defense, and advanced materials.',
     tags: ['DRDO', 'Defense', 'Technical Assistant', 'Engineering']
+  },
+
+  // 25. GATE PSU Executive Trainees
+  {
+    id: 'gate-psu-trainee-2026',
+    title: 'Maharatna PSU Executive Trainees (NTPC, ONGC, IOCL, BHEL)',
+    department: 'Central Public Sector Enterprises (CPSEs) through GATE',
+    category: 'defense',
+    categoryLabel: 'Defense & PSUs',
+    vacancies: '2,850 Posts',
+    qualification: 'B.E / B.Tech (Mechanical, Electrical, Civil, Chemical, CSE) + Valid GATE Score',
+    ageLimit: '18 - 30 Years',
+    salary: '₹60,000 - ₹1,80,000 / month (CTC ₹16 to ₹21 Lakhs/yr)',
+    salaryScale: '₹60,000 - ₹1,80,000 / month',
+    location: 'PSU Plants, Refineries & Offshore Rigs across India',
+    postedDate: '2026-08-26',
+    lastDate: '2026-10-25',
+    status: 'Active',
+    officialWebsite: 'https://gate2026.iitkgp.ac.in',
+    applyLink: 'https://gate2026.iitkgp.ac.in',
+    officialApplyLink: 'https://gate2026.iitkgp.ac.in',
+    notificationPdf: 'https://gate2026.iitkgp.ac.in',
+    notificationPdfLink: 'https://gate2026.iitkgp.ac.in',
+    description: 'Executive Trainee / Graduate Engineer Trainee recruitment across Maharatna & Navratna PSUs offering executive compensation & housing.',
+    tags: ['GATE', 'PSU', 'ONGC', 'NTPC', 'B.Tech Engineer']
+  },
+
+  // 26. Indian Air Force AFCAT
+  {
+    id: 'afcat-iaf-2026',
+    title: 'Indian Air Force AFCAT Commissioned Officers',
+    department: 'Indian Air Force (IAF)',
+    category: 'defense',
+    categoryLabel: 'Defense & PSUs',
+    vacancies: '317 Posts',
+    qualification: 'Graduation in any discipline (min 60%) / B.Tech (Flying & Ground Duty)',
+    ageLimit: '20 - 26 Years',
+    salary: '₹56,100 - ₹1,77,500 / month (Flying Officer Pay Level 10)',
+    salaryScale: '₹56,100 - ₹1,77,500 / month',
+    location: 'Air Force Stations across India',
+    postedDate: '2026-08-15',
+    lastDate: '2026-09-30',
+    status: 'Active',
+    officialWebsite: 'https://afcat.cdac.in',
+    applyLink: 'https://afcat.cdac.in',
+    officialApplyLink: 'https://afcat.cdac.in',
+    notificationPdf: 'https://afcat.cdac.in',
+    notificationPdfLink: 'https://afcat.cdac.in',
+    description: 'Commissioned Officer entry in Flying Branch (Fighter, Transport, Helicopter) and Ground Duty (Technical & Non-Technical) branches.',
+    tags: ['AFCAT', 'Air Force', 'Flying Officer', 'Defense Officer', 'Pilot']
   }
 ];
