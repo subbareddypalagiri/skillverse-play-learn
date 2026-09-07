@@ -104,7 +104,7 @@ export const ingestOpportunities = async (records = []) => {
   }
 
   const REQUIRED_FIELDS = ['title', 'organization', 'type', 'location'];
-  const VALID_TYPES = ['job', 'internship', 'place'];
+  const VALID_TYPES = ['job', 'internship', 'place', 'govt'];
 
   const operations = [];
   const errors = [];

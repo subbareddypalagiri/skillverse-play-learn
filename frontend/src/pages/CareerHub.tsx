@@ -869,19 +869,19 @@ const typeColors: Record<string, string> = {
                 {/* Live Vacancies Quick Stats */}
                 <div className="flex flex-wrap items-center gap-2.5 pt-2">
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-black text-emerald-400 flex items-center gap-1.5 shadow-sm">
-                    <TrendingUp className="w-3.5 h-3.5" /> 1,45,000+ Total Posts
+                    <TrendingUp className="w-3.5 h-3.5" /> 2,50,000+ Total Posts ({govtJobNotifications.length} Active Notifications)
                   </div>
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-cyan-300">
-                    🚩 47,000+ AP State
+                    🚩 55,000+ AP State
                   </div>
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-amber-300">
-                    🚆 38,000+ Railways
+                    🚆 89,000+ Railways
                   </div>
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-indigo-300">
-                    🇮🇳 35,000+ Central
+                    🇮🇳 75,000+ Central
                   </div>
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-rose-300">
-                    🏦 20,000+ Banking
+                    🏦 27,000+ Banking & PSUs
                   </div>
                 </div>
 
