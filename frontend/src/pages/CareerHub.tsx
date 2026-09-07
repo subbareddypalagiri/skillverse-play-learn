@@ -176,6 +176,20 @@ const typeColors: Record<string, string> = {
     });
   }, [activeGovtDataset, govtCategory, govtEducation, govtSearch]);
 
+  // Government Notifications 20-per-page pagination
+  const [govtPage, setGovtPage] = useState(1);
+  const govtItemsPerPage = 20;
+
+  useEffect(() => {
+    setGovtPage(1);
+  }, [govtCategory, govtEducation, govtSearch]);
+
+  const totalGovtPages = Math.ceil(filteredGovtJobs.length / govtItemsPerPage) || 1;
+  const paginatedGovtJobs = useMemo(() => {
+    const startIndex = (govtPage - 1) * govtItemsPerPage;
+    return filteredGovtJobs.slice(startIndex, startIndex + govtItemsPerPage);
+  }, [filteredGovtJobs, govtPage, govtItemsPerPage]);
+
   const handleSubscribeAlerts = async () => {
     if (!whatsappNumber || whatsappNumber.length < 10) {
       toast({
@@ -954,19 +968,19 @@ const typeColors: Record<string, string> = {
                 {/* Live Vacancies Quick Stats */}
                 <div className="flex flex-wrap items-center gap-2.5 pt-2">
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-black text-emerald-400 flex items-center gap-1.5 shadow-sm">
-                    <TrendingUp className="w-3.5 h-3.5" /> 2,50,000+ Total Posts ({activeGovtDataset.length} Active Notifications)
+                    <TrendingUp className="w-3.5 h-3.5" /> 3,50,000+ Total Posts ({activeGovtDataset.length} Active Notifications)
                   </div>
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-cyan-300">
-                    🚩 55,000+ AP State
+                    🚩 95,000+ AP State
                   </div>
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-amber-300">
-                    🚆 89,000+ Railways
+                    🚆 95,000+ Railways
                   </div>
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-indigo-300">
-                    🇮🇳 75,000+ Central
+                    🇮🇳 95,000+ Central
                   </div>
                   <div className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-rose-300">
-                    🏦 27,000+ Banking & PSUs
+                    🏦 65,000+ Banking & PSUs
                   </div>
                 </div>
 
@@ -1026,7 +1040,7 @@ const typeColors: Record<string, string> = {
                 )}
               </div>
               <div className="text-xs font-bold text-slate-600 flex-shrink-0 self-center">
-                Showing <span className="text-emerald-700 font-extrabold text-sm">{filteredGovtJobs.length}</span> active notices
+                Showing <span className="text-emerald-700 font-extrabold text-sm">{filteredGovtJobs.length === 0 ? 0 : (govtPage - 1) * govtItemsPerPage + 1} - {Math.min(govtPage * govtItemsPerPage, filteredGovtJobs.length)}</span> of <span className="text-emerald-700 font-extrabold text-sm">{filteredGovtJobs.length}</span> active notices
               </div>
             </div>
 
@@ -1077,9 +1091,9 @@ const typeColors: Record<string, string> = {
             </div>
           </div>
 
-          {/* Govt Notifications Cards Grid - PURE SOLID WHITE CARDS */}
+          {/* Govt Notifications Cards Grid - PURE SOLID WHITE CARDS (20 Per Page) */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredGovtJobs.map((job) => {
+            {paginatedGovtJobs.map((job) => {
               const isAp = job.category === 'ap_state';
               return (
                 <div
@@ -1198,6 +1212,63 @@ const typeColors: Record<string, string> = {
               </div>
             )}
           </div>
+
+          {/* Pagination Controls - Exactly 20 items per page */}
+          {totalGovtPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-5 rounded-3xl bg-white border border-slate-200 shadow-md">
+              <div className="text-xs font-bold text-slate-600">
+                Page <span className="text-emerald-700 font-black">{govtPage}</span> of <span className="text-slate-900 font-black">{totalGovtPages}</span> ({filteredGovtJobs.length} active opportunities • 20 per page)
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                <button
+                  onClick={() => {
+                    setGovtPage(prev => Math.max(prev - 1, 1));
+                    window.scrollTo({ top: 550, behavior: 'smooth' });
+                  }}
+                  disabled={govtPage === 1}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition shadow-sm"
+                >
+                  <ChevronLeft className="w-4 h-4" /> Prev
+                </button>
+                
+                {Array.from({ length: totalGovtPages }, (_, i) => i + 1)
+                  .filter(p => p === 1 || p === totalGovtPages || Math.abs(p - govtPage) <= 2)
+                  .map((pageNum, idx, arr) => {
+                    const prevNum = arr[idx - 1];
+                    const showEllipsis = prevNum && pageNum - prevNum > 1;
+                    return (
+                      <div key={pageNum} className="flex items-center">
+                        {showEllipsis && <span className="px-1.5 text-slate-400 font-bold">...</span>}
+                        <button
+                          onClick={() => {
+                            setGovtPage(pageNum);
+                            window.scrollTo({ top: 550, behavior: 'smooth' });
+                          }}
+                          className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl text-xs font-black transition ${
+                            govtPage === pageNum
+                              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      </div>
+                    );
+                  })}
+
+                <button
+                  onClick={() => {
+                    setGovtPage(prev => Math.min(prev + 1, totalGovtPages));
+                    window.scrollTo({ top: 550, behavior: 'smooth' });
+                  }}
+                  disabled={govtPage === totalGovtPages}
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition shadow-sm"
+                >
+                  Next <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
