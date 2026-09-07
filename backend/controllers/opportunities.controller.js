@@ -2,7 +2,8 @@ import {
   getOpportunities,
   getOpportunityById,
   ingestOpportunities,
-  subscribeAlerts
+  subscribeAlerts,
+  sendTestAlertService
 } from '../services/opportunities.service.js';
 import { executeGovtPipeline } from '../agents/fetchGovtJobs.js';
 import { successResponse, paginatedResponse } from '../utils/responseHandler.js';
@@ -147,3 +148,26 @@ export const syncGovtOpportunities = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * @desc    Generate & test recruitment alert dispatch
+ * @route   POST /api/opportunities/alerts/test
+ * @access  Public
+ */
+export const testAlertHandler = async (req, res, next) => {
+  try {
+    const whatsapp = req.body?.whatsapp || req.query?.whatsapp;
+    const email = req.body?.email || req.query?.email;
+
+    if (!whatsapp) {
+      throw new ValidationError('WhatsApp phone number is required to trigger test alert');
+    }
+
+    const result = await sendTestAlertService({ whatsapp, email });
+    return successResponse(res, 200, 'Test alert generated successfully', result);
+  } catch (error) {
+    logger.error(`[OpportunitiesAPI] Test alert failed: ${error.message}`);
+    next(error);
+  }
+};
+

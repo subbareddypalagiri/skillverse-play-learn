@@ -4,7 +4,8 @@ import {
   showOpportunity,
   bulkIngest,
   subscribeAlertsHandler,
-  syncGovtOpportunities
+  syncGovtOpportunities,
+  testAlertHandler
 } from '../controllers/opportunities.controller.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 
@@ -21,9 +22,12 @@ const router = express.Router();
 // GET  /api/opportunities                   → list with filters & pagination
 // GET  /api/opportunities/:id               → single opportunity detail
 // POST /api/opportunities/alerts/subscribe  → subscribe WhatsApp/Gmail for recruitment alerts
+// POST /api/opportunities/alerts/test       → test recruitment alert generator & WhatsApp link
 // POST /api/opportunities/sync-govt         → trigger automated govt jobs sync & auto-expiry
 router.get('/',    listOpportunities);
 router.post('/alerts/subscribe', subscribeAlertsHandler);
+router.post('/alerts/test', testAlertHandler);
+router.get('/alerts/test', testAlertHandler);
 router.post('/sync-govt', syncGovtOpportunities);
 router.get('/:id', showOpportunity);
 
