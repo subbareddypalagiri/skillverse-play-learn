@@ -54,8 +54,15 @@ async function runTest() {
 
     console.log('\n--- 3. SYNTHESIZED WHATSAPP ALERT MESSAGE ---');
     console.log(whatsappText);
-    console.log('\n--- 4. DIRECT WHATSAPP LAUNCH URL ---');
-    console.log(waUrl);
+
+    // 4. Dispatch via Twilio WhatsApp API
+    const { sendWhatsAppMessage } = await import('../services/notification.service.js');
+    console.log('\n--- 4. DISPATCHING REAL INCOMING WHATSAPP MESSAGE VIA TWILIO... ---');
+    const dispatchResult = await sendWhatsAppMessage({
+      to: cleanPhone,
+      message: whatsappText
+    });
+    console.log('Twilio Dispatch Result:', JSON.stringify(dispatchResult, null, 2));
 
     await mongoose.disconnect();
     console.log('\n--- TEST EXECUTION FINISHED: 100% SUCCESS ---');
