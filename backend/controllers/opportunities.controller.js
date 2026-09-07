@@ -105,13 +105,14 @@ export const bulkIngest = async (req, res, next) => {
  */
 export const subscribeAlertsHandler = async (req, res, next) => {
   try {
-    const { whatsapp, email, categories, userId } = req.body;
+    const { name, whatsapp, email, categories, userId } = req.body;
 
     if (!whatsapp || whatsapp.trim().length < 10) {
       throw new ValidationError('Please provide a valid 10-digit WhatsApp number');
     }
 
     const subscription = await subscribeAlerts({
+      name: name || req.user?.name || req.user?.username || 'Subba Reddy',
       whatsapp,
       email,
       categories,
@@ -120,6 +121,7 @@ export const subscribeAlertsHandler = async (req, res, next) => {
 
     return successResponse(res, 201, 'Subscribed to recruitment alerts successfully', {
       subscription: {
+        name: subscription.name,
         whatsapp: subscription.whatsapp,
         email: subscription.email,
         categories: subscription.categories,
@@ -158,12 +160,13 @@ export const testAlertHandler = async (req, res, next) => {
   try {
     const whatsapp = req.body?.whatsapp || req.query?.whatsapp;
     const email = req.body?.email || req.query?.email;
+    const name = req.body?.name || req.query?.name || req.user?.name || req.user?.username || 'Subba Reddy';
 
     if (!whatsapp) {
       throw new ValidationError('WhatsApp phone number is required to trigger test alert');
     }
 
-    const result = await sendTestAlertService({ whatsapp, email });
+    const result = await sendTestAlertService({ name, whatsapp, email });
     return successResponse(res, 200, 'Test alert generated successfully', result);
   } catch (error) {
     logger.error(`[OpportunitiesAPI] Test alert failed: ${error.message}`);

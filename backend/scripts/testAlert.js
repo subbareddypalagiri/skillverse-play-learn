@@ -31,9 +31,12 @@ async function runTest() {
 
     console.log(`\n--- 2. MATCHED RECRUITMENTS (${opps.length} notices for: ${categories.join(', ')}) ---`);
 
+    const candidateName = sub.name || 'Subba Reddy';
+
     // 3. Format WhatsApp Recruitment Digest
-    let whatsappText = `🎯 *SkillVerse Daily Recruitment Bulletin* 🔔\n`;
-    whatsappText += `Hello Subba Reddy! Here is your verified job alerts digest:\n\n`;
+    let whatsappText = `🎉 *HAAPPY CAREER JOURNEY, ${candidateName.toUpperCase()}!* 🚀\n`;
+    whatsappText += `🎯 *SkillVerse Daily Recruitment Bulletin* 🔔\n`;
+    whatsappText += `Hello ${candidateName}! We are HAAPPY to share today's top verified recruitment notices with you:\n\n`;
 
     opps.forEach((opp, i) => {
       whatsappText += `${i + 1}️⃣ *${opp.title}*\n`;
@@ -47,7 +50,7 @@ async function runTest() {
 
     whatsappText += `📍 *Track all 214 active government jobs & notifications live:*\n`;
     whatsappText += `https://skillverse-app.com/careers?type=govt\n\n`;
-    whatsappText += `_SkillVerse Alert Service • Subscribed on WhatsApp (+91 ${targetPhone}) & Gmail._`;
+    whatsappText += `_Wishing you a HAAPPY and Successful Career, ${candidateName}! • SkillVerse Alerts_`;
 
     const cleanPhone = '919493811060';
     const waUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(whatsappText)}`;

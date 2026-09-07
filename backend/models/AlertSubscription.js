@@ -8,6 +8,11 @@ import mongoose from 'mongoose';
 // ============================================================
 
 const alertSubscriptionSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    trim: true,
+    default: 'Subba Reddy'
+  },
   whatsapp: {
     type: String,
     required: [true, 'WhatsApp phone number is required'],

@@ -206,6 +206,7 @@ const typeColors: Record<string, string> = {
       setSubscribing(true);
       // Persist to MongoDB backend
       await apiClient.post('/opportunities/alerts/subscribe', {
+        name: user?.name || user?.username || 'Subba Reddy',
         whatsapp: whatsappNumber,
         email: user?.email || undefined,
         categories: subscribedCategories,
@@ -259,8 +260,11 @@ const typeColors: Record<string, string> = {
       setTestingAlert(true);
       let resData: any = null;
 
+      const candidateName = user?.name || user?.username || 'Subba Reddy';
+
       try {
         const res = await apiClient.post('/opportunities/alerts/test', {
+          name: candidateName,
           whatsapp: cleanPhone,
           email: user?.email || localStorage.getItem('userEmail') || 'subbareddy123sub@gmail.com'
         });
@@ -274,8 +278,9 @@ const typeColors: Record<string, string> = {
       if (!resData) {
         // High-fidelity fallback synthesis
         const sampleJobs = activeGovtDataset.slice(0, 4);
-        let bulletin = `🎯 *SkillVerse Daily Recruitment Bulletin* 🔔\n`;
-        bulletin += `Hello Candidate! Here is your verified job alerts digest:\n\n`;
+        let bulletin = `🎉 *HAAPPY CAREER JOURNEY, ${candidateName.toUpperCase()}!* 🚀\n`;
+        bulletin += `🎯 *SkillVerse Daily Recruitment Bulletin* 🔔\n`;
+        bulletin += `Hello ${candidateName}! We are HAAPPY to share today's verified job alerts with you:\n\n`;
 
         sampleJobs.forEach((job, idx) => {
           bulletin += `${idx + 1}️⃣ *${job.title}*\n`;
@@ -287,7 +292,7 @@ const typeColors: Record<string, string> = {
 
         bulletin += `📍 *Track all 214 active government jobs & notifications live:*\n`;
         bulletin += `https://skillverse-app.com/careers?type=govt\n\n`;
-        bulletin += `_SkillVerse Alert Service • Subscribed on WhatsApp (+91 ${cleanPhone.slice(-10)}) & Gmail._`;
+        bulletin += `_Wishing you a HAAPPY and Successful Career, ${candidateName}! • SkillVerse Alerts_`;
 
         const phoneWithCountry = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
         const waUrl = `https://api.whatsapp.com/send?phone=${phoneWithCountry}&text=${encodeURIComponent(bulletin)}`;

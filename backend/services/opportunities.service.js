@@ -273,19 +273,21 @@ export const archiveExpiredOpportunities = async () => {
 /**
  * Save or update user WhatsApp and Email alert subscription.
  */
-export const subscribeAlerts = async ({ whatsapp, email, categories, userId }) => {
+export const subscribeAlerts = async ({ name, whatsapp, email, categories, userId }) => {
   if (!whatsapp) {
     throw new Error('Valid WhatsApp phone number is required');
   }
 
   const cleanWhatsapp = whatsapp.trim().replace(/[^0-9+]/g, '');
   const cleanEmail = email ? email.trim().toLowerCase() : undefined;
+  const cleanName = (name || '').trim() || undefined;
 
   const subscription = await AlertSubscription.findOneAndUpdate(
     { whatsapp: cleanWhatsapp },
     {
       $set: {
         whatsapp: cleanWhatsapp,
+        ...(cleanName && { name: cleanName }),
         ...(cleanEmail && { email: cleanEmail }),
         ...(categories && Array.isArray(categories) && { categories }),
         ...(userId && { userId }),
@@ -295,14 +297,14 @@ export const subscribeAlerts = async ({ whatsapp, email, categories, userId }) =
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 
-  logger.info(`[OpportunitiesService] User alert preferences saved for WhatsApp: ${cleanWhatsapp}`);
+  logger.info(`[OpportunitiesService] User alert preferences saved for ${cleanName || 'User'} (WhatsApp: ${cleanWhatsapp})`);
   return subscription;
 };
 
 /**
  * Generate and dispatch test recruitment alert
  */
-export const sendTestAlertService = async ({ whatsapp, email }) => {
+export const sendTestAlertService = async ({ name, whatsapp, email }) => {
   const cleanWhatsapp = (whatsapp || '').trim().replace(/[^0-9]/g, '');
   if (!cleanWhatsapp || cleanWhatsapp.length < 10) {
     throw new Error('Valid 10-digit WhatsApp number is required');
@@ -313,6 +315,7 @@ export const sendTestAlertService = async ({ whatsapp, email }) => {
     whatsapp: { $regex: cleanWhatsapp.slice(-10) }
   }).lean();
 
+  const candidateName = name || subscription?.name || 'Subba Reddy';
   const categories = subscription?.categories?.length ? subscription.categories : ['ap_state', 'central', 'banking'];
 
   // Query top active opportunities matching subscriber preferences
@@ -356,8 +359,9 @@ export const sendTestAlertService = async ({ whatsapp, email }) => {
     }
   ];
 
-  let bulletin = `🎯 *SkillVerse Daily Recruitment Bulletin* 🔔\n`;
-  bulletin += `Hello Candidate! Here is your verified job alerts digest:\n\n`;
+  let bulletin = `🎉 *HAAPPY CAREER JOURNEY, ${candidateName.toUpperCase()}!* 🚀\n`;
+  bulletin += `🎯 *SkillVerse Daily Recruitment Bulletin* 🔔\n`;
+  bulletin += `Hello ${candidateName}! We are HAAPPY to share today's verified job alerts with you:\n\n`;
 
   sampleJobs.forEach((job, idx) => {
     bulletin += `${idx + 1}️⃣ *${job.title}*\n`;
@@ -374,7 +378,7 @@ export const sendTestAlertService = async ({ whatsapp, email }) => {
 
   bulletin += `📍 *Track all 214 active government jobs & notifications live:*\n`;
   bulletin += `https://skillverse-app.com/careers?type=govt\n\n`;
-  bulletin += `_SkillVerse Alert Service • Verified Daily Updates._`;
+  bulletin += `_Wishing you a HAAPPY and Successful Career, ${candidateName}! • SkillVerse Alerts_`;
 
   const phoneWithCountry = cleanWhatsapp.length === 10 ? `91${cleanWhatsapp}` : cleanWhatsapp;
   const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneWithCountry}&text=${encodeURIComponent(bulletin)}`;
