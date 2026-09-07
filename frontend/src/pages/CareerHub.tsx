@@ -189,8 +189,8 @@ const typeColors: Record<string, string> = {
           </p>
         </div>
         <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Tab Switcher — 3 Sleek Tabs */}
-          <div className="flex items-center gap-1 bg-black/10 dark:bg-white/5 rounded-2xl p-1 border border-border/50 backdrop-blur-sm">
+          {/* Tab Switcher — 3 Sleek Tabs (100% Solid) */}
+          <div className="flex items-center gap-1 bg-white dark:bg-slate-900 rounded-2xl p-1 border border-border shadow-md">
             <button
               onClick={() => setActiveTab('jobs')}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
@@ -247,10 +247,8 @@ const typeColors: Record<string, string> = {
       </div>
 
       {/* Dynamic Know Your Role Career Guidance Matrix (Only visible under activeTab === 'guidance') */}
-      {/* Dynamic Know Your Role Career Guidance Matrix (Only visible under activeTab === 'guidance') */}
       {activeTab === 'guidance' && (
-        <div className="rounded-3xl border border-border/50 p-6 sm:p-8 mb-8 animate-reveal-up"
-          style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="rounded-3xl border border-border p-6 sm:p-8 mb-8 animate-reveal-up bg-white dark:bg-slate-900 shadow-xl">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border/40">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center shadow-lg shadow-violet-600/10">
@@ -316,7 +314,7 @@ const typeColors: Record<string, string> = {
                         setSelectedRole(null);
                         setGuidanceLevel('roles');
                       }}
-                      className="group rounded-2xl border border-border/50 bg-surface/80 hover:bg-surface p-6 transition-all duration-300 hover:border-violet-500/50 hover:shadow-[0_0_30px_rgba(124,58,237,0.15)] flex flex-col justify-between cursor-pointer"
+                      className="group rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 p-6 transition-all duration-300 hover:border-violet-500/50 shadow-md hover:shadow-xl flex flex-col justify-between cursor-pointer"
                     >
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-3">
@@ -409,7 +407,7 @@ const typeColors: Record<string, string> = {
                         setSelectedRole(role);
                         setGuidanceLevel('details');
                       }}
-                      className="group rounded-2xl border border-border/50 bg-surface/80 hover:bg-surface p-6 transition-all duration-300 hover:border-violet-500/50 hover:shadow-[0_0_30px_rgba(124,58,237,0.15)] flex flex-col justify-between cursor-pointer"
+                      className="group rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/80 p-6 transition-all duration-300 hover:border-violet-500/50 shadow-md hover:shadow-xl flex flex-col justify-between cursor-pointer"
                     >
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-3">
@@ -846,29 +844,28 @@ const typeColors: Record<string, string> = {
       {/* Govt Notifications Feed (Visible under activeTab === 'govt') */}
       {activeTab === 'govt' && (
         <div className="space-y-6 mb-12 animate-reveal-up">
-          {/* AP & All-India Govt Tracker Banner */}
-          <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 via-slate-900 to-teal-950/30 backdrop-blur-xl">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          {/* AP & All-India Govt Tracker Banner - 100% Solid Opaque */}
+          <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border-2 border-emerald-600/40 bg-slate-900 text-white shadow-2xl">
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
               <div className="space-y-2 max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-extrabold uppercase tracking-wider">
                   <Landmark className="w-3.5 h-3.5 text-emerald-400" />
                   Official Govt Recruitment Tracker (AP & Central)
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
                   Verified Government Job Notifications
                 </h2>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-slate-300 leading-relaxed font-normal">
                   Real-time recruitment notices from APPSC, AP Police, AP Mega DSC, Sachivalayam, UPSC, SSC, Railways & Public Sector Undertakings. Directly linked to official gazettes and application portals.
                 </p>
-                <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+                <div className="flex flex-wrap items-center gap-4 pt-2 text-xs">
+                  <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
                     <ShieldCheck className="w-4 h-4 text-emerald-400" /> 100% Official Portals Only
                   </span>
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-1.5 text-cyan-300 font-semibold">
                     <RefreshCw className="w-3.5 h-3.5 text-cyan-400" /> Daily Auto-Refresh & TTL Expiry
                   </span>
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-1.5 text-amber-300 font-semibold">
                     <Bell className="w-3.5 h-3.5 text-amber-400" /> WhatsApp & Gmail Alert Ready
                   </span>
                 </div>
@@ -877,7 +874,7 @@ const typeColors: Record<string, string> = {
               <div className="flex flex-col sm:flex-row lg:flex-col gap-3 flex-shrink-0">
                 <button
                   onClick={() => setAlertsModalOpen(true)}
-                  className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition hover:scale-[1.02]"
+                  className="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/40 flex items-center justify-center gap-2 transition hover:scale-[1.02]"
                 >
                   <Bell className="w-4 h-4 animate-bounce" />
                   <span>Get WhatsApp & Gmail Alerts</span>
@@ -886,7 +883,7 @@ const typeColors: Record<string, string> = {
                   href="https://psc.ap.gov.in"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2.5 rounded-2xl border border-border/60 hover:border-emerald-500/40 bg-black/20 hover:bg-emerald-500/10 text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 transition"
+                  className="px-4 py-2.5 rounded-2xl border border-slate-700 bg-slate-800/90 hover:bg-slate-800 text-xs font-bold text-slate-200 hover:text-white flex items-center justify-center gap-2 transition"
                 >
                   <span>Visit APPSC Official Portal</span>
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -895,17 +892,17 @@ const typeColors: Record<string, string> = {
             </div>
           </div>
 
-          {/* Search and Category Filter Bar */}
-          <div className="rounded-2xl border border-border/50 p-4 sm:p-5 space-y-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+          {/* Search and Category Filter Bar - 100% Solid Opaque */}
+          <div className="rounded-2xl border border-border p-4 sm:p-5 space-y-4 bg-white dark:bg-slate-900 shadow-md">
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
               <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 <input
                   type="text"
                   placeholder="Search APPSC, Group 2, Police, SSC, B.Tech, Degree..."
                   value={govtSearch}
                   onChange={(e) => setGovtSearch(e.target.value)}
-                  className="premium-input pl-10 pr-9 w-full"
+                  className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-border bg-slate-50 dark:bg-slate-800 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-sm font-medium transition"
                 />
                 {govtSearch && (
                   <button
@@ -922,15 +919,15 @@ const typeColors: Record<string, string> = {
             </div>
 
             {/* Category Filter Chips */}
-            <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/40">
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
               {govtJobCategories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setGovtCategory(cat.id)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 ${
                     govtCategory === cat.id
-                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm shadow-emerald-600/30 scale-[1.02]'
-                      : 'bg-muted/15 text-muted-foreground hover:text-foreground hover:bg-muted/25 border border-border/40'
+                      ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 scale-[1.02]'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                   }`}
                 >
                   {cat.label}
@@ -939,64 +936,65 @@ const typeColors: Record<string, string> = {
             </div>
           </div>
 
-          {/* Govt Notifications Cards Grid */}
+          {/* Govt Notifications Cards Grid - 100% Solid Opaque */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredGovtJobs.map((job) => {
               const isAp = job.category === 'ap_state';
               return (
                 <div
                   key={job.id}
-                  className="rounded-3xl border border-border/60 hover:border-emerald-500/40 p-5 sm:p-6 transition-all duration-200 flex flex-col justify-between hover:shadow-xl hover:shadow-emerald-950/20 group relative overflow-hidden"
-                  style={{ background: 'rgba(255,255,255,0.015)' }}
+                  className="rounded-3xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 transition-all duration-200 flex flex-col justify-between shadow-lg hover:shadow-2xl hover:border-emerald-500 dark:hover:border-emerald-500 group relative overflow-hidden"
                 >
-                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${isAp ? 'from-emerald-500 to-teal-400' : 'from-blue-500 to-indigo-500'}`} />
+                  <div className={`absolute top-0 left-0 right-0 h-1.5 ${isAp ? 'bg-emerald-500' : 'bg-blue-600'}`} />
 
                   <div>
                     {/* Top Row: Department + State/Central Tag + Last Date */}
-                    <div className="flex items-start justify-between gap-2 mb-3">
+                    <div className="flex items-start justify-between gap-2 mb-3 pt-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider ${
-                          isAp ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' : 'bg-blue-500/15 text-blue-400 border border-blue-500/20'
+                        <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${
+                          isAp
+                            ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
+                            : 'bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800'
                         }`}>
                           {job.department}
                         </span>
-                        <span className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-muted-foreground/70" />
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-slate-400" />
                           {job.location}
                         </span>
                       </div>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 dark:bg-amber-950/90 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 whitespace-nowrap shadow-sm">
                         ⏳ {job.lastDate}
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-base font-bold text-foreground leading-snug group-hover:text-emerald-400 transition-colors mb-3">
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors mb-3">
                       {job.title}
                     </h3>
 
                     {/* Meta Info Grid */}
-                    <div className="grid grid-cols-2 gap-2 text-xs py-3 my-2 border-y border-border/40">
-                      <div className="bg-muted/10 p-2.5 rounded-xl border border-border/30">
-                        <span className="text-[10px] text-muted-foreground uppercase font-semibold block">Total Posts</span>
-                        <span className="font-extrabold text-foreground text-xs sm:text-sm text-emerald-400">{job.vacancies}</span>
+                    <div className="grid grid-cols-2 gap-2 text-xs py-3 my-2 border-y border-slate-200 dark:border-slate-800">
+                      <div className="bg-slate-50 dark:bg-slate-800/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold block">Total Posts</span>
+                        <span className="font-black text-emerald-600 dark:text-emerald-400 text-sm sm:text-base">{job.vacancies}</span>
                       </div>
-                      <div className="bg-muted/10 p-2.5 rounded-xl border border-border/30">
-                        <span className="text-[10px] text-muted-foreground uppercase font-semibold block">Salary Scale</span>
-                        <span className="font-bold text-foreground text-[11px] truncate block" title={job.salaryScale}>{job.salaryScale}</span>
+                      <div className="bg-slate-50 dark:bg-slate-800/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold block">Salary Scale</span>
+                        <span className="font-bold text-slate-800 dark:text-slate-200 text-xs truncate block" title={job.salaryScale}>{job.salaryScale}</span>
                       </div>
-                      <div className="bg-muted/10 p-2.5 rounded-xl border border-border/30 col-span-2">
-                        <span className="text-[10px] text-muted-foreground uppercase font-semibold block">Qualification Required</span>
-                        <span className="font-medium text-foreground text-xs leading-relaxed">{job.qualification}</span>
+                      <div className="bg-slate-50 dark:bg-slate-800/90 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 col-span-2">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold block">Qualification Required</span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs leading-relaxed">{job.qualification}</span>
                       </div>
                     </div>
 
                     {/* Age Limit & Tags */}
-                    <div className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground mt-2 mb-4">
-                      <span>🎂 Age: <b className="text-foreground">{job.ageLimit}</b></span>
+                    <div className="flex items-center justify-between gap-2 text-[11px] text-slate-600 dark:text-slate-400 mt-2 mb-4">
+                      <span>🎂 Age: <b className="text-slate-900 dark:text-white font-bold">{job.ageLimit}</b></span>
                       <div className="flex gap-1">
                         {job.tags.slice(0, 2).map((t, idx) => (
-                          <span key={idx} className="text-[10px] px-1.5 py-0.5 rounded bg-muted/20 text-muted-foreground">
+                          <span key={idx} className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 font-medium">
                             #{t}
                           </span>
                         ))}
@@ -1005,12 +1003,12 @@ const typeColors: Record<string, string> = {
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-3 border-t border-border/40 flex items-center gap-2">
+                  <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center gap-2">
                     <a
                       href={job.officialApplyLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-md shadow-emerald-600/30 flex items-center justify-center gap-1.5 transition"
                     >
                       <span>Apply Official</span>
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -1020,10 +1018,10 @@ const typeColors: Record<string, string> = {
                         href={job.notificationPdfLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="py-2.5 px-3 rounded-xl border border-border/60 hover:border-emerald-500/40 bg-muted/10 hover:bg-muted/20 text-muted-foreground hover:text-foreground text-xs font-semibold flex items-center gap-1 transition"
+                        className="py-2.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1 transition shadow-sm"
                         title="Official Gazette / PDF"
                       >
-                        <FileText className="w-3.5 h-3.5" />
+                        <FileText className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                         <span className="hidden sm:inline">Notice</span>
                       </a>
                     )}
@@ -1031,7 +1029,7 @@ const typeColors: Record<string, string> = {
                       href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`📢 *Govt Job Alert:* ${job.title}\n👥 Posts: ${job.vacancies}\n🎓 Qualification: ${job.qualification}\n⏳ Last Date: ${job.lastDate}\n👉 Apply: ${job.officialApplyLink}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="py-2.5 px-2.5 rounded-xl border border-border/60 hover:border-emerald-500/40 bg-muted/10 hover:bg-emerald-500/15 text-emerald-400 text-xs transition"
+                      className="py-2.5 px-2.5 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition shadow-sm"
                       title="Share to WhatsApp"
                     >
                       <Send className="w-3.5 h-3.5" />
@@ -1042,9 +1040,9 @@ const typeColors: Record<string, string> = {
             })}
 
             {filteredGovtJobs.length === 0 && (
-              <div className="col-span-full text-center py-16 rounded-3xl border border-border/50 bg-muted/5">
+              <div className="col-span-full text-center py-16 rounded-3xl border border-border bg-white dark:bg-slate-900 shadow-md">
                 <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
-                  <Landmark className="w-6 h-6 text-emerald-400" />
+                  <Landmark className="w-6 h-6 text-emerald-500" />
                 </div>
                 <h3 className="font-bold text-foreground mb-1.5 text-base">No government notifications match your filter</h3>
                 <p className="text-xs text-muted-foreground mb-4">Try clearing the search query or switching to 'All Notifications'</p>
@@ -1060,19 +1058,18 @@ const typeColors: Record<string, string> = {
         </div>
       )}
 
-      {/* Filters (Only visible under activeTab === 'jobs') */}
+      {/* Filters (Only visible under activeTab === 'jobs') - 100% Solid Opaque */}
       {activeTab === 'jobs' && (
-        <div className="rounded-2xl border border-border/50 p-5 mb-6 animate-reveal-up delay-100"
-          style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <div className="rounded-2xl border border-border p-5 mb-6 animate-reveal-up delay-100 bg-white dark:bg-slate-900 shadow-md">
           <div className="grid sm:grid-cols-3 gap-3">
             <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/60 pointer-events-none" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <input placeholder="Search title, company, skills..." value={searchQuery}
                 onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                className="premium-input pl-10" />
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-slate-50 dark:bg-slate-800 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-500/50 text-sm font-medium transition" />
             </div>
             <Select value={locationFilter} onValueChange={(v) => { setLocationFilter(v); setCurrentPage(1); }}>
-              <SelectTrigger className="premium-input h-auto">
+              <SelectTrigger className="premium-input h-auto bg-slate-50 dark:bg-slate-800 border-border">
                 <SelectValue placeholder="Location" />
               </SelectTrigger>
               <SelectContent style={{ background: 'hsl(230,25%,8%)', border: '1px solid hsl(230,20%,14%)' }}>
@@ -1084,7 +1081,7 @@ const typeColors: Record<string, string> = {
               </SelectContent>
             </Select>
             <Select value={typeFilter} onValueChange={(v) => { setTypeFilter(v); setCurrentPage(1); }}>
-              <SelectTrigger className="premium-input h-auto">
+              <SelectTrigger className="premium-input h-auto bg-slate-50 dark:bg-slate-800 border-border">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
               <SelectContent style={{ background: 'hsl(230,25%,8%)', border: '1px solid hsl(230,20%,14%)' }}>
@@ -1134,7 +1131,7 @@ const typeColors: Record<string, string> = {
             <>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {paginatedOpportunities.map((opp: any, i: number) => (
-                  <div key={opp._id || i} className="premium-card bg-white/95 dark:bg-slate-900/95 border border-border/70 rounded-2xl shadow-md hover:shadow-xl hover:border-violet-500/40 transition-all duration-300 flex flex-col h-full animate-reveal-up"
+                  <div key={opp._id || i} className="premium-card bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl shadow-lg hover:shadow-2xl hover:border-violet-500/50 transition-all duration-300 flex flex-col h-full animate-reveal-up"
                     style={{ animationDelay: `${i * 0.05}s` }}>
                     <div className="p-6 flex flex-col flex-grow">
                       <div className="flex items-center justify-between gap-2 mb-3">
